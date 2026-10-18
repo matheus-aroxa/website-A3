@@ -1,0 +1,888 @@
+/* ---------- Topo: migalhas + galeria ---------- */
+
+.topo {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-top: 20px;
+}
+
+/* ---------- Layout: conteúdo + lateral ---------- */
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 380px);
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    'cabecalho lateral'
+    'conteudo lateral';
+  gap: 40px 56px;
+  align-items: start;
+  padding-top: 36px;
+  padding-bottom: 96px;
+}
+
+.cabecalhoImovel {
+  grid-area: cabecalho;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.lateral {
+  grid-area: lateral;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.conteudo {
+  grid-area: conteudo;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  min-width: 0;
+}
+
+.etiquetas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tituloLinha {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.tituloTexto {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.tituloTexto h1 {
+  font-size: clamp(36px, 4.4vw, 60px);
+  line-height: 0.98;
+  font-weight: 800;
+  font-stretch: 118%;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.tituloTexto p {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  color: var(--texto-3);
+}
+
+.tituloTexto p svg {
+  flex: none;
+}
+
+.compartilhar {
+  flex: none;
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 14px !important;
+}
+
+/* ---------- Preço ---------- */
+
+.preco {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 26px;
+  border-radius: 24px;
+  background: var(--mar);
+  color: #fff;
+}
+
+.preco > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.preco > div:first-child > span {
+  font-size: 14px;
+  color: var(--mar-texto);
+}
+
+.preco strong {
+  font-size: 44px;
+  line-height: 1;
+  font-weight: 800;
+  font-stretch: 112%;
+  letter-spacing: -0.025em;
+  font-variant-numeric: tabular-nums;
+}
+
+.preco small {
+  margin-top: 6px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--mar-texto);
+}
+
+.precoAcoes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
+  gap: 8px;
+}
+
+.botaoClaro {
+  background: transparent;
+  color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+
+/* ---------- Contato (abas) ---------- */
+
+.contato {
+  scroll-margin-top: calc(var(--altura-cabecalho) + 16px);
+}
+
+.cartaoContato {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 22px;
+  border: 1px solid var(--borda-2);
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 24px 48px -36px rgba(14, 31, 29, 0.35);
+}
+
+.cartaoContato :global(.segmentado) button {
+  height: 46px;
+}
+
+.ancora {
+  position: absolute;
+  top: 0;
+  scroll-margin-top: calc(var(--altura-cabecalho) + 16px);
+}
+
+.agendaGrupo {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.agendaGrupo legend {
+  padding: 0;
+  margin-bottom: 4px;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.agendaGrupo p {
+  margin-top: -6px;
+  font-size: 14px;
+  color: var(--texto-2);
+}
+
+.legendaSuave {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: var(--texto-3);
+}
+
+.dias {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.dias button {
+  height: 52px;
+  padding: 0;
+}
+
+.horas {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.horas button {
+  padding: 0;
+}
+
+.periodo {
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--texto-2);
+}
+
+.resumoAgenda {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--mar-claro);
+  font-size: 14px;
+  line-height: 1.5;
+  color: #1f2f2c;
+}
+
+.resumoAgenda svg {
+  flex: none;
+  color: var(--mar);
+}
+
+.canais {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 15px;
+}
+
+.canais label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  cursor: pointer;
+}
+
+.canais input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--mar);
+}
+
+/* ---------- Ficha rápida ---------- */
+
+.ficha {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(160px, 100%), 1fr));
+  gap: 12px;
+}
+
+.ficha li {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px;
+  border-radius: 16px;
+  background: var(--fundo-3);
+}
+
+.ficha li > svg {
+  color: var(--mar);
+}
+
+.ficha li > span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13px;
+  color: var(--texto-2);
+}
+
+.ficha strong {
+  font-size: 18px;
+  color: var(--tinta);
+}
+
+.rotuloCurto {
+  display: none;
+}
+
+/* ---------- Seções ---------- */
+
+.secao {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-top: 36px;
+  border-top: 1px solid var(--borda);
+}
+
+.secaoTitulo {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.secaoTitulo span {
+  font-size: 15px;
+  color: var(--texto-2);
+}
+
+.etapas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(140px, 100%), 1fr));
+  gap: 8px;
+}
+
+.etapas li {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.barraEtapa {
+  height: 6px;
+  border-radius: 999px;
+  background: #d3ddd9;
+}
+
+.etapas li:not([data-estado='futura']) .barraEtapa {
+  background: var(--mar);
+}
+
+.rotuloEtapa {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  color: var(--texto-2);
+}
+
+.etapas li[data-estado='feita'] .rotuloEtapa {
+  font-weight: 600;
+  color: var(--texto-3);
+}
+
+.etapas li[data-estado='atual'] .rotuloEtapa {
+  font-weight: 800;
+  color: var(--tinta);
+}
+
+.marcador {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 2px solid #a9b8b3;
+  color: var(--mar);
+}
+
+.etapas li[data-estado='feita'] .marcador {
+  border: 0;
+}
+
+.etapas li[data-estado='atual'] .marcador {
+  border: 5px solid var(--mar);
+  background: #fff;
+}
+
+.texto {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.texto p {
+  max-width: 760px;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--texto-4);
+}
+
+/* Plantas */
+
+.plantas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(190px, 100%), 1fr));
+  gap: 14px;
+}
+
+.planta {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--borda-2);
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.plantaImagem {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: #fafaf7;
+  border-bottom: 1px solid var(--borda-3);
+}
+
+.plantaImagem img {
+  object-fit: contain;
+}
+
+.planta figcaption {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  font-size: 14px;
+  color: var(--texto-2);
+}
+
+.planta figcaption strong {
+  font-size: 16px;
+  color: var(--tinta);
+}
+
+.seletorPlantas {
+  display: none !important;
+}
+
+.notaPlantas {
+  margin-top: -6px;
+  font-size: 12px;
+  color: var(--texto-2);
+}
+
+/* Lazer */
+
+.lazer {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+  gap: 14px 24px;
+  font-size: 16px;
+}
+
+.lazer li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lazer li > span {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--mar-claro);
+  color: var(--mar);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.botaoLazer {
+  display: none;
+}
+
+/* Localização */
+
+.enderecoLinha {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.enderecoLinha address {
+  font-style: normal;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.enderecoLinha strong {
+  font-size: 17px;
+}
+
+.enderecoLinha span {
+  font-size: 15px;
+  color: var(--texto-2);
+}
+
+.abrirMapa {
+  font-size: 14px;
+}
+
+.mapa {
+  height: 360px;
+  border-radius: 22px;
+}
+
+.proximidades {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.proximidades > span {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.proximidades ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.proximidades li {
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: var(--fundo-3);
+}
+
+/* Ficha técnica */
+
+.fichaTecnica {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  gap: 0 32px;
+  font-size: 16px;
+}
+
+.fichaTecnica div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--borda-3);
+}
+
+.fichaTecnica dt {
+  color: var(--texto-2);
+}
+
+.fichaTecnica dd {
+  font-weight: 600;
+  text-align: right;
+}
+
+/* ---------- Semelhantes ---------- */
+
+.semelhantes {
+  background: var(--fundo-2);
+  padding: 88px 0 104px;
+}
+
+.semelhantesTopo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+}
+
+.semelhantesTopo h2 {
+  font-size: clamp(28px, 3vw, 40px);
+  line-height: 1.05;
+  font-weight: 800;
+  font-stretch: 115%;
+  letter-spacing: -0.025em;
+}
+
+.gradeSemelhantes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+  gap: 24px;
+}
+
+.barraInferior {
+  display: none;
+}
+
+/* ---------- Tablet: uma coluna, preço logo após o título ---------- */
+
+@media (max-width: 1023px) {
+  .layout {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 32px;
+  }
+  .lateral {
+    display: contents;
+  }
+  .cabecalhoImovel {
+    order: 1;
+  }
+  .preco {
+    order: 2;
+  }
+  .conteudo {
+    order: 3;
+  }
+  .contato {
+    order: 4;
+  }
+}
+
+/* ---------- Celular (protótipo 390px) ---------- */
+
+@media (max-width: 767px) {
+  .topo {
+    padding-top: 0;
+  }
+  .migalhas {
+    display: none;
+  }
+  .galeriaMargem {
+    margin-inline: calc(var(--margem) * -1);
+  }
+
+  .layout {
+    gap: 16px;
+    padding-top: 20px;
+    padding-bottom: 8px;
+  }
+  .cabecalhoImovel {
+    gap: 12px;
+  }
+  .etiquetas {
+    gap: 6px;
+  }
+  .tituloTexto h1 {
+    font-size: 36px;
+    line-height: 1;
+    font-stretch: 115%;
+  }
+  .tituloTexto p {
+    font-size: 16px;
+    line-height: 1.45;
+  }
+  .tituloTexto p svg,
+  .compartilhar {
+    display: none !important;
+  }
+
+  .preco {
+    gap: 4px;
+    padding: 20px;
+    border-radius: 20px;
+  }
+  .preco strong {
+    font-size: 38px;
+  }
+  .precoAcoes {
+    display: none;
+  }
+
+  .conteudo {
+    gap: 0;
+  }
+  .ficha {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .ficha li {
+    gap: 2px;
+    padding: 14px;
+    border-radius: 14px;
+  }
+  .ficha li > svg {
+    display: none;
+  }
+  .ficha li > span {
+    font-size: 12px;
+  }
+  .ficha strong {
+    font-size: 16px;
+  }
+  .rotuloLongo {
+    display: none;
+  }
+  .rotuloCurto {
+    display: inline;
+  }
+
+  .secao {
+    gap: 14px;
+    padding-top: 28px;
+    border-top: 0;
+  }
+  .secaoTitulo span {
+    display: none;
+  }
+  .etapas {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .etapas li {
+    gap: 8px;
+  }
+  .rotuloEtapa {
+    font-size: 12px;
+    line-height: 1.25;
+  }
+  .marcador {
+    display: none;
+  }
+  .texto {
+    gap: 12px;
+  }
+  .texto p {
+    font-size: 16px;
+    line-height: 1.65;
+  }
+
+  .plantas {
+    grid-template-columns: 1fr;
+  }
+  .planta:not([data-selecionada]) {
+    display: none;
+  }
+  .plantaImagem {
+    aspect-ratio: auto;
+    height: 250px;
+  }
+  .planta figcaption {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px;
+  }
+  .seletorPlantas {
+    display: flex !important;
+    gap: 8px !important;
+    padding-bottom: 8px !important;
+  }
+  .seletorPlantas > button {
+    width: auto !important;
+    min-height: 52px;
+    padding: 6px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 1px;
+    text-align: left;
+    border-radius: 12px;
+  }
+  .seletorPlantas strong {
+    font-size: 14px;
+  }
+  .seletorPlantas span {
+    font-size: 12px;
+    font-weight: 500;
+    opacity: 0.85;
+  }
+  .notaPlantas {
+    margin-top: 0;
+  }
+
+  .lazer {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    font-size: 15px;
+  }
+  .lazer li > span {
+    width: 26px;
+    height: 26px;
+  }
+  .lazer:not([data-aberto]) li:nth-child(n + 9) {
+    display: none;
+  }
+  .botaoLazer {
+    display: inline-flex;
+  }
+
+  .enderecoLinha {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .enderecoLinha strong {
+    font-size: 16px;
+  }
+  .abrirMapa {
+    order: 2;
+    height: 48px;
+    font-size: 15px;
+  }
+  .mapa {
+    height: 210px;
+    border-radius: 18px;
+  }
+
+  .fichaTecnica {
+    font-size: 15px;
+  }
+  .fichaTecnica div {
+    padding: 12px 0;
+  }
+
+  .contato {
+    margin-top: 16px;
+  }
+  .cartaoContato {
+    gap: 18px;
+    padding: 16px;
+    border: 0;
+    border-radius: 22px;
+    background: var(--fundo-3);
+    box-shadow: none;
+  }
+  .cartaoContato :global(.segmentado) {
+    background: #e1e9e6;
+  }
+  .cartaoContato :global(.segmentado) button {
+    font-size: 14px;
+  }
+  .dias button {
+    height: 48px;
+  }
+
+  .semelhantes {
+    padding: 40px 0 32px;
+    background: #fff;
+  }
+  .semelhantesTopo {
+    margin-bottom: 14px;
+  }
+  .semelhantesTopo h2 {
+    font-size: 22px;
+  }
+  .semelhantesTopo :global(.link-texto) {
+    display: none;
+  }
+
+  .barraInferior {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 30;
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 10px;
+    padding: 12px 16px calc(16px + env(safe-area-inset-bottom));
+    background: #fff;
+    border-top: 1px solid var(--borda);
+    box-shadow: 0 -12px 24px -16px rgba(14, 31, 29, 0.3);
+  }
+  .barraInferior :global(.btn) {
+    height: 52px;
+  }
+}

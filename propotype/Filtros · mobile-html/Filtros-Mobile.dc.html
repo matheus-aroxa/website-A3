@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Filtros · mobile | A3 Soluções Imobiliárias</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&amp;display=swap">
+<style>
+body{margin:0;background:#08302C}
+*{box-sizing:border-box}
+a{color:#0B4A44}a:hover{color:#08332F}
+input,select,textarea,button{font:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid #8EE07A;outline-offset:2px}
+.scroller{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 16px 10px;scrollbar-width:none}
+.scroller::-webkit-scrollbar{display:none}
+.scroller > *{scroll-snap-align:start;flex:none}
+.flink{color:inherit;text-decoration:none}
+.mlink{color:#0E1F1D;text-decoration:none}
+.field{width:100%;height:52px;border:1px solid #C4D1CC;border-radius:12px;background:#FFFFFF;padding:0 14px;font-size:16px;color:#0E1F1D;appearance:none;-webkit-appearance:none}
+.field:focus{border-color:#0B4A44;outline:none;box-shadow:0 0 0 3px rgba(11,74,68,.18)}
+textarea.field{height:auto;padding:12px 14px;resize:vertical}
+</style>
+</helmet>
+<div style="width: 390px; min-height: 100vh; font-family: 'Archivo', system-ui, sans-serif; color: #0E1F1D; background: #F3F6F5; position: relative">
+<sc-if value="{{listaVisivel}}" hint-placeholder-val="{{ true }}">
+<header style="position: sticky; top: 0; z-index: 20; height: 64px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E1E8E5; background: #FFFFFF">
+<a href="Inicio-Mobile.dc.html" aria-label="A3 Soluções Imobiliárias, página inicial" style="display: flex; align-items: center; text-decoration: none">
+<img src="./assets/8b437510b7c58ab196dc122487c39490.png" alt="A3 Soluções Imobiliárias" style="height: 36px; width: auto; display: block">
+</a>
+<div style="display: flex; gap: 8px">
+<a href="https://wa.me/5581991483731" style="height: 44px; padding: 0 14px; border-radius: 999px; background: {{sol}}; color: #0E1F1D; display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 14px; text-decoration: none; white-space: nowrap">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 0 1-11.6 7.1L4 20l1-4.2A8 8 0 1 1 20 12z"></path></svg>
+Fale conosco
+</a>
+<button type="button" onClick="{{abrirMenu}}" aria-label="Abrir menu" aria-expanded="{{menuAberto}}" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #D3DDD9; background: #FFFFFF; color: #0E1F1D; display: flex; align-items: center; justify-content: center">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+</button>
+</div>
+</header>
+
+<sc-if value="{{menuAberto}}" hint-placeholder-val="{{ false }}">
+<div onClick="{{fecharMenu}}" style="position: fixed; inset: 0; z-index: 50; background: rgba(8, 48, 44, 0.55)"></div>
+<nav aria-label="Menu" style="position: fixed; top: 0; left: 0; right: 0; z-index: 51; background: #FFFFFF; border-radius: 0 0 26px 26px; padding: 0 16px 24px; display: flex; flex-direction: column; box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.45)">
+<div style="height: 64px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E1E8E5; margin: 0 -16px; padding: 0 16px">
+<img src="./assets/8b437510b7c58ab196dc122487c39490.png" alt="A3 Soluções Imobiliárias" style="height: 36px; width: auto; display: block">
+<button type="button" onClick="{{fecharMenu}}" aria-label="Fechar menu" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #D3DDD9; background: #FFFFFF; color: #0E1F1D; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+</div>
+<div style="display: flex; flex-direction: column; padding-top: 6px">
+<a class="mlink" href="Busca-Mobile.dc.html" onClick="{{fecharMenu}}" aria-current="page" style="min-height: 56px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E6ECEA; font-size: 22px; font-weight: 800; font-stretch: 112%; letter-spacing: -0.01em">Imóveis<span style="color: #8A9A96"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
+<a class="mlink" href="Inicio-Mobile.dc.html#m-servicos" onClick="{{fecharMenu}}" style="min-height: 56px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E6ECEA; font-size: 22px; font-weight: 700; font-stretch: 112%; letter-spacing: -0.01em">Serviços<span style="color: #8A9A96"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
+<a class="mlink" href="Inicio-Mobile.dc.html#m-anunciar" onClick="{{fecharMenu}}" style="min-height: 56px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E6ECEA; font-size: 22px; font-weight: 700; font-stretch: 112%; letter-spacing: -0.01em">Anunciar<span style="color: #8A9A96"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
+<a class="mlink" href="Inicio-Mobile.dc.html#m-quem" onClick="{{fecharMenu}}" style="min-height: 56px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E6ECEA; font-size: 22px; font-weight: 700; font-stretch: 112%; letter-spacing: -0.01em">Sobre nós<span style="color: #8A9A96"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
+<a class="mlink" href="Inicio-Mobile.dc.html#m-contato" onClick="{{fecharMenu}}" style="min-height: 56px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E6ECEA; font-size: 22px; font-weight: 700; font-stretch: 112%; letter-spacing: -0.01em">Contato<span style="color: #8A9A96"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
+</div>
+<a href="https://wa.me/5581991483731" style="margin-top: 20px; height: 54px; border-radius: 999px; background: {{sol}}; color: #0E1F1D; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 16px; text-decoration: none"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 0 1-11.6 7.1L4 20l1-4.2A8 8 0 1 1 20 12z"></path></svg>Fale conosco</a>
+<span style="margin-top: 14px; font-size: 13px; color: #4B5B58; text-align: center">CRECI 18568PJ</span>
+</nav>
+</sc-if>
+
+<main>
+<section style="background: #FFFFFF; border-bottom: 1px solid #E1E8E5; padding: 16px 16px 18px; display: flex; flex-direction: column; gap: 14px">
+<nav aria-label="Você está em">
+<ol style="list-style: none; margin: 0; padding: 0; display: flex; gap: 8px; font-size: 13px; color: #4B5B58">
+<li><a href="Inicio-Mobile.dc.html" style="color: #4B5B58; text-decoration: none">Início</a></li>
+<li aria-hidden="true">›</li>
+<li aria-current="page" style="color: #0E1F1D; font-weight: 600">{{migalha}}</li>
+</ol>
+</nav>
+<h1 style="margin: 0; font-size: 28px; line-height: 1.08; font-weight: 800; font-stretch: 115%; letter-spacing: -0.025em">{{titulo}}</h1>
+<p style="margin: 0; font-size: 15px; line-height: 1.5; color: #4B5B58">{{subtitulo}}</p>
+<label style="position: relative; display: block">
+<span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Buscar por bairro, empreendimento ou código</span>
+<span style="position: absolute; left: 14px; top: 16px; pointer-events: none; color: #4B5B58"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg></span>
+<input class="field" type="search" value="{{busca}}" onChange="{{setBusca}}" placeholder="Bairro, empreendimento ou código" style="padding-left: 46px; background: #F7FAF9">
+</label>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<button type="button" onClick="{{abrirFiltros}}" style="height: 52px; border-radius: 12px; border: 2px solid {{mar}}; background: #FFFFFF; color: #0E1F1D; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 700; font-size: 15px">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"></path><circle cx="16" cy="6" r="2"></circle><circle cx="10" cy="12" r="2"></circle><circle cx="18" cy="18" r="2"></circle></svg>
+Filtros
+<sc-if value="{{temAtivos}}" hint-placeholder-val="{{ false }}"><span style="min-width: 24px; height: 24px; padding: 0 7px; border-radius: 999px; background: {{mar}}; color: #FFFFFF; font-size: 13px; display: flex; align-items: center; justify-content: center">{{nAtivos}}</span></sc-if>
+</button>
+<label style="position: relative; display: block">
+<span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Ordenar por</span>
+<span style="position: relative; display: block"><select class="field" value="{{ordem}}" onChange="{{setOrdem}}" style="font-weight: 600; font-size: 15px"><option value="recentes">Mais recentes</option><option value="area">Maior área</option><option value="quartos">Mais quartos</option></select><span style="position: absolute; right: 12px; top: 16px; pointer-events: none; color: #4B5B58"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></span></span>
+</label>
+</div>
+</section>
+
+<div style="padding: 16px 0 4px; display: flex; flex-direction: column; gap: 10px">
+<p style="margin: 0; padding: 0 16px; font-size: 15px; color: #3E4E4B"><strong style="color: #0E1F1D">{{totalTxt}}</strong></p>
+<sc-if value="{{temAtivos}}" hint-placeholder-val="{{ false }}">
+<div class="scroller" style="gap: 8px; padding-bottom: 4px">
+<sc-for list="{{ativos}}" as="a" hint-placeholder-count="2">
+<button type="button" onClick="{{a.remove}}" aria-label="Remover filtro {{a.label}}" style="height: 40px; padding: 0 10px 0 14px; border-radius: 999px; border: 1px solid {{mar}}; background: #FFFFFF; color: #0E1F1D; display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; white-space: nowrap">{{a.label}} <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+</sc-for>
+<button type="button" onClick="{{limpar}}" style="height: 40px; padding: 0 8px; border: none; background: none; color: {{mar}}; font-weight: 700; font-size: 14px; text-decoration: underline; text-underline-offset: 4px; white-space: nowrap">Limpar tudo</button>
+</div>
+</sc-if>
+</div>
+
+<section aria-label="Resultados" style="padding: 12px 16px 40px; display: flex; flex-direction: column; gap: 16px; background: #F3F6F5">
+<sc-for list="{{lista}}" as="it" hint-placeholder-count="6">
+<article style="position: relative; display: flex; flex-direction: column; background: #FFFFFF; border: 1px solid #DCE4E1; border-radius: 20px; overflow: hidden">
+<a href="Empreendimento-Mobile.dc.html" aria-label="Ver {{it.nome}}" style="position: relative; display: block; height: 200px; overflow: hidden; background: #D6E5E0">
+<img src="{{it.img}}" alt="Perspectiva ilustrada do {{it.nome}}" style="width: 100%; height: 100%; object-fit: cover; display: block">
+<span style="position: absolute; top: 12px; left: 12px; padding: 6px 11px; border-radius: 999px; font-size: 12px; font-weight: 700; background: {{it.tagBg}}; color: {{it.tagFg}}; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12)">{{it.situacao}}</span>
+</a>
+<div style="padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 8px; flex: 1">
+<span style="font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4B5B58">{{it.tipo}}</span>
+<h3 style="margin: 0; font-size: 21px; line-height: 1.12; font-weight: 800; font-stretch: 112%"><a href="Empreendimento-Mobile.dc.html" style="color: #0E1F1D; text-decoration: none">{{it.nome}}</a></h3>
+<span style="display: flex; align-items: center; gap: 6px; font-size: 14px; color: #4B5B58"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z"></path><circle cx="12" cy="9.5" r="2.5"></circle></svg>{{it.local}}</span>
+<ul style="list-style: none; margin: 2px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; color: #2E3D3A">
+<li style="display: flex; align-items: center; gap: 5px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8V3h5M21 16v5h-5M3 3l7 7M21 21l-7-7"></path></svg>{{it.area}}</li>
+<li style="display: flex; align-items: center; gap: 5px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 19V6"></path><path d="M3 13h18v6"></path><path d="M21 13a3 3 0 0 0-3-3h-7v3"></path><circle cx="7" cy="10" r="1.6"></circle></svg>{{it.quartos}}</li>
+<li style="display: flex; align-items: center; gap: 5px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"></path><path d="M6 12V6a2 2 0 0 1 3.5-1.3"></path><path d="M7 19l-1 2M17 19l1 2"></path></svg>{{it.banheiros}}</li>
+<li style="display: flex; align-items: center; gap: 5px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 17v-5l2.2-5.2A1.5 1.5 0 0 1 7.6 6h8.8a1.5 1.5 0 0 1 1.4.8L20 12v5z"></path><path d="M4 12h16"></path><path d="M6 17v2M18 17v2"></path></svg>{{it.vagasLabel}}</li>
+</ul>
+<div style="margin-top: auto; padding-top: 12px; border-top: 1px solid #E6ECEA; display: flex; justify-content: space-between; align-items: flex-end; gap: 10px">
+<span style="display: flex; flex-direction: column"><span style="font-size: 12px; color: #4B5B58">{{it.precoLabel}}</span><strong style="font-size: 22px; font-stretch: 108%; font-variant-numeric: tabular-nums">{{it.precoTxt}}</strong></span>
+<span style="font-size: 12px; color: #4B5B58; text-align: right">{{it.rodape}}</span>
+</div>
+</div>
+</article>
+</sc-for>
+<sc-if value="{{temMais}}" hint-placeholder-val="{{ true }}">
+<button type="button" onClick="{{carregarMais}}" style="height: 54px; border-radius: 14px; border: 1px solid #C4D1CC; background: #FFFFFF; color: #0E1F1D; font-weight: 700; font-size: 16px">Carregar mais imóveis</button>
+<p style="margin: 0; text-align: center; font-size: 13px; color: #4B5B58">{{mostrandoTxt}}</p>
+</sc-if>
+<sc-if value="{{vazio}}" hint-placeholder-val="{{ false }}">
+<div style="background: #FFFFFF; border: 1px dashed #B9C8C3; border-radius: 20px; padding: 40px 20px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center">
+<h2 style="margin: 0; font-size: 21px; font-weight: 800; font-stretch: 110%">Nenhum imóvel com esses filtros</h2>
+<p style="margin: 0; font-size: 15px; line-height: 1.5; color: #4B5B58">Tente remover algum filtro — ou fale com um corretor, que ele busca para você entre os imóveis que ainda não estão no site.</p>
+<button type="button" onClick="{{limpar}}" style="height: 48px; padding: 0 20px; border: none; border-radius: 12px; background: {{mar}}; color: #FFFFFF; font-weight: 700; font-size: 15px">Limpar filtros</button>
+<a href="https://wa.me/5581991483731" style="height: 48px; padding: 0 20px; border-radius: 12px; border: 1px solid #C4D1CC; color: #0E1F1D; display: flex; align-items: center; font-weight: 700; font-size: 15px; text-decoration: none">Falar com um corretor</a>
+</div>
+</sc-if>
+</section>
+</main>
+<footer style="background: {{marEscuro}}; color: {{marTexto}}; padding: 40px 16px 28px; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<img src="./assets/50257d81843cc16b3fc7ae24d2719289.png" alt="A3 Soluções Imobiliárias" style="height: 72px; width: auto; display: block; align-self: flex-start">
+<p style="margin: 0; font-size: 15px; line-height: 1.6">Venda, aluguel e lançamentos de imóveis, com um corretor do primeiro contato à entrega das chaves.</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 16px; font-size: 15px">
+<nav aria-label="Rodapé" style="display: flex; flex-direction: column; gap: 12px">
+<strong style="color: #FFFFFF">Navegação</strong>
+<a class="flink" href="Busca-Mobile.dc.html">Imóveis à venda</a>
+<a class="flink" href="Busca-Mobile.dc.html">Para alugar</a>
+<a class="flink" href="Busca-Mobile.dc.html">Lançamentos</a>
+<a class="flink" href="Inicio-Mobile.dc.html#m-anunciar">Anunciar imóvel</a>
+<a class="flink" href="Inicio-Mobile.dc.html#m-quem">Quem somos</a>
+</nav>
+<nav aria-label="Buscas frequentes" style="display: flex; flex-direction: column; gap: 12px">
+<strong style="color: #FFFFFF">Buscas frequentes</strong>
+<a class="flink" href="Busca-Mobile.dc.html">Janga</a>
+<a class="flink" href="Busca-Mobile.dc.html">Pau Amarelo</a>
+<a class="flink" href="Busca-Mobile.dc.html">Jaguaribe</a>
+<a class="flink" href="Busca-Mobile.dc.html">Igarassu</a>
+<a class="flink" href="Busca-Mobile.dc.html">Recife</a>
+</nav>
+</div>
+<a href="Inicio-Mobile.dc.html#m-contato" style="height: 48px; align-self: flex-start; padding: 0 20px; border-radius: 999px; background: {{sol}}; color: #0E1F1D; display: flex; align-items: center; font-weight: 700; font-size: 15px; text-decoration: none">Fale conosco</a>
+<div style="border-top: 1px solid rgba(255, 255, 255, 0.16); padding-top: 20px; padding-right: 84px; display: flex; flex-direction: column; gap: 8px; font-size: 13px">
+<span>© 2026 A3 Soluções Imobiliárias · CRECI 18568PJ</span>
+<a class="flink" href="#" style="text-decoration: underline; text-underline-offset: 3px">Política de privacidade</a>
+</div>
+</footer>
+
+<a href="https://wa.me/5581991483731" aria-label="Falar no WhatsApp" style="position: fixed; right: 16px; bottom: 16px; z-index: 30; width: 60px; height: 60px; border-radius: 999px; background: {{sol}}; color: #0E1F1D; display: flex; align-items: center; justify-content: center; box-shadow: 0 16px 32px -12px rgba(0, 0, 0, 0.5)">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 0 1-11.6 7.1L4 20l1-4.2A8 8 0 1 1 20 12z"></path></svg>
+</a>
+</sc-if>
+
+<sc-if value="{{filtrosAbertos}}" hint-placeholder-val="{{ false }}">
+<div style="min-height: 100%; background: #FFFFFF; padding-bottom: 96px">
+<header style="position: sticky; top: 0; z-index: 5; height: 64px; padding: 0 8px; display: grid; grid-template-columns: 88px 1fr 88px; align-items: center; background: #FFFFFF; border-bottom: 1px solid #E1E8E5">
+<button type="button" onClick="{{fecharFiltros}}" aria-label="Fechar filtros" style="width: 44px; height: 44px; border-radius: 12px; border: none; background: none; color: #0E1F1D; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+<h1 style="margin: 0; text-align: center; font-size: 18px; font-weight: 800; font-stretch: 110%">Filtros</h1>
+<button type="button" onClick="{{limpar}}" style="height: 44px; border: none; background: none; color: {{mar}}; font-weight: 700; font-size: 15px; justify-self: end; padding: 0 8px">Limpar</button>
+</header>
+<form style="margin: 0; display: flex; flex-direction: column">
+
+<fieldset style="border: none; margin: 0; padding: 0 16px 22px; border-bottom: 1px solid #E6ECEA">
+<legend style="font-size: 16px; font-weight: 800; padding: 22px 0 0; float: left; width: 100%; margin-bottom: 12px">Finalidade</legend>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 4px; border-radius: 14px; background: #EDF2F0; gap: 4px; clear: both">
+<sc-for list="{{modos}}" as="m" hint-placeholder-count="3">
+<button type="button" onClick="{{m.pick}}" aria-pressed="{{m.on}}" style="height: 44px; padding: 0 6px; border-radius: 10px; border: none; background: {{m.bg}}; color: {{m.fg}}; font-weight: 700; font-size: 15px; box-shadow: {{m.sh}}">{{m.label}}</button>
+</sc-for>
+</div>
+</fieldset>
+
+<div style="padding: 22px 16px; border-bottom: 1px solid #E6ECEA">
+<label style="display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 60px; padding: 12px 16px; border-radius: 14px; background: {{marClaro}}">
+<span style="display: flex; flex-direction: column; gap: 2px"><strong style="font-size: 16px">Minha Casa Minha Vida</strong><span style="font-size: 13px; color: #3E4E4B">Só imóveis elegíveis ao programa</span></span>
+<input type="checkbox" checked="{{mcmv}}" onChange="{{toggleMcmv}}" style="width: 24px; height: 24px; margin: 0; accent-color: #0B4A44; flex: none">
+</label>
+</div>
+
+<fieldset style="border: none; margin: 0; padding: 0 16px 22px; border-bottom: 1px solid #E6ECEA; display: flex; flex-direction: column; gap: 12px">
+<legend style="font-size: 16px; font-weight: 800; padding: 22px 0 0; float: left; width: 100%; margin-bottom: 12px">Localização</legend>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #4B5B58">Cidade<span style="position: relative; display: block"><select class="field" value="{{cidade}}" onChange="{{setCidade}}"><option value="Todas">Todas as cidades</option><option value="Paulista">Paulista</option><option value="Igarassu">Igarassu</option><option value="Recife">Recife</option><option value="Jaboatão dos Guararapes">Jaboatão dos Guararapes</option></select><span style="position: absolute; right: 12px; top: 16px; pointer-events: none; color: #4B5B58"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></span></span></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #4B5B58">Bairro<span style="position: relative; display: block"><select class="field"><option>Todos os bairros</option><option>Agamenon Magalhães</option><option>Eco Parque Paineiras</option><option>Jaguaribe</option><option>Janga</option><option>Pau Amarelo</option><option>Piedade</option><option>Praia da Conceição</option><option>Tamarineira</option></select><span style="position: absolute; right: 12px; top: 16px; pointer-events: none; color: #4B5B58"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></span></span></label>
+</fieldset>
+
+<fieldset style="border: none; margin: 0; padding: 0 16px 22px; border-bottom: 1px solid #E6ECEA">
+<legend style="font-size: 16px; font-weight: 800; padding: 22px 0 0; float: left; width: 100%; margin-bottom: 12px">Situação</legend>
+<div style="display: flex; flex-wrap: wrap; gap: 8px; clear: both">
+<sc-for list="{{situacoes}}" as="c" hint-placeholder-count="4">
+<button type="button" onClick="{{c.toggle}}" aria-pressed="{{c.on}}" style="min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid {{c.bd}}; background: {{c.bg}}; color: {{c.fg}}; font-weight: 600; font-size: 14px">{{c.label}}</button>
+</sc-for>
+</div>
+</fieldset>
+
+<fieldset style="border: none; margin: 0; padding: 0 16px 22px; border-bottom: 1px solid #E6ECEA; display: flex; flex-direction: column; gap: 2px">
+<legend style="font-size: 16px; font-weight: 800; padding: 22px 0 0; float: left; width: 100%; margin-bottom: 12px; margin-bottom: 8px">Tipo de imóvel</legend>
+<sc-for list="{{tipos}}" as="t" hint-placeholder-count="3">
+<label style="display: flex; align-items: center; justify-content: space-between; min-height: 48px; font-size: 16px">{{t.label}}<input type="checkbox" checked="{{t.on}}" onChange="{{t.toggle}}" style="width: 22px; height: 22px; margin: 0; accent-color: #0B4A44"></label>
+</sc-for>
+</fieldset>
+
+<fieldset style="border: none; margin: 0; padding: 0 16px 22px; border-bottom: 1px solid #E6ECEA">
+<legend style="font-size: 16px; font-weight: 800; padding: 22px 0 0; float: left; width: 100%; margin-bottom: 12px">Quartos</legend>
+<div style="display: grid; grid-template-columns: minmax(72px, 1.5fr) repeat(4, minmax(0, 1fr)); gap: 6px; clear: both">
+<sc-for list="{{quartosOpts}}" as="p" hint-placeholder-count="5">
+<button type="button" onClick="{{p.pick}}" aria-pressed="{{p.on}}" style="height: 48px; padding: 0 6px; white-space: nowrap; border-radius: 12px; border: 1px solid {{p.bd}}; background: {{p.bg}}; color: {{p.fg}}; font-weight: 700; font-size: 15px">{{p.label}}</button>
+</sc-for>
+</div>
+</fieldset>
+
+<fieldset style="border: none; margin: 0; padding: 0 16px 22px; border-bottom: 1px solid #E6ECEA">
+<legend style="font-size: 16px; font-weight: 800; padding: 22px 0 0; float: left; width: 100%; margin-bottom: 12px">Banheiros</legend>
+<div style="display: grid; grid-template-columns: minmax(72px, 1.5fr) repeat(3, minmax(0, 1fr)); gap: 6px; clear: both">
+<sc-for list="{{banhOpts}}" as="p" hint-placeholder-count="4">
+<button type="button" onClick="{{p.pick}}" aria-pressed="{{p.on}}" style="height: 48px; padding: 0 6px; white-space: nowrap; border-radius: 12px; border: 1px solid {{p.bd}}; background: {{p.bg}}; color: {{p.fg}}; font-weight: 700; font-size: 15px">{{p.label}}</button>
+</sc-for>
+</div>
+</fieldset>
+
+<fieldset style="border: none; margin: 0; padding: 0 16px 22px; border-bottom: 1px solid #E6ECEA">
+<legend style="font-size: 16px; font-weight: 800; padding: 22px 0 0; float: left; width: 100%; margin-bottom: 12px">Vagas de garagem</legend>
+<div style="display: grid; grid-template-columns: minmax(72px, 1.5fr) repeat(3, minmax(0, 1fr)); gap: 6px; clear: both">
+<sc-for list="{{vagasOpts}}" as="p" hint-placeholder-count="4">
+<button type="button" onClick="{{p.pick}}" aria-pressed="{{p.on}}" style="height: 48px; padding: 0 6px; white-space: nowrap; border-radius: 12px; border: 1px solid {{p.bd}}; background: {{p.bg}}; color: {{p.fg}}; font-weight: 700; font-size: 15px">{{p.label}}</button>
+</sc-for>
+</div>
+</fieldset>
+
+<fieldset style="border: none; margin: 0; padding: 0 16px 22px; border-bottom: 1px solid #E6ECEA">
+<legend style="font-size: 16px; font-weight: 800; padding: 22px 0 0; float: left; width: 100%; margin-bottom: 12px">Área privativa</legend>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; clear: both">
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #4B5B58">De<input class="field" type="text" inputmode="numeric" placeholder="0 m²"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #4B5B58">Até<input class="field" type="text" inputmode="numeric" placeholder="Sem limite"></label>
+</div>
+</fieldset>
+
+<div style="padding: 22px 16px">
+<label style="display: flex; flex-direction: column; gap: 10px; font-size: 16px; font-weight: 800">Previsão de entrega<span style="position: relative; display: block"><select class="field" style="font-weight: 400"><option>Qualquer data</option><option>Pronto para morar</option><option>Até dez/2026</option><option>Até dez/2027</option><option>Até dez/2028</option></select><span style="position: absolute; right: 12px; top: 16px; pointer-events: none; color: #4B5B58"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></span></span></label>
+</div>
+</form>
+<div style="position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; padding: 12px 16px 16px; background: #FFFFFF; border-top: 1px solid #E1E8E5; box-shadow: 0 -12px 24px -16px rgba(14, 31, 29, 0.3)">
+<button type="button" onClick="{{fecharFiltros}}" style="width: 100%; height: 54px; border: none; border-radius: 14px; background: {{mar}}; color: #FFFFFF; font-weight: 700; font-size: 16px">{{verResultados}}</button>
+</div>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"corPrincipal":{"editor":"color","default":"#0B4A44","options":["#0B4A44","#14406B","#3A2E5E","#22302E"],"section":"Marca"},"corDestaque":{"editor":"color","default":"#8EE07A","options":["#8EE07A","#F2894E","#86D1BC","#E8D36A"],"section":"Marca"},"$preview":{"width":390,"height":1750}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { menuAberto: false, filtrosAbertos: true, modo: 'todos', busca: '', cidade: 'Todas', tipos: [], situacoes: [], quartos: 0, banheiros: 0, vagas: 0, mcmv: false, ordem: 'recentes', visiveis: 6 };
+  }
+  mix(hex, to, t) {
+    if (!/^#[0-9a-fA-F]{6}$/.test(hex || '')) hex = '#0B4A44';
+    const p = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+    const a = p(hex);
+    const b = p(to);
+    return '#' + a.map((v, i) => Math.round(v + (b[i] - v) * t).toString(16).padStart(2, '0')).join('');
+  }
+  toggleIn(key, val) {
+    const arr = this.state[key];
+    this.setState({ [key]: arr.includes(val) ? arr.filter((x) => x !== val) : arr.concat(val) });
+  }
+  juntar(arr, sep) {
+    if (arr.length <= 1) return arr.join('');
+    return arr.slice(0, -1).join(', ') + sep + arr[arr.length - 1];
+  }
+  renderVals() {
+    const s = this.state;
+    const mar = this.props.corPrincipal ?? '#0B4A44';
+    const sol = this.props.corDestaque ?? '#8EE07A';
+    const marEscuro = this.mix(mar, '#000000', 0.36);
+    const marTexto = this.mix(mar, '#FFFFFF', 0.82);
+    const marClaro = this.mix(mar, '#FFFFFF', 0.9);
+    const menu = { menuAberto: !!s.menuAberto, abrirMenu: () => this.setState({ menuAberto: true }), fecharMenu: () => this.setState({ menuAberto: false }) };
+    const tags = { 'Lançamento': [sol, '#0E1F1D'], 'Breve lançamento': ['#FFFFFF', '#0E1F1D'], 'Em construção': [mar, '#FFFFFF'], 'Pronto para morar': [marClaro, '#0E1F1D'], 'Para alugar': ['#0E1F1D', '#FFFFFF'] };
+    const on = (v) => ({ bg: v ? mar : '#FFFFFF', fg: v ? '#FFFFFF' : '#0E1F1D', bd: v ? mar : '#C4D1CC' });
+    const IMGS = { 'Viva Paineiras': './assets/c7be17520c0ba0b30d51459b0632bbb6.jpg', 'Janga Garden': './assets/8d508497af5c02ceae748f7c4a68676c.jpg', 'Bela Vista Living': './assets/4ad7ad6a16c4eba14f6ec9620eadec08.jpg', 'Villa Alta Vista': './assets/635ed544ab0a37ebc869960ee3bf01a0.jpg', 'Vila das Palmeiras': './assets/1865971c9c85a8b06d9db6caaf3211c7.jpg', 'Alameda dos Corais': './assets/44c7c94c6be68d1c1762847839b324b8.jpg', 'Privê San Sebastián': './assets/3df6fd790a7cfc926b513a029977c94b.jpg', 'Estrada dos Marcos II': './assets/e0db76d6afaf45b9bbf19e2cdd8922ff.jpg', 'Aurora de Roma': './assets/a20bbea6b706bcbb991b03e5be17e95c.jpg', 'Residencial Villa Júlia': './assets/d6fcb7b3764f4b70a560127bcab1d5e4.jpg' };
+    const base = [
+      { nome: 'Viva Paineiras', tipo: 'Apartamento', local: 'Eco Parque Paineiras, Paulista', cidade: 'Paulista', situacao: 'Lançamento', area: '50 a 54 m²', areaMax: 54, qMax: 2, quartos: '2 quartos', bMax: 2, banheiros: '1 a 2 banh.', vagas: 1, precoTxt: 'R$ 257.000', rodape: 'Entrega jan/2028', cod: 'VEM_31002' },
+      { nome: 'Janga Garden', tipo: 'Apartamento', local: 'Janga, Paulista', cidade: 'Paulista', situacao: 'Em construção', area: '42 m²', areaMax: 42, qMax: 2, quartos: '2 quartos', bMax: 1, banheiros: '1 banh.', vagas: 1, precoTxt: 'R$ 205.900', rodape: 'Entrega jan/2027', cod: 'VEM_28877' },
+      { nome: 'Bela Vista Living', tipo: 'Apartamento', local: 'Jaguaribe, Paulista', cidade: 'Paulista', situacao: 'Lançamento', area: '50 a 91 m²', areaMax: 91, qMax: 3, quartos: '2 ou 3 quartos', bMax: 2, banheiros: '2 banh.', vagas: 1, precoTxt: 'R$ 265.000', rodape: 'Entrega jan/2028', mcmv: true, cod: 'VEM_37819' },
+      { nome: 'Villa Alta Vista', tipo: 'Apartamento', local: 'Janga, Paulista', cidade: 'Paulista', situacao: 'Breve lançamento', area: '51 a 60 m²', areaMax: 60, qMax: 3, quartos: '2 ou 3 quartos', bMax: 1, banheiros: '1 banh.', vagas: 0, vagasLabel: 'Vaga a consultar', precoTxt: 'R$ 250.000', rodape: 'Cód. 259556', cod: '259556' },
+      { nome: 'Vila das Palmeiras', tipo: 'Apartamento', local: 'PE-22, Paulista', cidade: 'Paulista', situacao: 'Em construção', area: '51,7 m²', areaMax: 51.7, qMax: 3, quartos: '2 ou 3 quartos', bMax: 1, banheiros: '1 banh.', vagas: 1, precoTxt: 'R$ 260.000', rodape: 'Entrega dez/2026', cod: 'VEM_30451' },
+      { nome: 'Alameda dos Corais', tipo: 'Apartamento', local: 'Praia da Conceição, Paulista', cidade: 'Paulista', situacao: 'Em construção', area: '50 m²', areaMax: 50, qMax: 2, quartos: '2 quartos', bMax: 2, banheiros: '2 banh.', vagas: 1, precoTxt: 'R$ 240.807', rodape: 'Entrega dez/2026', cod: 'VEM_29960' },
+      { nome: 'Privê San Sebastián', tipo: 'Casa de condomínio', local: 'Pau Amarelo, Paulista', cidade: 'Paulista', situacao: 'Em construção', area: '50 m²', areaMax: 50, qMax: 2, quartos: '2 quartos', bMax: 1, banheiros: '1 banh.', vagas: 1, precoTxt: 'R$ 175.000', rodape: 'Cód. 103790', cod: '103790' },
+      { nome: 'Estrada dos Marcos II', tipo: 'Apartamento', local: 'Agamenon Magalhães, Igarassu', cidade: 'Igarassu', situacao: 'Em construção', area: '46 m²', areaMax: 46, qMax: 2, quartos: '2 quartos', bMax: 1, banheiros: '1 banh.', vagas: 1, precoTxt: 'R$ 173.000', rodape: 'Cód. 251830', cod: '251830' },
+      { nome: 'Aurora de Roma', tipo: 'Apartamento', local: 'Tamarineira, Recife', cidade: 'Recife', situacao: 'Em construção', area: '46 m²', areaMax: 46, qMax: 2, quartos: '2 quartos', bMax: 1, banheiros: '1 banh.', vagas: 1, precoTxt: 'R$ 333.113', rodape: 'Cód. 259322', cod: '259322' },
+      { nome: 'Residencial Villa Júlia', tipo: 'Apartamento', local: 'Piedade, Jaboatão dos Guararapes', cidade: 'Jaboatão dos Guararapes', situacao: 'Para alugar', area: '51 m²', areaMax: 51, qMax: 2, quartos: '2 quartos', bMax: 2, banheiros: '2 banh.', vagas: 1, precoTxt: 'R$ 2.800/mês', rodape: 'Cód. VEM_44616', modo: 'alugar', cod: 'VEM_44616' }
+    ];
+    const q = (s.busca || '').trim().toLowerCase();
+    let todos = base.filter((it) => s.modo === 'todos' || (it.modo || 'comprar') === s.modo)
+      .filter((it) => !q || (it.nome + ' ' + it.local + ' ' + it.cod).toLowerCase().includes(q))
+      .filter((it) => s.cidade === 'Todas' || it.cidade === s.cidade)
+      .filter((it) => s.tipos.length === 0 || s.tipos.includes(it.tipo))
+      .filter((it) => s.situacoes.length === 0 || s.situacoes.includes(it.situacao))
+      .filter((it) => it.qMax >= s.quartos && it.bMax >= s.banheiros && it.vagas >= s.vagas)
+      .filter((it) => !s.mcmv || it.mcmv);
+    if (s.ordem === 'area') todos.sort((a, b) => b.areaMax - a.areaMax);
+    if (s.ordem === 'quartos') todos.sort((a, b) => b.qMax - a.qMax);
+    todos = todos.map((it) => ({
+      ...it,
+      img: IMGS[it.nome],
+      vagasLabel: it.vagasLabel || (it.vagas + (it.vagas === 1 ? ' vaga' : ' vagas')),
+      precoLabel: it.modo === 'alugar' ? 'Aluguel' : 'Investimento a partir de',
+      tagBg: tags[it.situacao][0],
+      tagFg: tags[it.situacao][1]
+    }));
+    const n = todos.length;
+    const lista = todos.slice(0, s.visiveis);
+
+    const ativos = [];
+    if (s.modo !== 'todos') ativos.push({ label: s.modo === 'comprar' ? 'Venda' : 'Aluguel', remove: () => this.setState({ modo: 'todos' }) });
+    if (s.mcmv) ativos.push({ label: 'Minha Casa Minha Vida', remove: () => this.setState({ mcmv: false }) });
+    if (s.cidade !== 'Todas') ativos.push({ label: s.cidade, remove: () => this.setState({ cidade: 'Todas' }) });
+    s.situacoes.forEach((t) => ativos.push({ label: t, remove: () => this.toggleIn('situacoes', t) }));
+    s.tipos.forEach((t) => ativos.push({ label: t, remove: () => this.toggleIn('tipos', t) }));
+    if (s.quartos) ativos.push({ label: s.quartos + '+ quartos', remove: () => this.setState({ quartos: 0 }) });
+    if (s.banheiros) ativos.push({ label: s.banheiros + '+ banheiros', remove: () => this.setState({ banheiros: 0 }) });
+    if (s.vagas) ativos.push({ label: s.vagas + '+ vagas', remove: () => this.setState({ vagas: 0 }) });
+
+    const plural = (k) => k + (k === 1 ? ' imóvel' : ' imóveis');
+    const venda = s.modo === 'comprar';
+    const aluguel = s.modo === 'alugar';
+    const pillsOf = (opts, key) => opts.map(([v, label]) => ({ label, on: s[key] === v, ...on(s[key] === v), pick: () => this.setState({ [key]: v }) }));
+    return {
+      mar, sol, marEscuro, marTexto, marClaro, ...menu,
+      listaVisivel: !s.filtrosAbertos,
+      filtrosAbertos: s.filtrosAbertos,
+      abrirFiltros: () => this.setState({ filtrosAbertos: true, menuAberto: false }),
+      fecharFiltros: () => this.setState({ filtrosAbertos: false, visiveis: 6 }),
+      migalha: venda ? 'Imóveis à venda' : aluguel ? 'Imóveis para alugar' : 'Imóveis',
+      titulo: venda ? 'Apartamentos, casas e lançamentos à venda' : aluguel ? 'Apartamentos e casas para alugar' : 'Chegou a hora de realizar o sonho da casa própria',
+      subtitulo: aluguel ? 'Imóveis para alugar com atendimento de um corretor da A3.' : 'Apartamentos, casas e lançamentos para comprar ou alugar, com atendimento de um corretor da A3.',
+      busca: s.busca,
+      setBusca: (e) => this.setState({ busca: e.target.value, visiveis: 6 }),
+      ordem: s.ordem,
+      setOrdem: (e) => this.setState({ ordem: e.target.value }),
+      ativos,
+      temAtivos: ativos.length > 0,
+      nAtivos: String(ativos.length),
+      totalTxt: ativos.length || q ? (n === 1 ? '1 imóvel encontrado' : plural(n) + ' encontrados') : plural(n) + ' disponíveis',
+      lista,
+      temMais: n > s.visiveis,
+      mostrandoTxt: 'Mostrando ' + Math.min(s.visiveis, n) + ' de ' + n,
+      carregarMais: () => this.setState({ visiveis: s.visiveis + 6 }),
+      vazio: n === 0,
+      modos: [['todos', 'Todos'], ['comprar', 'Comprar'], ['alugar', 'Alugar']].map(([id, label]) => {
+        const sel = s.modo === id;
+        return { label, on: sel, bg: sel ? '#FFFFFF' : 'transparent', fg: sel ? '#0E1F1D' : '#3E4E4B', sh: sel ? '0 2px 6px rgba(14,31,29,.14)' : 'none', pick: () => this.setState({ modo: id }) };
+      }),
+      mcmv: s.mcmv,
+      toggleMcmv: () => this.setState({ mcmv: !s.mcmv }),
+      cidade: s.cidade,
+      setCidade: (e) => this.setState({ cidade: e.target.value }),
+      situacoes: ['Breve lançamento', 'Lançamento', 'Em construção', 'Pronto para morar'].map((t) => ({ label: t, on: s.situacoes.includes(t), ...on(s.situacoes.includes(t)), toggle: () => this.toggleIn('situacoes', t) })),
+      tipos: ['Apartamento', 'Casa de condomínio', 'Terreno'].map((t) => ({ label: t, on: s.tipos.includes(t), toggle: () => this.toggleIn('tipos', t) })),
+      quartosOpts: pillsOf([[0, 'Todos'], [1, '1+'], [2, '2+'], [3, '3+'], [4, '4+']], 'quartos'),
+      banhOpts: pillsOf([[0, 'Todos'], [1, '1+'], [2, '2+'], [3, '3+']], 'banheiros'),
+      vagasOpts: pillsOf([[0, 'Todas'], [1, '1+'], [2, '2+'], [3, '3+']], 'vagas'),
+      limpar: () => this.setState({ modo: 'todos', busca: '', cidade: 'Todas', tipos: [], situacoes: [], quartos: 0, banheiros: 0, vagas: 0, mcmv: false }),
+      verResultados: n === 0 ? 'Nenhum imóvel — ajuste os filtros' : 'Ver ' + plural(n)
+    };
+  }
+}
+</script>
+</body>
+</html>

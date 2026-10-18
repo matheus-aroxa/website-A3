@@ -1,0 +1,49 @@
+.pagina {
+  padding: 48px 0 88px;
+}
+
+.conteudo {
+  max-width: 780px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--texto-4);
+}
+
+.conteudo h1 {
+  font-size: clamp(32px, 4vw, 48px);
+  line-height: 1.05;
+  font-weight: 800;
+  font-stretch: 115%;
+  letter-spacing: -0.025em;
+  color: var(--tinta);
+}
+
+.conteudo h2 {
+  margin-top: 16px;
+  font-size: 22px;
+  font-weight: 800;
+  font-stretch: 110%;
+  color: var(--tinta);
+}
+
+.conteudo ul {
+  margin: 0;
+  padding-left: 22px;
+}
+
+.aviso {
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--mar-claro);
+  font-size: 15px;
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+}

@@ -1,0 +1,89 @@
+.cabecalho {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #fff;
+  border-bottom: 1px solid var(--borda);
+}
+
+.barra {
+  height: var(--altura-cabecalho);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.logo img {
+  height: 40px;
+  width: auto;
+}
+
+.voltar {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  height: 44px;
+  color: var(--tinta);
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+}
+
+.nav {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.navLink {
+  color: var(--tinta);
+  text-decoration: none;
+  text-underline-offset: 7px;
+  text-decoration-thickness: 2px;
+}
+
+.navLink:hover,
+.navLink[aria-current='page'] {
+  color: var(--mar);
+  text-decoration-line: underline;
+}
+
+.navLink[aria-current='page'] {
+  font-weight: 700;
+}
+
+.acoes {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.compartilhar {
+  display: none;
+}
+
+@media (max-width: 959px) {
+  .barra {
+    padding-inline: 16px;
+  }
+  .nav {
+    display: none;
+  }
+  .logo img {
+    height: 36px;
+  }
+}
+
+/* Página de imóvel no celular: "‹ Imóveis" + compartilhar + menu (protótipo mobile). */
+@media (max-width: 767px) {
+  .cabecalho[data-variante='detalhe'] .logo {
+    display: none;
+  }
+  .cabecalho[data-variante='detalhe'] .voltar,
+  .cabecalho[data-variante='detalhe'] .compartilhar {
+    display: inline-flex;
+  }
+}

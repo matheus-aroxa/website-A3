@@ -1,0 +1,50 @@
+.mapa {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 150px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #edefe8;
+}
+
+.mapa img {
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.mapa:hover img {
+  transform: scale(1.03);
+}
+
+.pino {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px 999px 999px 0;
+  transform: rotate(-45deg);
+  background: var(--mar);
+  box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pino span {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--sol);
+}
+
+.legenda {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  font-size: 12px;
+  color: #33433f;
+}

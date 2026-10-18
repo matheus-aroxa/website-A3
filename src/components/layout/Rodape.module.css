@@ -1,0 +1,110 @@
+.rodape {
+  background: var(--mar-escuro);
+  color: var(--mar-texto);
+  padding: 72px 0 28px;
+  font-size: 15px;
+}
+
+.interno {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.colunas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+  gap: 40px;
+}
+
+.marca {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  line-height: 1.6;
+}
+
+.marca img {
+  height: 88px;
+  width: auto;
+  align-self: flex-start;
+}
+
+.coluna {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  line-height: 1.5;
+}
+
+.coluna strong {
+  color: #fff;
+}
+
+.link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.link:hover {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.endereco {
+  font-style: normal;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.base {
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  padding: 24px 96px 0 0; /* espaço para o botão flutuante do WhatsApp */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+}
+
+@media (max-width: 767px) {
+  .rodape {
+    padding: 40px 0 28px;
+  }
+  .rodape[data-barra-inferior] {
+    padding-bottom: 112px;
+  }
+  .interno {
+    gap: 28px;
+  }
+  .colunas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 16px;
+  }
+  .marca {
+    grid-column: 1 / -1;
+    gap: 14px;
+  }
+  .marca img {
+    height: 72px;
+  }
+  .atendimento {
+    grid-column: 1 / -1;
+  }
+  .atendimento > span:first-of-type {
+    display: none;
+  }
+  .base {
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px 84px 0 0;
+    font-size: 13px;
+  }
+  .base .link {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}

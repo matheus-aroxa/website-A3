@@ -1,0 +1,39 @@
+.migalhas ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  font-size: 14px;
+  color: var(--texto-2);
+}
+
+.migalhas li {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.migalhas a {
+  color: var(--texto-2);
+  text-decoration: none;
+}
+
+.migalhas a:hover {
+  color: var(--mar);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.migalhas [aria-current='page'] {
+  color: var(--tinta);
+  font-weight: 600;
+}
+
+@media (max-width: 767px) {
+  .migalhas ol {
+    font-size: 13px;
+  }
+}

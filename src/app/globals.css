@@ -1,0 +1,661 @@
+/* Tokens e padrões compartilhados. Valores extraídos do protótipo (propotype/). */
+
+:root {
+  --mar: #0b4a44; /* cor principal */
+  --mar-escuro: #072f2c; /* rodapé */
+  --mar-texto: #d3dedd; /* texto sobre a cor principal */
+  --mar-claro: #e7edec; /* fundos suaves */
+  --sol: #8ee07a; /* destaque / CTAs */
+  --tinta: #0e1f1d;
+  --texto-2: #4b5b58;
+  --texto-3: #3e4e4b;
+  --texto-4: #2e3d3a;
+  --verde-rotulo: #2f6b1e;
+  --borda: #e1e8e5;
+  --borda-2: #dce4e1;
+  --borda-3: #e6ece9;
+  --borda-campo: #c4d1cc;
+  --fundo-2: #f3f6f5;
+  --fundo-3: #f1f5f3;
+  --fundo-4: #edf2f0;
+  --sombra-card: 0 18px 40px -22px rgba(14, 31, 29, 0.35);
+  --altura-cabecalho: 76px;
+  --largura-max: 1360px;
+  --margem: clamp(16px, 4vw, 40px);
+}
+
+@media (max-width: 959px) {
+  :root {
+    --altura-cabecalho: 64px;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--altura-cabecalho) + 1px); /* altura exata do cabeçalho fixo (+1px da borda) */
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: var(--fonte-archivo), system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--tinta);
+  background: #fff;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: var(--mar);
+}
+
+:focus-visible {
+  outline: 3px solid var(--sol);
+  outline-offset: 2px;
+}
+
+h1,
+h2,
+h3,
+p,
+figure,
+blockquote,
+dl,
+dd {
+  margin: 0;
+}
+
+/* ---------- Layout ---------- */
+
+.container {
+  width: 100%;
+  max-width: var(--largura-max);
+  margin-inline: auto;
+  padding-inline: var(--margem);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.pular-conteudo {
+  position: absolute;
+  left: 16px;
+  top: -100px;
+  z-index: 100;
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: var(--tinta);
+  color: #fff;
+  font-weight: 700;
+}
+
+.pular-conteudo:focus {
+  top: 12px;
+}
+
+/* ---------- Tipografia ---------- */
+
+.sobretitulo {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mar);
+}
+
+.titulo-secao {
+  font-size: clamp(30px, 3.4vw, 48px);
+  line-height: 1.04;
+  font-weight: 800;
+  font-stretch: 115%;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.titulo-bloco {
+  font-size: 26px;
+  font-weight: 800;
+  font-stretch: 112%;
+  letter-spacing: -0.015em;
+}
+
+@media (max-width: 767px) {
+  .sobretitulo {
+    font-size: 12px;
+  }
+  .titulo-bloco {
+    font-size: 22px;
+  }
+}
+
+/* ---------- Botões ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: filter 0.15s ease, background-color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn:hover {
+  filter: brightness(0.93);
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  filter: none;
+}
+
+.btn-sol {
+  background: var(--sol);
+  color: var(--tinta);
+}
+
+.btn-mar {
+  background: var(--mar);
+  color: #fff;
+}
+
+.btn-tinta {
+  background: var(--tinta);
+  color: #fff;
+}
+
+.btn-contorno {
+  background: transparent;
+  color: var(--tinta);
+  box-shadow: inset 0 0 0 2px var(--tinta);
+}
+
+.btn-linha {
+  background: #fff;
+  color: var(--tinta);
+  box-shadow: inset 0 0 0 1px var(--borda-campo);
+}
+
+.btn-g {
+  height: 56px;
+  padding: 0 26px;
+  font-size: 17px;
+}
+
+.btn-p {
+  height: 44px;
+  padding: 0 18px;
+}
+
+.btn-quadrado {
+  border-radius: 14px;
+}
+
+.btn-bloco {
+  width: 100%;
+}
+
+.btn-icone {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 12px;
+  background: #fff;
+  color: var(--tinta);
+  box-shadow: inset 0 0 0 1px #d3ddd9;
+}
+
+.link-texto {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--mar);
+  font-weight: 700;
+  font-size: 15px;
+  text-decoration: none;
+}
+
+.link-texto:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* ---------- Etiquetas ---------- */
+
+.etiqueta {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.etiqueta-lancamento,
+.etiqueta-breve-lancamento {
+  background: var(--sol);
+  color: var(--tinta);
+}
+
+.etiqueta-breve-lancamento {
+  background: #fff;
+}
+
+.etiqueta-em-construcao {
+  background: var(--mar);
+  color: #fff;
+}
+
+.etiqueta-pronto {
+  background: var(--mar-claro);
+  color: var(--tinta);
+}
+
+.etiqueta-aluguel {
+  background: var(--tinta);
+  color: #fff;
+}
+
+.etiqueta-suave {
+  background: var(--mar-claro);
+  color: var(--tinta);
+}
+
+.etiqueta-contorno {
+  font-weight: 600;
+  color: var(--texto-3);
+  box-shadow: inset 0 0 0 1px #d3ddd9;
+}
+
+/* ---------- Formulários ---------- */
+
+.campo {
+  width: 100%;
+  height: 52px;
+  padding: 0 14px;
+  border: 1px solid var(--borda-campo);
+  border-radius: 12px;
+  background: #fff;
+  font-size: 16px; /* 16px evita o zoom automático do iOS */
+  color: var(--tinta);
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.campo:focus {
+  border-color: var(--mar);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(11, 74, 68, 0.18);
+}
+
+.campo::placeholder {
+  color: #7b8a87;
+}
+
+textarea.campo {
+  height: auto;
+  padding: 12px 14px;
+  resize: vertical;
+}
+
+.campo[aria-invalid='true'] {
+  border-color: #b3261e;
+}
+
+.campo-select {
+  position: relative;
+  display: block;
+}
+
+.campo-select .campo {
+  padding-right: 40px;
+}
+
+.campo-select svg {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--texto-2);
+}
+
+/* ---------- Seletor (substitui o <select> nativo; ver components/ui/Seletor.tsx) ---------- */
+.seletor {
+  position: relative;
+  display: block;
+}
+
+.seletor-botao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-right: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.seletor-valor {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.seletor-seta {
+  flex: none;
+  color: var(--texto-2);
+  transition: transform 0.2s ease;
+}
+
+.seletor[data-aberto] .seletor-botao {
+  border-color: var(--mar);
+  box-shadow: 0 0 0 3px rgba(11, 74, 68, 0.18);
+}
+
+.seletor[data-aberto] .seletor-seta {
+  transform: rotate(180deg);
+}
+
+.seletor-lista {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  min-width: max-content;
+  max-height: 300px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: #fff;
+  border: 1px solid var(--borda-2);
+  border-radius: 14px;
+  box-shadow: var(--sombra-card);
+  animation: seletor-abrir 0.16s ease-out;
+}
+
+.seletor-lista ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.seletor-grupo {
+  display: block;
+  padding: 10px 12px 4px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--verde-rotulo);
+}
+
+.seletor-opcao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 42px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--tinta);
+  cursor: pointer;
+}
+
+.seletor-opcao[data-ativo] {
+  background: var(--mar-claro);
+}
+
+.seletor-opcao[aria-selected='true'] {
+  font-weight: 700;
+  color: var(--mar);
+}
+
+.seletor-opcao svg {
+  flex: none;
+  color: var(--mar);
+}
+
+@keyframes seletor-abrir {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seletor-lista {
+    animation: none;
+  }
+  .seletor-seta {
+    transition: none;
+  }
+}
+
+.rotulo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--texto-3);
+}
+
+.rotulo-opcional {
+  font-weight: 400;
+  color: var(--texto-2);
+}
+
+.erro-campo {
+  font-size: 13px;
+  font-weight: 600;
+  color: #b3261e;
+}
+
+.consentimento {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--texto-3);
+  cursor: pointer;
+}
+
+.consentimento input,
+.caixa {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--mar);
+}
+
+/* Botão-alternância (pílulas de filtro, dias e horários). */
+.alternancia {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--borda-campo);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--tinta);
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.alternancia[aria-pressed='true'] {
+  border-color: var(--mar);
+  background: var(--mar);
+  color: #fff;
+}
+
+.alternancia-pilula {
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+/* Abas em trilho (Comprar/Alugar, Agendar visita/Falar com corretor). */
+.segmentado {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 14px;
+  background: var(--fundo-4);
+}
+
+.segmentado button {
+  height: 44px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--texto-3);
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.segmentado button[aria-pressed='true'],
+.segmentado button[aria-selected='true'] {
+  background: #fff;
+  color: var(--tinta);
+  box-shadow: 0 2px 6px rgba(14, 31, 29, 0.14);
+}
+
+/* ---------- Diversos ---------- */
+
+.elevar {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+@media (hover: hover) {
+  .elevar:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 22px 44px -22px rgba(14, 31, 29, 0.4);
+  }
+}
+
+/* Lista que vira carrossel com rolagem horizontal no celular. */
+@media (max-width: 767px) {
+  .carrossel-mobile {
+    display: flex !important;
+    gap: 12px !important;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    margin-inline: calc(var(--margem) * -1);
+    padding: 0 var(--margem) 28px;
+    scroll-padding-inline: var(--margem);
+  }
+  .carrossel-mobile::-webkit-scrollbar {
+    display: none;
+  }
+  .carrossel-mobile > * {
+    flex: none;
+    width: min(300px, 82vw);
+    scroll-snap-align: start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* ---------- Animações ao rolar (landing page) ----------
+   Só escondem o conteúdo depois que o JS marca <html data-revelar-ativo>, então sem JS tudo aparece normalmente.
+   Keyframes com fill "backwards" não fixam o estado final, assim o hover dos cards (.elevar) continua funcionando. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-revelar-ativo] [data-revelar]:not(.revelado),
+  [data-revelar-ativo] [data-revelar-filhos]:not(.revelado) > * {
+    opacity: 0;
+  }
+  [data-revelar-ativo] [data-revelar].revelado,
+  [data-revelar-ativo] [data-revelar-filhos].revelado > * {
+    --deslocamento: translateY(28px);
+    animation: revelar 0.7s cubic-bezier(0.22, 1, 0.36, 1) var(--atraso, 0ms) backwards;
+  }
+  [data-revelar-ativo] [data-revelar='esquerda'].revelado {
+    --deslocamento: translateX(-36px);
+  }
+  [data-revelar-ativo] [data-revelar='direita'].revelado {
+    --deslocamento: translateX(36px);
+  }
+  [data-revelar-ativo] [data-revelar='zoom'].revelado {
+    --deslocamento: scale(0.94);
+  }
+}
+
+@keyframes revelar {
+  from {
+    opacity: 0;
+    transform: var(--deslocamento);
+  }
+}

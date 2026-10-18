@@ -1,0 +1,60 @@
+.armadilha {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0;
+}
+
+.linha {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+  gap: 16px;
+}
+
+.erroGeral {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #fdecea;
+  color: #8c1d18;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.sucesso {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 0;
+}
+
+.sucesso h3 {
+  font-size: 24px;
+  font-weight: 800;
+  font-stretch: 112%;
+}
+
+.sucesso p {
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--texto-3);
+}
+
+.sucessoIcone {
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  background: var(--mar);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

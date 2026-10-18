@@ -1,0 +1,303 @@
+.galeria {
+  position: relative;
+}
+
+.trilho {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: 250px 250px;
+  gap: 8px;
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.galeria[data-quantidade='1'] .trilho {
+  grid-template-columns: 1fr;
+  grid-template-rows: 460px;
+}
+
+.galeria[data-quantidade='2'] .trilho,
+.galeria[data-quantidade='3'] .trilho {
+  grid-template-columns: 2fr 1fr;
+}
+
+.item {
+  position: relative;
+  order: var(--ordem);
+  min-height: 0;
+  margin: 0;
+  padding: 12px;
+  border: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  background: #d6e5e0;
+  text-align: left;
+  transition: filter 0.15s ease;
+}
+
+.item:hover {
+  filter: brightness(0.95);
+}
+
+.item img {
+  object-fit: cover;
+}
+
+.item[data-principal] {
+  grid-row: span 2;
+  padding: 18px;
+  cursor: zoom-in;
+}
+
+.galeria[data-quantidade='2'] .item:not([data-principal]) {
+  grid-row: span 2;
+}
+
+.item[data-fora-do-mosaico] {
+  display: none;
+}
+
+.legenda {
+  position: relative;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(14, 31, 29, 0.6);
+  font-size: 12px;
+  color: #fff;
+}
+
+.legendaPrincipal {
+  display: none;
+}
+
+.item[data-principal] .legenda {
+  padding: 6px 12px;
+}
+
+.item[data-principal] .legendaPrincipal {
+  display: inline;
+}
+
+.verTodas {
+  position: absolute;
+  bottom: 18px;
+  left: calc(50% - 18px);
+  transform: translateX(-100%);
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 12px;
+  background: #fff;
+  color: var(--tinta);
+  font-size: 14px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.14);
+}
+
+.galeria[data-quantidade='1'] .verTodas,
+.galeria[data-quantidade='2'] .verTodas,
+.galeria[data-quantidade='3'] .verTodas {
+  left: auto;
+  right: 18px;
+  transform: none;
+}
+
+.controlesMobile {
+  display: none;
+}
+
+.seta {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--tinta);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px -6px rgba(0, 0, 0, 0.4);
+}
+
+/* ---------- Lightbox ---------- */
+
+.lightbox {
+  width: 100vw;
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: rgba(8, 20, 19, 0.96);
+  color: #fff;
+}
+
+.lightbox::backdrop {
+  background: rgba(8, 20, 19, 0.9);
+}
+
+.lightboxFigura {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 64px 72px 24px;
+}
+
+.lightboxImagem {
+  position: relative;
+  flex: 1;
+}
+
+.lightboxImagem img {
+  object-fit: contain;
+}
+
+.lightbox figcaption {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 16px;
+  font-size: 14px;
+  color: var(--mar-texto);
+}
+
+.lightbox .seta {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.lightbox .setaEsquerda {
+  left: 16px;
+}
+
+.lightbox .setaDireita {
+  right: 16px;
+}
+
+.lightbox .lightboxFechar {
+  top: 16px;
+  right: 16px;
+  transform: none;
+}
+
+/* ---------- Celular: carrossel ---------- */
+
+@media (max-width: 767px) {
+  .trilho {
+    display: flex;
+    gap: 0;
+    height: 290px;
+    border-radius: 0;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
+
+  .trilho::-webkit-scrollbar {
+    display: none;
+  }
+
+  .item,
+  .item[data-fora-do-mosaico] {
+    display: flex;
+    order: 0;
+    flex: none;
+    width: 100%;
+    padding: 14px;
+    align-items: flex-start;
+    scroll-snap-align: start;
+    cursor: zoom-in;
+  }
+
+  .item .legenda {
+    padding: 5px 10px;
+  }
+
+  .item .legendaPrincipal {
+    display: inline;
+  }
+
+  .verTodas {
+    display: none;
+  }
+
+  .controlesMobile {
+    display: block;
+  }
+
+  .controlesMobile .seta {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .setaEsquerda {
+    left: 12px;
+  }
+
+  .setaDireita {
+    right: 12px;
+  }
+
+  .contador {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    padding: 5px 11px;
+    border-radius: 999px;
+    background: rgba(14, 31, 29, 0.72);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pontos {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 8px;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* Área de toque de 24px com o ponto visível de 8px no centro. */
+  .pontos button {
+    width: 20px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    background: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pontos button::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.55);
+    transition: width 0.2s ease;
+  }
+
+  .pontos button[aria-current]::before {
+    width: 22px;
+    background: #fff;
+  }
+
+  .pontos button[aria-current] {
+    width: 34px;
+  }
+
+  .lightboxFigura {
+    padding: 64px 0 24px;
+  }
+
+  .lightbox figcaption {
+    padding: 16px 16px 0;
+  }
+}

@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Detalhe do empreendimento · mobile | A3 Soluções Imobiliárias</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&amp;display=swap">
+<style>
+body{margin:0;background:#08302C}
+*{box-sizing:border-box}
+a{color:#0B4A44}a:hover{color:#08332F}
+input,select,textarea,button{font:inherit}
+:focus-visible{outline:3px solid #8EE07A;outline-offset:2px}
+.ph{background-color:#D6E5E0;background-image:repeating-linear-gradient(135deg,rgba(11,74,68,.08) 0 1px,transparent 1px 12px)}
+.ph-sand{background-color:#EEE4D2;background-image:repeating-linear-gradient(135deg,rgba(120,84,30,.09) 0 1px,transparent 1px 12px)}
+.swipe{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+.swipe::-webkit-scrollbar{display:none}
+.swipe > *{scroll-snap-align:start;flex:none}
+.scroller{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 16px 8px;scrollbar-width:none}
+.scroller::-webkit-scrollbar{display:none}
+.scroller > *{scroll-snap-align:start;flex:none}
+.flink{color:inherit;text-decoration:none}
+.field{width:100%;height:52px;border:1px solid #C4D1CC;border-radius:12px;background:#FFFFFF;padding:0 14px;font-size:16px;color:#0E1F1D;appearance:none;-webkit-appearance:none}
+.field:focus{border-color:#0B4A44;outline:none;box-shadow:0 0 0 3px rgba(11,74,68,.18)}
+textarea.field{height:auto;padding:14px}
+</style>
+</helmet>
+<div style="width: 390px; font-family: 'Archivo', system-ui, sans-serif; color: #0E1F1D; background: #FFFFFF; position: relative">
+
+<header style="position: sticky; top: 0; z-index: 20; height: 64px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E1E8E5; background: #FFFFFF">
+<a href="Busca-Mobile.dc.html" style="height: 44px; display: flex; align-items: center; gap: 6px; color: #0E1F1D; text-decoration: none; font-weight: 600; font-size: 15px">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"></path></svg>
+Imóveis
+</a>
+<div style="display: flex; gap: 8px">
+<button type="button" aria-label="Compartilhar" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #D3DDD9; background: #FFFFFF; color: #0E1F1D; display: flex; align-items: center; justify-content: center">
+<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="12" r="2.5"></circle><circle cx="18" cy="6" r="2.5"></circle><circle cx="18" cy="18" r="2.5"></circle><path d="m8.2 10.8 7.6-3.6M8.2 13.2l7.6 3.6"></path></svg>
+</button>
+<button type="button" onClick="{{abrirMenu}}" aria-label="Abrir menu" aria-expanded="{{menuAberto}}" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #D3DDD9; background: #FFFFFF; color: #0E1F1D; display: flex; align-items: center; justify-content: center">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+</button>
+</div>
+</header>
+
+<sc-if value="{{menuAberto}}" hint-placeholder-val="{{ false }}">
+<div onClick="{{fecharMenu}}" style="position: fixed; inset: 0; z-index: 50; background: rgba(8, 48, 44, 0.55)"></div>
+<nav aria-label="Menu" style="position: fixed; top: 0; left: 0; right: 0; z-index: 51; background: #FFFFFF; border-radius: 0 0 26px 26px; padding: 0 16px 24px; display: flex; flex-direction: column; box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.45)">
+<div style="height: 64px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E1E8E5; margin: 0 -16px; padding: 0 16px">
+<img src="./assets/8b437510b7c58ab196dc122487c39490.png" alt="A3 Soluções Imobiliárias" style="height: 36px; width: auto; display: block">
+<button type="button" onClick="{{fecharMenu}}" aria-label="Fechar menu" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #D3DDD9; background: #FFFFFF; color: #0E1F1D; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+</div>
+<div style="display: flex; flex-direction: column; padding-top: 6px">
+<a class="mlink" href="Busca-Mobile.dc.html" onClick="{{fecharMenu}}" style="min-height: 56px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E6ECEA; font-size: 22px; font-weight: 700; font-stretch: 112%; letter-spacing: -0.01em">Imóveis<span style="color: #8A9A96"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
+<a class="mlink" href="Inicio-Mobile.dc.html#m-servicos" onClick="{{fecharMenu}}" style="min-height: 56px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E6ECEA; font-size: 22px; font-weight: 700; font-stretch: 112%; letter-spacing: -0.01em">Serviços<span style="color: #8A9A96"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
+<a class="mlink" href="Inicio-Mobile.dc.html#m-anunciar" onClick="{{fecharMenu}}" style="min-height: 56px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E6ECEA; font-size: 22px; font-weight: 700; font-stretch: 112%; letter-spacing: -0.01em">Anunciar<span style="color: #8A9A96"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
+<a class="mlink" href="Inicio-Mobile.dc.html#m-quem" onClick="{{fecharMenu}}" style="min-height: 56px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E6ECEA; font-size: 22px; font-weight: 700; font-stretch: 112%; letter-spacing: -0.01em">Sobre nós<span style="color: #8A9A96"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
+<a class="mlink" href="Inicio-Mobile.dc.html#m-contato" onClick="{{fecharMenu}}" style="min-height: 56px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E6ECEA; font-size: 22px; font-weight: 700; font-stretch: 112%; letter-spacing: -0.01em">Contato<span style="color: #8A9A96"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
+</div>
+<a href="https://wa.me/5581991483731" style="margin-top: 20px; height: 54px; border-radius: 999px; background: {{sol}}; color: #0E1F1D; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 16px; text-decoration: none"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 0 1-11.6 7.1L4 20l1-4.2A8 8 0 1 1 20 12z"></path></svg>Fale conosco</a>
+<span style="margin-top: 14px; font-size: 13px; color: #4B5B58; text-align: center">CRECI 18568PJ</span>
+</nav>
+</sc-if>
+
+
+<main>
+<div style="position: relative; height: 290px; background: #D6E5E0; overflow: hidden">
+<img src="{{foto.img}}" alt="{{foto.label}}, imagem ilustrativa" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
+<span style="position: absolute; left: 14px; top: 14px; font-size: 12px; color: #FFFFFF; background: rgba(14, 31, 29, 0.6); padding: 5px 10px; border-radius: 999px">{{foto.label}} · imagem ilustrativa</span>
+<button type="button" onClick="{{fotoAnterior}}" aria-label="Foto anterior" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 999px; border: none; background: rgba(255, 255, 255, 0.92); color: #0E1F1D; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 16px -6px rgba(0, 0, 0, 0.4)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"></path></svg></button>
+<button type="button" onClick="{{fotoProxima}}" aria-label="Próxima foto" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 999px; border: none; background: rgba(255, 255, 255, 0.92); color: #0E1F1D; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 16px -6px rgba(0, 0, 0, 0.4)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg></button>
+<div style="position: absolute; left: 0; right: 0; bottom: 14px; display: flex; justify-content: center; gap: 6px">
+<sc-for list="{{pontos}}" as="p" hint-placeholder-count="5">
+<button type="button" onClick="{{p.pick}}" aria-label="Ver foto {{p.n}}" style="width: {{p.w}}; height: 8px; padding: 0; border: none; border-radius: 999px; background: {{p.bg}}"></button>
+</sc-for>
+</div>
+<span style="position: absolute; right: 14px; top: 14px; font-size: 13px; font-weight: 700; color: #FFFFFF; background: rgba(14, 31, 29, 0.72); padding: 5px 11px; border-radius: 999px; font-variant-numeric: tabular-nums">{{contador}}</span>
+</div>
+<section style="padding: 20px 16px 8px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+<span style="padding: 6px 11px; border-radius: 999px; font-size: 12px; font-weight: 700; background: {{sol}}; color: #0E1F1D">Lançamento</span>
+<span style="padding: 6px 11px; border-radius: 999px; font-size: 12px; font-weight: 700; background: {{marClaro}}; color: #0E1F1D">Minha Casa Minha Vida</span>
+<span style="padding: 6px 11px; border-radius: 999px; font-size: 12px; font-weight: 600; border: 1px solid #D3DDD9; color: #3E4E4B">Cód. VEM_37819</span>
+</div>
+<h1 style="margin: 0; font-size: 36px; line-height: 1; font-weight: 800; font-stretch: 115%; letter-spacing: -0.035em">Bela Vista Living</h1>
+<p style="margin: 0; font-size: 16px; line-height: 1.45; color: #3E4E4B">Apartamentos de 2 e 3 quartos com suíte em Jaguaribe, Paulista – PE</p>
+</section>
+
+<section style="padding: 12px 16px 0">
+<div style="background: {{mar}}; color: #FFFFFF; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 13px; color: {{marTexto}}">Investimento a partir de</span>
+<strong style="font-size: 38px; line-height: 1; font-weight: 800; font-stretch: 112%; letter-spacing: -0.025em; font-variant-numeric: tabular-nums">R$ 265.000</strong>
+<span style="font-size: 13px; color: {{marTexto}}; line-height: 1.45; margin-top: 6px">O valor pode mudar conforme a disponibilidade na tabela da construtora.</span>
+</div>
+</section>
+
+<section aria-label="Resumo do empreendimento" style="padding: 16px 16px 0">
+<ul style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<li style="background: #F1F5F3; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: #4B5B58">Área privativa</span><strong style="font-size: 16px">50,84 a 91,12 m²</strong></li>
+<li style="background: #F1F5F3; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: #4B5B58">Quartos</span><strong style="font-size: 16px">2 ou 3, com suíte</strong></li>
+<li style="background: #F1F5F3; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: #4B5B58">Banheiros</span><strong style="font-size: 16px">2</strong></li>
+<li style="background: #F1F5F3; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: #4B5B58">Vagas</span><strong style="font-size: 16px">1</strong></li>
+<li style="background: #F1F5F3; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: #4B5B58">Entrega prevista</span><strong style="font-size: 16px">Jan/2028</strong></li>
+<li style="background: #F1F5F3; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: #4B5B58">Unidades</span><strong style="font-size: 16px">Tipo e garden</strong></li>
+</ul>
+</section>
+
+<section aria-labelledby="mo-obra" style="padding: 28px 16px 0; display: flex; flex-direction: column; gap: 14px">
+<h2 id="mo-obra" style="margin: 0; font-size: 22px; font-weight: 800; font-stretch: 112%">Andamento da obra</h2>
+<ol style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; font-size: 12px; line-height: 1.25">
+<li style="display: flex; flex-direction: column; gap: 8px"><span style="height: 6px; border-radius: 999px; background: {{mar}}"></span><span style="color: #3E4E4B">Breve lançamento</span></li>
+<li aria-current="step" style="display: flex; flex-direction: column; gap: 8px"><span style="height: 6px; border-radius: 999px; background: {{mar}}"></span><strong>Lançamento</strong></li>
+<li style="display: flex; flex-direction: column; gap: 8px"><span style="height: 6px; border-radius: 999px; background: #D3DDD9"></span><span style="color: #4B5B58">Em construção</span></li>
+<li style="display: flex; flex-direction: column; gap: 8px"><span style="height: 6px; border-radius: 999px; background: #D3DDD9"></span><span style="color: #4B5B58">Pronto para morar</span></li>
+</ol>
+</section>
+
+<section aria-labelledby="mo-sobre" style="padding: 28px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<h2 id="mo-sobre" style="margin: 0; font-size: 22px; font-weight: 800; font-stretch: 112%">Sobre o empreendimento</h2>
+<p style="margin: 0; font-size: 16px; line-height: 1.65; color: #2E3D3A">Condomínio de apartamentos modernos em Jaguaribe, com área verde, planta funcional e boa ventilação. Unidades tipo e garden no térreo, com varanda e cozinha integrada à varanda.</p>
+<p style="margin: 0; font-size: 16px; line-height: 1.65; color: #2E3D3A">Perto de hospital, shopping, supermercado, instituição de ensino e terminal de transporte.</p>
+</section>
+
+<section aria-labelledby="mo-plantas" style="padding: 28px 0 0; display: flex; flex-direction: column; gap: 14px">
+<h2 id="mo-plantas" style="margin: 0; padding: 0 16px; font-size: 22px; font-weight: 800; font-stretch: 112%">Plantas disponíveis</h2>
+<div style="margin: 0 16px; border: 1px solid #DCE4E1; border-radius: 18px; overflow: hidden; background: #FAFAF7">
+<img src="{{planta.img}}" alt="Planta ilustrativa, {{planta.nome}} {{planta.sub}}" style="width: 100%; height: 250px; object-fit: contain; display: block">
+<div style="padding: 12px 14px; background: #FFFFFF; border-top: 1px solid #E6ECEA; display: flex; justify-content: space-between; align-items: center; gap: 8px"><strong style="font-size: 16px">{{planta.nome}}</strong><span style="font-size: 14px; color: #4B5B58">{{planta.sub}}</span></div>
+</div>
+<div class="scroller" style="gap: 8px">
+<sc-for list="{{plantas}}" as="p" hint-placeholder-count="4">
+<button type="button" onClick="{{p.pick}}" aria-pressed="{{p.on}}" style="min-height: 52px; padding: 6px 14px; border-radius: 12px; border: 1px solid {{p.bd}}; background: {{p.bg}}; color: {{p.fg}}; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 1px; text-align: left"><strong style="font-size: 14px">{{p.nome}}</strong><span style="font-size: 12px; opacity: 0.85">{{p.sub}}</span></button>
+</sc-for>
+</div>
+<p style="margin: 0; padding: 0 16px; font-size: 12px; color: #4B5B58">Plantas ilustrativas. Medidas sujeitas a alteração conforme o projeto da construtora.</p>
+</section>
+
+<section aria-labelledby="mo-lazer" style="padding: 24px 16px 0; display: flex; flex-direction: column; gap: 14px">
+<h2 id="mo-lazer" style="margin: 0; font-size: 22px; font-weight: 800; font-stretch: 112%">Lazer e infraestrutura</h2>
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; font-size: 15px">
+<sc-for list="{{lazer}}" as="l" hint-placeholder-count="8">
+<li style="display: flex; align-items: center; gap: 12px"><span style="width: 26px; height: 26px; border-radius: 999px; background: {{l.bg}}; color: {{l.fg}}; display: flex; align-items: center; justify-content: center; flex: none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg></span>{{l.label}}</li>
+</sc-for>
+</ul>
+<button type="button" onClick="{{toggleLazer}}" aria-expanded="{{lazerAberto}}" style="height: 48px; border-radius: 12px; border: 1px solid #C4D1CC; background: #FFFFFF; color: #0E1F1D; font-weight: 700; font-size: 15px">{{lazerBotao}}</button>
+</section>
+
+<section aria-labelledby="mo-local" style="padding: 28px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<h2 id="mo-local" style="margin: 0; font-size: 22px; font-weight: 800; font-stretch: 112%">Localização</h2>
+<address style="font-style: normal; display: flex; flex-direction: column; gap: 2px"><strong style="font-size: 16px">[Endereço completo do empreendimento]</strong><span style="font-size: 14px; color: #4B5B58">Jaguaribe, Paulista – PE</span></address>
+<div style="height: 210px; border-radius: 18px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; background: #EDEFE8">
+<img src="./assets/2bf554aeb7c7d926e8b2398cc5b1b32f.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
+<span style="position: relative; width: 46px; height: 46px; border-radius: 999px 999px 999px 0; transform: rotate(-45deg); background: {{mar}}; box-shadow: 0 10px 24px -8px rgba(0, 0, 0, 0.45); display: flex; align-items: center; justify-content: center"><span style="width: 14px; height: 14px; border-radius: 999px; background: {{sol}}"></span></span>
+<span style="position: absolute; left: 12px; bottom: 12px; font-size: 11px; color: #33433F; background: rgba(255, 255, 255, 0.78); padding: 5px 10px; border-radius: 999px">Mapa do Google</span>
+</div>
+<a href="https://maps.google.com" style="height: 48px; border-radius: 12px; border: 1px solid #C4D1CC; color: #0E1F1D; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 15px; text-decoration: none">Abrir no Google Maps</a>
+</section>
+
+<section aria-labelledby="mo-ficha" style="padding: 28px 16px 0; display: flex; flex-direction: column; gap: 8px">
+<h2 id="mo-ficha" style="margin: 0 0 4px; font-size: 22px; font-weight: 800; font-stretch: 112%">Ficha técnica</h2>
+<dl style="margin: 0; font-size: 15px">
+<div style="display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid #E6ECEA"><dt style="color: #4B5B58">Tipo</dt><dd style="margin: 0; font-weight: 600">Apartamento</dd></div>
+<div style="display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid #E6ECEA"><dt style="color: #4B5B58">Construtora</dt><dd style="margin: 0; font-weight: 600">[Nome da construtora]</dd></div>
+<div style="display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid #E6ECEA"><dt style="color: #4B5B58">Entrega prevista</dt><dd style="margin: 0; font-weight: 600">Janeiro de 2028</dd></div>
+<div style="display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid #E6ECEA"><dt style="color: #4B5B58">Minha Casa Minha Vida</dt><dd style="margin: 0; font-weight: 600">Elegível</dd></div>
+<div style="display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid #E6ECEA"><dt style="color: #4B5B58">Código</dt><dd style="margin: 0; font-weight: 600">VEM_37819</dd></div>
+</dl>
+</section>
+
+<!-- Formulários -->
+<section id="mo-form" aria-label="Contato sobre este imóvel" style="padding: 32px 16px 0">
+<div style="background: #F1F5F3; border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 18px">
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 4px; border-radius: 14px; background: #E1E9E6; gap: 4px">
+<sc-for list="{{abas}}" as="a" hint-placeholder-count="2">
+<button type="button" onClick="{{a.pick}}" aria-pressed="{{a.on}}" style="height: 46px; border-radius: 10px; border: none; background: {{a.bg}}; color: {{a.fg}}; font-weight: 700; font-size: 14px; box-shadow: {{a.sh}}">{{a.label}}</button>
+</sc-for>
+</div>
+
+<sc-if value="{{corretorPendente}}" hint-placeholder-val="{{ true }}">
+<form style="display: flex; flex-direction: column; gap: 14px; margin: 0">
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600; color: #3E4E4B">Nome<input class="field" type="text" autocomplete="name" placeholder="Seu nome completo"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600; color: #3E4E4B">WhatsApp<input class="field" type="tel" autocomplete="tel" placeholder="(81) 9 0000-0000"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600; color: #3E4E4B">E-mail<input class="field" type="email" autocomplete="email" placeholder="voce@email.com"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600; color: #3E4E4B">Mensagem<textarea class="field" rows="3" placeholder="Olá! Tenho interesse no Bela Vista Living e gostaria de mais informações."></textarea></label>
+<label style="display: flex; gap: 12px; align-items: flex-start; font-size: 13px; line-height: 1.45; color: #3E4E4B"><input type="checkbox" style="width: 20px; height: 20px; margin: 0; accent-color: #0B4A44; flex: none"><span>Autorizo a A3 a entrar em contato e concordo com a <a href="#" style="color: {{mar}}; font-weight: 600">Política de Privacidade</a>.</span></label>
+<button type="button" onClick="{{enviarCorretor}}" style="height: 54px; border: none; border-radius: 14px; background: {{mar}}; color: #FFFFFF; font-weight: 700; font-size: 16px">Enviar mensagem</button>
+</form>
+</sc-if>
+<sc-if value="{{corretorEnviado}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 12px; align-items: flex-start; padding: 12px 0">
+<span style="width: 56px; height: 56px; border-radius: 999px; background: {{mar}}; color: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg></span>
+<h3 style="margin: 0; font-size: 23px; font-weight: 800; font-stretch: 112%">Mensagem enviada!</h3>
+<p style="margin: 0; font-size: 16px; line-height: 1.55; color: #3E4E4B">Um corretor da A3 vai responder pelo WhatsApp informado.</p>
+<button type="button" onClick="{{novoCorretor}}" style="height: 44px; padding: 0; border: none; background: none; color: {{mar}}; font-weight: 700; font-size: 15px">Enviar outra mensagem</button>
+</div>
+</sc-if>
+
+<sc-if value="{{visitaPendente}}" hint-placeholder-val="{{ false }}">
+<form style="display: flex; flex-direction: column; gap: 18px; margin: 0">
+<fieldset style="border: none; margin: 0; padding: 0">
+<legend style="font-size: 16px; font-weight: 800; padding: 0; margin-bottom: 4px">Quais dias você pode?</legend>
+<p style="margin: 0 0 10px; font-size: 14px; color: #4B5B58">Marque os dias da semana que ficam melhor para você.</p>
+<div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px">
+<sc-for list="{{dias}}" as="d" hint-placeholder-count="7">
+<button type="button" onClick="{{d.toggle}}" aria-pressed="{{d.sel}}" aria-label="{{d.aria}}" style="height: 48px; padding: 0; border-radius: 12px; border: 1px solid {{d.bd}}; background: {{d.bg}}; color: {{d.fg}}; font-weight: 700; font-size: 14px; cursor: pointer">{{d.semana}}</button>
+</sc-for>
+</div>
+</fieldset>
+<fieldset style="border: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+<legend style="font-size: 16px; font-weight: 800; padding: 0; margin-bottom: 10px">E em quais horários?</legend>
+<button type="button" onClick="{{qualquer.toggle}}" aria-pressed="{{qualquer.sel}}" style="height: 44px; border-radius: 12px; border: 1px solid {{qualquer.bd}}; background: {{qualquer.bg}}; color: {{qualquer.fg}}; font-weight: 700; font-size: 14px; cursor: pointer">Qualquer horário</button>
+<span style="font-size: 13px; font-weight: 700; color: #4B5B58; margin-top: 4px">Manhã</span>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px">
+<sc-for list="{{manha}}" as="h" hint-placeholder-count="4">
+<button type="button" onClick="{{h.toggle}}" aria-pressed="{{h.sel}}" style="height: 44px; border-radius: 12px; border: 1px solid {{h.bd}}; background: {{h.bg}}; color: {{h.fg}}; font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums; cursor: pointer">{{h.label}}</button>
+</sc-for>
+</div>
+<span style="font-size: 13px; font-weight: 700; color: #4B5B58; margin-top: 4px">Tarde</span>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px">
+<sc-for list="{{tarde}}" as="h" hint-placeholder-count="6">
+<button type="button" onClick="{{h.toggle}}" aria-pressed="{{h.sel}}" style="height: 44px; border-radius: 12px; border: 1px solid {{h.bd}}; background: {{h.bg}}; color: {{h.fg}}; font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums; cursor: pointer">{{h.label}}</button>
+</sc-for>
+</div>
+</fieldset>
+<p style="margin: 0; border-radius: 12px; background: #FFFFFF; padding: 12px 14px; font-size: 14px; line-height: 1.5">{{resumo}}</p>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600; color: #3E4E4B">Nome<input class="field" type="text" placeholder="Seu nome completo"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600; color: #3E4E4B">WhatsApp<input class="field" type="tel" placeholder="(81) 9 0000-0000"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600; color: #3E4E4B"><span>Observações <span style="font-weight: 400; color: #4B5B58">(opcional)</span></span><textarea class="field" rows="3" placeholder="Ex.: prefiro visitar com minha família, tenho interesse na planta de 3 quartos…" style="height: auto; padding: 12px 14px; resize: vertical"></textarea></label>
+<label style="display: flex; gap: 12px; align-items: flex-start; font-size: 13px; line-height: 1.45; color: #3E4E4B"><input type="checkbox" style="width: 20px; height: 20px; margin: 0; accent-color: #0B4A44; flex: none"><span>Autorizo a A3 a entrar em contato e concordo com a <a href="#" style="color: {{mar}}; font-weight: 600">Política de Privacidade</a>.</span></label>
+<button type="button" onClick="{{enviarVisita}}" style="height: 54px; border: none; border-radius: 14px; background: {{mar}}; color: #FFFFFF; font-weight: 700; font-size: 16px">Solicitar visita</button>
+</form>
+</sc-if>
+<sc-if value="{{visitaEnviada}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 12px; align-items: flex-start; padding: 12px 0">
+<span style="width: 56px; height: 56px; border-radius: 999px; background: {{mar}}; color: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg></span>
+<h3 style="margin: 0; font-size: 23px; font-weight: 800; font-stretch: 112%">Pedido de visita enviado!</h3>
+<p style="margin: 0; font-size: 16px; line-height: 1.55; color: #3E4E4B">{{resumo}} Um corretor da A3 vai combinar os detalhes com você.</p>
+<button type="button" onClick="{{refazerVisita}}" style="height: 44px; padding: 0; border: none; background: none; color: {{mar}}; font-weight: 700; font-size: 15px">Alterar dias e horários</button>
+</div>
+</sc-if>
+</div>
+</section>
+
+<section aria-labelledby="mo-similares" style="padding: 40px 0 32px; display: flex; flex-direction: column; gap: 14px">
+<h2 id="mo-similares" style="margin: 0; padding: 0 16px; font-size: 22px; font-weight: 800; font-stretch: 112%">Parecidos em Paulista</h2>
+<div class="scroller">
+<sc-for list="{{similares}}" as="it" hint-placeholder-count="3">
+<a href="Empreendimento-Mobile.dc.html" style="width: 260px; border: 1px solid #DCE4E1; border-radius: 18px; overflow: hidden; text-decoration: none; color: #0E1F1D; display: flex; flex-direction: column">
+<img src="{{it.img}}" alt="Perspectiva ilustrada do {{it.nome}}" style="width: 100%; height: 150px; object-fit: cover; display: block">
+<span style="padding: 14px; display: flex; flex-direction: column; gap: 4px">
+<strong style="font-size: 17px; font-stretch: 112%">{{it.nome}}</strong>
+<span style="font-size: 13px; color: #4B5B58">{{it.local}}</span>
+<span style="font-size: 13px; color: #4B5B58; margin-top: 6px">Investimento a partir de</span>
+<strong style="font-size: 19px; font-variant-numeric: tabular-nums">{{it.preco}}</strong>
+</span>
+</a>
+</sc-for>
+</div>
+</section>
+</main>
+
+<footer style="background: {{marEscuro}}; color: {{marTexto}}; padding: 40px 16px 112px; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<img src="./assets/50257d81843cc16b3fc7ae24d2719289.png" alt="A3 Soluções Imobiliárias" style="height: 72px; width: auto; display: block; align-self: flex-start">
+<p style="margin: 0; font-size: 15px; line-height: 1.6">Venda, aluguel e lançamentos de imóveis, com um corretor do primeiro contato à entrega das chaves.</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 16px; font-size: 15px">
+<nav aria-label="Rodapé" style="display: flex; flex-direction: column; gap: 12px">
+<strong style="color: #FFFFFF">Navegação</strong>
+<a class="flink" href="Busca-Mobile.dc.html">Imóveis à venda</a>
+<a class="flink" href="Busca-Mobile.dc.html">Para alugar</a>
+<a class="flink" href="Busca-Mobile.dc.html">Lançamentos</a>
+<a class="flink" href="Inicio-Mobile.dc.html#m-anunciar">Anunciar imóvel</a>
+<a class="flink" href="Inicio-Mobile.dc.html#m-quem">Quem somos</a>
+</nav>
+<nav aria-label="Buscas frequentes" style="display: flex; flex-direction: column; gap: 12px">
+<strong style="color: #FFFFFF">Buscas frequentes</strong>
+<a class="flink" href="Busca-Mobile.dc.html">Janga</a>
+<a class="flink" href="Busca-Mobile.dc.html">Pau Amarelo</a>
+<a class="flink" href="Busca-Mobile.dc.html">Jaguaribe</a>
+<a class="flink" href="Busca-Mobile.dc.html">Igarassu</a>
+<a class="flink" href="Busca-Mobile.dc.html">Recife</a>
+</nav>
+</div>
+<a href="Inicio-Mobile.dc.html#m-contato" style="height: 48px; align-self: flex-start; padding: 0 20px; border-radius: 999px; background: {{sol}}; color: #0E1F1D; display: flex; align-items: center; font-weight: 700; font-size: 15px; text-decoration: none">Fale conosco</a>
+<div style="border-top: 1px solid rgba(255, 255, 255, 0.16); padding-top: 20px; padding-right: 84px; display: flex; flex-direction: column; gap: 8px; font-size: 13px">
+<span>© 2026 A3 Soluções Imobiliárias · CRECI 18568PJ</span>
+<a class="flink" href="#" style="text-decoration: underline; text-underline-offset: 3px">Política de privacidade</a>
+</div>
+</footer>
+
+<div style="position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; padding: 12px 16px 16px; background: #FFFFFF; border-top: 1px solid #E1E8E5; box-shadow: 0 -12px 24px -16px rgba(14, 31, 29, 0.3); display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px">
+<a href="https://wa.me/5581991483731" style="height: 52px; border-radius: 14px; border: 1px solid #C4D1CC; color: #0E1F1D; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 15px; text-decoration: none">
+<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 0 1-11.6 7.1L4 20l1-4.2A8 8 0 1 1 20 12z"></path></svg>
+WhatsApp
+</a>
+<a href="#mo-form" onClick="{{irVisita}}" style="height: 52px; border-radius: 14px; background: {{sol}}; color: #0E1F1D; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 15px; text-decoration: none">
+<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg>
+Agendar visita
+</a>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"corPrincipal":{"editor":"color","default":"#0B4A44","options":["#0B4A44","#14406B","#3A2E5E","#22302E"],"section":"Marca"},"corDestaque":{"editor":"color","default":"#8EE07A","options":["#8EE07A","#F2894E","#86D1BC","#E8D36A"],"section":"Marca"},"$preview":{"width":390,"height":5300}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { menuAberto: false, aba: 'corretor', foto: 0, planta: 0, lazerAberto: false, dias: ['ter', 'qui'], horarios: ['09:00', '14:00'], visitaEnviada: false, corretorEnviado: false };
+  }
+  mix(hex, to, t) {
+    if (!/^#[0-9a-fA-F]{6}$/.test(hex || '')) hex = '#0B4A44';
+    const p = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+    const a = p(hex);
+    const b = p(to);
+    return '#' + a.map((v, i) => Math.round(v + (b[i] - v) * t).toString(16).padStart(2, '0')).join('');
+  }
+  toggleIn(key, val) {
+    const arr = this.state[key];
+    this.setState({ [key]: arr.includes(val) ? arr.filter((x) => x !== val) : arr.concat(val) });
+  }
+  juntar(arr, sep) {
+    if (arr.length <= 1) return arr.join('');
+    return arr.slice(0, -1).join(', ') + sep + arr[arr.length - 1];
+  }
+  renderVals() {
+    const s = this.state;
+    const mar = this.props.corPrincipal ?? '#0B4A44';
+    const sol = this.props.corDestaque ?? '#8EE07A';
+    const marClaro = this.mix(mar, '#FFFFFF', 0.9);
+    const marTexto = this.mix(mar, '#FFFFFF', 0.82);
+    const menu = { menuAberto: !!s.menuAberto, abrirMenu: () => this.setState({ menuAberto: true }), fecharMenu: () => this.setState({ menuAberto: false }) };
+    const sel = (v) => ({ bg: v ? mar : '#FFFFFF', fg: v ? '#FFFFFF' : '#0E1F1D', bd: v ? mar : '#C4D1CC' });
+    const nomes = { seg: 'segundas', ter: 'terças', qua: 'quartas', qui: 'quintas', sex: 'sextas', 'sáb': 'sábados', dom: 'domingos' };
+    const semana = ['seg', 'ter', 'qua', 'qui', 'sex', 'sáb', 'dom'];
+    const dias = semana.map((w) => {
+      const on = s.dias.includes(w);
+      return { semana: w.charAt(0).toUpperCase() + w.slice(1), sel: on, ...sel(on), aria: nomes[w], toggle: () => this.toggleIn('dias', w) };
+    });
+    const ordemHoras = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
+    const todas = ordemHoras.every((h) => s.horarios.includes(h));
+    const hora = (h) => {
+      const on = s.horarios.includes(h);
+      return { label: h, sel: on, ...sel(on), toggle: () => this.toggleIn('horarios', h) };
+    };
+    const qualquer = { sel: todas, ...sel(todas), toggle: () => this.setState({ horarios: todas ? [] : ordemHoras.slice() }) };
+    const diasSel = semana.filter((w) => s.dias.includes(w)).map((w) => nomes[w]);
+    const horasSel = ordemHoras.filter((h) => s.horarios.includes(h)).map((h) => parseInt(h, 10) + 'h');
+    const horasTxt = todas ? 'em qualquer horário' : 'às ' + this.juntar(horasSel, ' ou ');
+    let resumo = 'Escolha pelo menos um dia da semana e um horário.';
+    if (diasSel.length && horasSel.length) resumo = 'Você pode às ' + this.juntar(diasSel, ' e ') + ', ' + horasTxt + '.';
+    else if (diasSel.length) resumo = 'Dias: ' + this.juntar(diasSel, ' e ') + '. Agora escolha os horários.';
+    else if (horasSel.length) resumo = 'Horários: ' + (todas ? 'qualquer horário' : this.juntar(horasSel, ' ou ')) + '. Agora escolha os dias.';
+    const fotos = [
+        { label: 'Fachada', img: './assets/f1fd9ed89ef10821e5d8253ed8ba8843.jpg' },
+        { label: 'Piscina com prainha', img: './assets/850adf29925e3f17738e670d103e048b.jpg' },
+        { label: 'Área gourmet', img: './assets/ddfbcd6ba3bd27bfcbebe2582aad0897.jpg' },
+        { label: 'Sala integrada', img: './assets/8c531ae6f2aae831944936a638bd3b9b.jpg' },
+        { label: 'Beach tennis', img: './assets/ac736e0e53c0e15064d18dc9fd74dfca.jpg' }
+    ];
+    const PLANTAS = [
+      { nome: '2 quartos, suíte', sub: 'Tipo · 50,84 m²', img: './assets/c7aa98c2e4f6141e83178b29a32bffe8.jpg' },
+      { nome: '2 quartos, suíte', sub: 'Garden · 70,26 m²', img: './assets/91e5ff441b1bcc04cd88365472ec449e.jpg' },
+      { nome: '3 quartos, suíte', sub: 'Tipo · 62,25 m²', img: './assets/ae8b697bd94d30b779a2c86b2e43e372.jpg' },
+      { nome: '3 quartos, suíte', sub: 'Garden · 91,12 m²', img: './assets/897fcbf2b6947c1e2332abfb50994641.jpg' }
+    ];
+    const LAZER = ['Piscina adulto e infantil com prainha', 'Área de apoio com 3 churrasqueiras', 'Salão de festas', 'Playground', 'Brinquedoteca', 'Quadra poliesportiva', '2 mini campos', '2 quadras de beach tennis', 'Academias ao ar livre', 'Pista de cooper', 'Pet place', 'Bicicletário', 'Praça de convivência', 'Redário', 'Quiosque', 'Guarita'];
+    const tabs = [['corretor', 'Falar com corretor'], ['visita', 'Agendar visita']];
+    return {
+      mar, sol, marClaro, marTexto, ...menu,
+      foto: fotos[s.foto],
+      contador: (s.foto + 1) + ' / ' + fotos.length,
+      fotoAnterior: () => this.setState({ foto: (s.foto + fotos.length - 1) % fotos.length }),
+      fotoProxima: () => this.setState({ foto: (s.foto + 1) % fotos.length }),
+      pontos: fotos.map((f, i) => ({ n: String(i + 1), w: i === s.foto ? '22px' : '8px', bg: i === s.foto ? '#FFFFFF' : 'rgba(255,255,255,.55)', pick: () => this.setState({ foto: i }) })),
+      planta: PLANTAS[s.planta],
+      plantas: PLANTAS.map((p, i) => ({ ...p, on: i === s.planta, ...sel(i === s.planta), pick: () => this.setState({ planta: i }) })),
+      corretorPendente: s.aba === 'corretor' && !s.corretorEnviado,
+      corretorEnviado: s.aba === 'corretor' && s.corretorEnviado,
+      enviarCorretor: () => this.setState({ corretorEnviado: true }),
+      novoCorretor: () => this.setState({ corretorEnviado: false }),
+      visitaPendente: s.aba === 'visita' && !s.visitaEnviada,
+      visitaEnviada: s.aba === 'visita' && s.visitaEnviada,
+      enviarVisita: () => this.setState({ visitaEnviada: true }),
+      refazerVisita: () => this.setState({ visitaEnviada: false }),
+      marEscuro: this.mix(mar, '#000000', 0.36),
+      lazer: (s.lazerAberto ? LAZER : LAZER.slice(0, 8)).map((label) => ({ label, bg: marClaro, fg: mar })),
+      lazerAberto: s.lazerAberto,
+      lazerBotao: s.lazerAberto ? 'Mostrar menos' : 'Ver os 16 itens de lazer',
+      toggleLazer: () => this.setState({ lazerAberto: !s.lazerAberto }),
+      abas: tabs.map(([id, label]) => {
+        const on = s.aba === id;
+        return { label, on, bg: on ? '#FFFFFF' : 'transparent', fg: on ? '#0E1F1D' : '#3E4E4B', sh: on ? '0 2px 6px rgba(14,31,29,.14)' : 'none', pick: () => this.setState({ aba: id }) };
+      }),
+      abaCorretor: s.aba === 'corretor',
+      abaVisita: s.aba === 'visita',
+      irVisita: () => this.setState({ aba: 'visita' }),
+      dias,
+      manha: ordemHoras.slice(0, 4).map(hora),
+      tarde: ordemHoras.slice(4).map(hora),
+      qualquer,
+      resumo,
+      similares: [
+        { nome: 'Viva Paineiras', local: 'Eco Parque Paineiras, Paulista', preco: 'R$ 257.000', img: './assets/c7be17520c0ba0b30d51459b0632bbb6.jpg' },
+        { nome: 'Vila das Palmeiras', local: 'PE-22, Paulista', preco: 'R$ 260.000', img: './assets/1865971c9c85a8b06d9db6caaf3211c7.jpg' },
+        { nome: 'Alameda dos Corais', local: 'Praia da Conceição, Paulista', preco: 'R$ 240.807', img: './assets/44c7c94c6be68d1c1762847839b324b8.jpg' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

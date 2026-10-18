@@ -1,0 +1,193 @@
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: #fff;
+  border: 1px solid var(--borda-2);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.card[data-variante='destaque'] {
+  border: 0;
+  border-radius: 22px;
+  box-shadow: var(--sombra-card);
+}
+
+.foto {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: #d6e5e0;
+  overflow: hidden;
+}
+
+.card[data-variante='destaque'] .foto {
+  aspect-ratio: 16 / 9;
+}
+
+.foto img {
+  object-fit: cover;
+}
+
+.etiqueta {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.corpo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 18px 20px 20px;
+}
+
+.card[data-variante='destaque'] .corpo {
+  gap: 8px;
+  padding: 16px 20px 18px;
+}
+
+.tipo {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--texto-2);
+}
+
+.nome {
+  font-size: 21px;
+  line-height: 1.12;
+  font-weight: 800;
+  font-stretch: 112%;
+  letter-spacing: -0.01em;
+}
+
+.card[data-variante='destaque'] .nome {
+  font-size: 23px;
+}
+
+.link {
+  color: var(--tinta);
+  text-decoration: none;
+}
+
+/* O card inteiro é clicável, mas só existe um link (melhor para leitores de tela e SEO). */
+.link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.link:focus-visible {
+  outline: none;
+}
+
+.link:focus-visible::after {
+  border-radius: inherit;
+  outline: 3px solid var(--sol);
+  outline-offset: -3px;
+}
+
+.card:hover .link {
+  color: var(--mar);
+}
+
+.local {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--texto-2);
+}
+
+.atributos {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  font-size: 14px;
+  color: var(--texto-4);
+}
+
+.atributos li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rodape {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--borda-3);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.preco {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.preco span {
+  font-size: 13px;
+  color: var(--texto-2);
+}
+
+.preco strong {
+  font-size: 23px;
+  font-weight: 800;
+  font-stretch: 108%;
+  letter-spacing: -0.015em;
+  font-variant-numeric: tabular-nums;
+}
+
+.card[data-variante='destaque'] .preco strong {
+  font-size: 25px;
+}
+
+.extra {
+  font-size: 13px;
+  color: var(--texto-2);
+  text-align: right;
+}
+
+@media (max-width: 767px) {
+  .foto,
+  .card[data-variante='destaque'] .foto {
+    aspect-ratio: auto;
+    height: 200px;
+  }
+  .corpo,
+  .card[data-variante='destaque'] .corpo {
+    gap: 8px;
+    padding: 16px 18px 18px;
+  }
+  .tipo {
+    font-size: 11px;
+  }
+  .nome,
+  .card[data-variante='destaque'] .nome {
+    font-size: 21px;
+  }
+  .atributos {
+    gap: 6px 14px;
+  }
+  .preco span,
+  .extra {
+    font-size: 12px;
+  }
+  .preco strong,
+  .card[data-variante='destaque'] .preco strong {
+    font-size: 22px;
+  }
+}

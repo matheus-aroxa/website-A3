@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Menu aberto · mobile | A3 Soluções Imobiliárias</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&amp;display=swap">
+<style>
+body{margin:0;background:#08302C}
+*{box-sizing:border-box}
+a{color:#0B4A44}a:hover{color:#08332F}
+input,select,textarea,button{font:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid #8EE07A;outline-offset:2px}
+.scroller{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 16px 10px;scrollbar-width:none}
+.scroller::-webkit-scrollbar{display:none}
+.scroller > *{scroll-snap-align:start;flex:none}
+.flink{color:inherit;text-decoration:none}
+.mlink{color:#0E1F1D;text-decoration:none}
+.field{width:100%;height:52px;border:1px solid #C4D1CC;border-radius:12px;background:#FFFFFF;padding:0 14px;font-size:16px;color:#0E1F1D;appearance:none;-webkit-appearance:none}
+.field:focus{border-color:#0B4A44;outline:none;box-shadow:0 0 0 3px rgba(11,74,68,.18)}
+textarea.field{height:auto;padding:12px 14px;resize:vertical}
+</style>
+</helmet>
+<div style="width: 390px; font-family: 'Archivo', system-ui, sans-serif; color: #0E1F1D; background: #FFFFFF; position: relative">
+
+<header style="position: sticky; top: 0; z-index: 20; height: 64px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E1E8E5; background: #FFFFFF">
+<a href="Inicio-Mobile.dc.html" aria-label="A3 Soluções Imobiliárias, página inicial" style="display: flex; align-items: center; text-decoration: none">
+<img src="./assets/8b437510b7c58ab196dc122487c39490.png" alt="A3 Soluções Imobiliárias" style="height: 36px; width: auto; display: block">
+</a>
+<div style="display: flex; gap: 8px">
+<a href="https://wa.me/5581991483731" style="height: 44px; padding: 0 14px; border-radius: 999px; background: {{sol}}; color: #0E1F1D; display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 14px; text-decoration: none; white-space: nowrap">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 0 1-11.6 7.1L4 20l1-4.2A8 8 0 1 1 20 12z"></path></svg>
+Fale conosco
+</a>
+<button type="button" onClick="{{abrirMenu}}" aria-label="Abrir menu" aria-expanded="{{menuAberto}}" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #D3DDD9; background: #FFFFFF; color: #0E1F1D; display: flex; align-items: center; justify-content: center">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+</button>
+</div>
+</header>
+
+<sc-if value="{{menuAberto}}" hint-placeholder-val="{{ false }}">
+<div onClick="{{fecharMenu}}" style="position: fixed; inset: 0; z-index: 50; background: rgba(8, 48, 44, 0.55)"></div>
+<nav aria-label="Menu" style="position: fixed; top: 0; left: 0; right: 0; z-index: 51; background: #FFFFFF; border-radius: 0 0 26px 26px; padding: 0 16px 24px; display: flex; flex-direction: column; box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.45)">
+<div style="height: 64px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E1E8E5; margin: 0 -16px; padding: 0 16px">
+<img src="./assets/8b437510b7c58ab196dc122487c39490.png" alt="A3 Soluções Imobiliárias" style="height: 36px; width: auto; display: block">
+<button type="button" onClick="{{fecharMenu}}" aria-label="Fechar menu" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #D3DDD9; background: #FFFFFF; color: #0E1F1D; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+</div>
+<div style="display: flex; flex-direction: column; padding-top: 6px">
+<a class="mlink" href="Busca-Mobile.dc.html" onClick="{{fecharMenu}}" style="min-height: 56px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E6ECEA; font-size: 22px; font-weight: 700; font-stretch: 112%; letter-spacing: -0.01em">Imóveis<span style="color: #8A9A96"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
+<a class="mlink" href="#m-servicos" onClick="{{fecharMenu}}" style="min-height: 56px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E6ECEA; font-size: 22px; font-weight: 700; font-stretch: 112%; letter-spacing: -0.01em">Serviços<span style="color: #8A9A96"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
+<a class="mlink" href="#m-anunciar" onClick="{{fecharMenu}}" style="min-height: 56px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E6ECEA; font-size: 22px; font-weight: 700; font-stretch: 112%; letter-spacing: -0.01em">Anunciar<span style="color: #8A9A96"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
+<a class="mlink" href="#m-quem" onClick="{{fecharMenu}}" style="min-height: 56px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E6ECEA; font-size: 22px; font-weight: 700; font-stretch: 112%; letter-spacing: -0.01em">Sobre nós<span style="color: #8A9A96"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
+<a class="mlink" href="#m-contato" onClick="{{fecharMenu}}" style="min-height: 56px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E6ECEA; font-size: 22px; font-weight: 700; font-stretch: 112%; letter-spacing: -0.01em">Contato<span style="color: #8A9A96"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
+</div>
+<a href="https://wa.me/5581991483731" style="margin-top: 20px; height: 54px; border-radius: 999px; background: {{sol}}; color: #0E1F1D; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 16px; text-decoration: none"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 0 1-11.6 7.1L4 20l1-4.2A8 8 0 1 1 20 12z"></path></svg>Fale conosco</a>
+<span style="margin-top: 14px; font-size: 13px; color: #4B5B58; text-align: center">CRECI 18568PJ</span>
+</nav>
+</sc-if>
+
+<main>
+<!-- Hero -->
+<section style="background: {{mar}}; color: #FFFFFF; padding: 32px 16px 64px; display: flex; flex-direction: column; gap: 18px">
+<h1 style="margin: 0; font-size: 54px; line-height: 0.92; font-weight: 800; font-stretch: 118%; letter-spacing: -0.04em">Seu lar <span style="color: {{sol}}">está aqui.</span></h1>
+<p style="margin: 0; font-size: 16px; line-height: 1.55; color: {{marTexto}}">Na <strong style="color: #FFFFFF">A3 Soluções Imobiliárias</strong> você encontra apartamentos, casas de condomínio e lançamentos para comprar ou alugar — com um corretor do primeiro contato à entrega das chaves.</p>
+<div style="position: relative; margin-top: 6px">
+<div style="position: relative; height: 230px; border-radius: 22px; overflow: hidden; background: #15574F">
+<img src="./assets/f1fd9ed89ef10821e5d8253ed8ba8843.jpg" alt="Perspectiva ilustrada da fachada do Bela Vista Living, com a piscina em primeiro plano" style="width: 100%; height: 100%; object-fit: cover; display: block">
+<span style="position: absolute; top: 12px; right: 12px; font-size: 11px; color: #FFFFFF; background: rgba(14, 31, 29, 0.6); padding: 5px 10px; border-radius: 999px">Imagem ilustrativa</span>
+</div>
+<a href="Empreendimento-Mobile.dc.html" style="position: absolute; left: 12px; right: 12px; bottom: -30px; background: #FFFFFF; color: #0E1F1D; border-radius: 18px; padding: 12px; display: flex; gap: 12px; align-items: center; text-decoration: none; box-shadow: 0 20px 40px -18px rgba(0, 0, 0, 0.5)">
+<img src="./assets/4ad7ad6a16c4eba14f6ec9620eadec08.jpg" alt="" style="width: 60px; height: 60px; border-radius: 12px; flex: none; object-fit: cover">
+<span style="display: flex; flex-direction: column; gap: 3px; min-width: 0">
+<span style="font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #2F6B1E">Lançamento · Jaguaribe</span>
+<strong style="font-size: 17px; font-stretch: 112%">Bela Vista Living</strong>
+<span style="font-size: 13px; color: #4B5B58">Investimento a partir de <strong style="color: #0E1F1D">R$ 265.000</strong></span>
+</span>
+<span style="margin-left: auto; flex: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg></span>
+</a>
+</div>
+</section>
+
+<!-- Destaques -->
+<section aria-labelledby="m-destaques" style="background: {{marClaro}}; padding: 56px 0 40px; display: flex; flex-direction: column; gap: 20px">
+<div style="padding: 0 16px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: {{mar}}">Destaques</span>
+<h2 id="m-destaques" style="margin: 0; font-size: 30px; line-height: 1.05; font-weight: 800; font-stretch: 115%; letter-spacing: -0.025em">Lançamentos e empreendimentos em destaque</h2>
+</div>
+<div class="scroller" style="padding-bottom: 28px">
+<sc-for list="{{destaques}}" as="it" hint-placeholder-count="3">
+<article style="width: 300px; position: relative; display: flex; flex-direction: column; background: #FFFFFF; border: none; box-shadow: 0 18px 40px -22px rgba(14, 31, 29, 0.35); border-radius: 20px; overflow: hidden">
+<a href="Empreendimento-Mobile.dc.html" aria-label="Ver {{it.nome}}" style="position: relative; display: block; height: 200px; overflow: hidden; background: #D6E5E0">
+<img src="{{it.img}}" alt="Perspectiva ilustrada do {{it.nome}}" style="width: 100%; height: 100%; object-fit: cover; display: block">
+<span style="position: absolute; top: 12px; left: 12px; padding: 6px 11px; border-radius: 999px; font-size: 12px; font-weight: 700; background: {{it.tagBg}}; color: {{it.tagFg}}; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12)">{{it.situacao}}</span>
+</a>
+<div style="padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 8px; flex: 1">
+<span style="font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4B5B58">{{it.tipo}}</span>
+<h3 style="margin: 0; font-size: 21px; line-height: 1.12; font-weight: 800; font-stretch: 112%"><a href="Empreendimento-Mobile.dc.html" style="color: #0E1F1D; text-decoration: none">{{it.nome}}</a></h3>
+<span style="display: flex; align-items: center; gap: 6px; font-size: 14px; color: #4B5B58"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z"></path><circle cx="12" cy="9.5" r="2.5"></circle></svg>{{it.local}}</span>
+<ul style="list-style: none; margin: 2px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; color: #2E3D3A">
+<li style="display: flex; align-items: center; gap: 5px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8V3h5M21 16v5h-5M3 3l7 7M21 21l-7-7"></path></svg>{{it.area}}</li>
+<li style="display: flex; align-items: center; gap: 5px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 19V6"></path><path d="M3 13h18v6"></path><path d="M21 13a3 3 0 0 0-3-3h-7v3"></path><circle cx="7" cy="10" r="1.6"></circle></svg>{{it.quartos}}</li>
+<li style="display: flex; align-items: center; gap: 5px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"></path><path d="M6 12V6a2 2 0 0 1 3.5-1.3"></path><path d="M7 19l-1 2M17 19l1 2"></path></svg>{{it.banheiros}}</li>
+<li style="display: flex; align-items: center; gap: 5px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 17v-5l2.2-5.2A1.5 1.5 0 0 1 7.6 6h8.8a1.5 1.5 0 0 1 1.4.8L20 12v5z"></path><path d="M4 12h16"></path><path d="M6 17v2M18 17v2"></path></svg>{{it.vagasLabel}}</li>
+</ul>
+<div style="margin-top: auto; padding-top: 12px; border-top: 1px solid #E6ECEA; display: flex; justify-content: space-between; align-items: flex-end; gap: 10px">
+<span style="display: flex; flex-direction: column"><span style="font-size: 12px; color: #4B5B58">{{it.precoLabel}}</span><strong style="font-size: 22px; font-stretch: 108%; font-variant-numeric: tabular-nums">{{it.precoTxt}}</strong></span>
+<span style="font-size: 12px; color: #4B5B58; text-align: right">{{it.rodape}}</span>
+</div>
+</div>
+</article>
+</sc-for>
+</div>
+<div style="padding: 0 16px">
+<a href="Busca-Mobile.dc.html" style="height: 56px; border-radius: 999px; background: {{sol}}; color: #0E1F1D; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 16px; text-decoration: none; box-shadow: 0 14px 28px -14px rgba(14, 31, 29, 0.45)">Ver todos os imóveis <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+</div>
+</section>
+
+<!-- Serviços -->
+<section id="m-servicos" aria-labelledby="m-servicos-t" style="background: {{mar}}; color: #FFFFFF; padding: 48px 16px; display: flex; flex-direction: column; gap: 22px; scroll-margin-top: 64px">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: {{sol}}">Nossos serviços</span>
+<h2 id="m-servicos-t" style="margin: 0; font-size: 30px; line-height: 1.05; font-weight: 800; font-stretch: 115%; letter-spacing: -0.025em">Da primeira visita à <span style="color: {{sol}}">entrega das chaves</span></h2>
+<p style="margin: 0; font-size: 16px; line-height: 1.6; color: {{marTexto}}">Um corretor da A3 acompanha cada etapa: a escolha do imóvel, a visita, a simulação do financiamento e a assinatura do contrato.</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 10px">
+<span style="width: 48px; height: 48px; border-radius: 14px; background: {{sol}}; color: #0E1F1D; display: flex; align-items: center; justify-content: center; margin-bottom: 4px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11 12 4l8 7v9H4z"></path><path d="M10 20v-5h4v5"></path></svg></span>
+<h3 style="margin: 0; font-size: 19px; font-weight: 800; font-stretch: 110%">Comprar seu imóvel</h3>
+<p style="margin: 0; font-size: 15px; line-height: 1.55; color: {{marTexto}}">Apartamentos, casas de condomínio e terrenos à venda, com visita acompanhada por um corretor.</p>
+<a href="Busca-Mobile.dc.html" style="min-height: 44px; display: flex; align-items: center; gap: 6px; color: {{sol}}; font-weight: 700; font-size: 15px; text-decoration: none">Imóveis à venda <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+</div>
+<div style="background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 10px">
+<span style="width: 48px; height: 48px; border-radius: 14px; background: {{sol}}; color: #0E1F1D; display: flex; align-items: center; justify-content: center; margin-bottom: 4px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"></circle><path d="m11 12 8-8M16 7l2 2M14 9l2 2"></path></svg></span>
+<h3 style="margin: 0; font-size: 19px; font-weight: 800; font-stretch: 110%">Alugar sem complicação</h3>
+<p style="margin: 0; font-size: 15px; line-height: 1.55; color: {{marTexto}}">Encontramos o imóvel para alugar no bairro que você precisa e cuidamos da negociação com o proprietário.</p>
+<a href="Busca-Mobile.dc.html" style="min-height: 44px; display: flex; align-items: center; gap: 6px; color: {{sol}}; font-weight: 700; font-size: 15px; text-decoration: none">Imóveis para alugar <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+</div>
+<div style="background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 10px">
+<span style="width: 48px; height: 48px; border-radius: 14px; background: {{sol}}; color: #0E1F1D; display: flex; align-items: center; justify-content: center; margin-bottom: 4px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="1"></rect><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2M10 21v-3h4v3"></path></svg></span>
+<h3 style="margin: 0; font-size: 19px; font-weight: 800; font-stretch: 110%">Lançamentos e Minha Casa Minha Vida</h3>
+<p style="margin: 0; font-size: 15px; line-height: 1.55; color: {{marTexto}}">Imóveis na planta das construtoras parceiras, com orientação sobre o enquadramento no programa.</p>
+<a href="Busca-Mobile.dc.html" style="min-height: 44px; display: flex; align-items: center; gap: 6px; color: {{sol}}; font-weight: 700; font-size: 15px; text-decoration: none">Ver lançamentos <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+</div>
+<div style="background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 10px">
+<span style="width: 48px; height: 48px; border-radius: 14px; background: {{sol}}; color: #0E1F1D; display: flex; align-items: center; justify-content: center; margin-bottom: 4px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="m9 15 6-6"></path><circle cx="9.3" cy="9.3" r="0.9"></circle><circle cx="14.7" cy="14.7" r="0.9"></circle></svg></span>
+<h3 style="margin: 0; font-size: 19px; font-weight: 800; font-stretch: 110%">Financiamento orientado</h3>
+<p style="margin: 0; font-size: 15px; line-height: 1.55; color: {{marTexto}}">Simulamos as parcelas e ajudamos você a escolher o financiamento que cabe na sua renda.</p>
+<a href="#m-contato" style="min-height: 44px; display: flex; align-items: center; gap: 6px; color: {{sol}}; font-weight: 700; font-size: 15px; text-decoration: none">Simular financiamento <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+</div>
+</div>
+</section>
+
+<!-- Anunciar -->
+<section id="m-anunciar" aria-labelledby="m-anunciar-t" style="padding: 48px 16px 0; scroll-margin-top: 64px">
+<div style="background: {{sol}}; border-radius: 24px; padding: 26px 22px; display: flex; flex-direction: column; gap: 14px">
+<h2 id="m-anunciar-t" style="margin: 0; font-size: 27px; line-height: 1.05; font-weight: 800; font-stretch: 115%; letter-spacing: -0.025em; color: #0E1F1D">Tem um imóvel para vender ou alugar?</h2>
+<p style="margin: 0; font-size: 16px; line-height: 1.5; color: #2A2412">Cadastre seu imóvel e a A3 cuida da divulgação e do atendimento aos interessados.</p>
+<a href="#m-contato" style="height: 52px; border-radius: 999px; background: #0E1F1D; color: #FFFFFF; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 16px; text-decoration: none; margin-top: 4px">Anunciar meu imóvel <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+<a href="https://wa.me/5581991483731" style="height: 52px; border-radius: 999px; border: 2px solid #0E1F1D; color: #0E1F1D; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; text-decoration: none">Falar com um corretor</a>
+</div>
+</section>
+
+<!-- Quem somos -->
+<section id="m-quem" aria-labelledby="m-quem-t" style="padding: 48px 16px; display: flex; flex-direction: column; gap: 16px; scroll-margin-top: 64px">
+<img src="./assets/12e580bef00dc3f1ed94c57fee7f7f51.jpg" alt="Equipe da A3 Soluções Imobiliárias" style="width: 100%; height: 260px; object-fit: cover; border-radius: 22px; display: block">
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: {{mar}}; margin-top: 8px">Quem somos</span>
+<h2 id="m-quem-t" style="margin: 0; font-size: 30px; line-height: 1.05; font-weight: 800; font-stretch: 115%; letter-spacing: -0.025em">Uma imobiliária que acompanha você em cada passo</h2>
+<p style="margin: 0; font-size: 16px; line-height: 1.6; color: #3E4E4B">A A3 Soluções Imobiliárias tem sede em Jaguaribe, Paulista – PE, e ajuda quem quer comprar, alugar ou anunciar um imóvel.</p>
+<p style="margin: 0; font-size: 16px; line-height: 1.6; color: #3E4E4B">Trabalhamos com lançamentos de construtoras parceiras, imóveis do Minha Casa Minha Vida e locação — sempre com um corretor que explica cada etapa, da visita à assinatura do contrato.</p>
+<ul style="list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 12px; font-size: 15px">
+<sc-for list="{{diferenciais}}" as="d" hint-placeholder-count="3">
+<li style="display: flex; gap: 12px; align-items: center"><span style="width: 28px; height: 28px; border-radius: 999px; background: {{marClaro}}; color: {{mar}}; display: flex; align-items: center; justify-content: center; flex: none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg></span>{{d.label}}</li>
+</sc-for>
+</ul>
+</section>
+
+<!-- Depoimentos -->
+<section aria-labelledby="m-depo" style="background: {{mar}}; color: #FFFFFF; padding: 48px 0 40px; display: flex; flex-direction: column; gap: 22px; position: relative; overflow: hidden">
+<span aria-hidden="true" style="position: absolute; right: -10px; top: -60px; font-size: 240px; line-height: 1; font-weight: 800; color: {{sol}}; opacity: 0.14">”</span>
+<div style="position: relative; padding: 0 16px; display: flex; flex-direction: column; gap: 12px">
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: {{sol}}">Clientes A3</span>
+<h2 id="m-depo" style="margin: 0; font-size: 30px; line-height: 1.05; font-weight: 800; font-stretch: 115%; letter-spacing: -0.025em">Quem já encontrou o lar <span style="color: {{sol}}">com a A3</span></h2>
+<p style="margin: 0; font-size: 16px; line-height: 1.55; color: {{marTexto}}">Histórias de quem saiu da busca com a chave na mão.</p>
+</div>
+<div class="scroller" style="position: relative; padding-bottom: 24px">
+<figure style="width: 300px; margin: 0; background: #FFFFFF; color: #0E1F1D; border-radius: 24px; padding: 24px; display: flex; flex-direction: column; gap: 18px; box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.5)">
+<span style="align-self: flex-start; display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; background: {{marClaro}}; color: {{mar}}; padding: 6px 11px; border-radius: 999px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11 12 4l8 7v9H4z"></path></svg>Primeiro apartamento</span>
+<blockquote style="margin: 0; font-size: 18px; line-height: 1.45; font-weight: 600">“Muito grata pelo atendimento! Consegui realizar o sonho do meu primeiro apartamento.”</blockquote>
+<figcaption style="margin-top: auto; display: flex; align-items: center; gap: 10px"><span aria-hidden="true" style="width: 42px; height: 42px; border-radius: 999px; background: {{mar}}; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 800">R</span><span style="display: flex; flex-direction: column"><strong style="font-size: 15px">Rayani</strong><span style="font-size: 13px; color: #4B5B58">Profissional de software</span></span></figcaption>
+</figure>
+<figure style="width: 300px; margin: 0; background: #FFFFFF; color: #0E1F1D; border-radius: 24px; padding: 24px; display: flex; flex-direction: column; gap: 18px; box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.5)">
+<span style="align-self: flex-start; display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; background: {{marClaro}}; color: {{mar}}; padding: 6px 11px; border-radius: 999px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg>Dúvidas esclarecidas</span>
+<blockquote style="margin: 0; font-size: 18px; line-height: 1.45; font-weight: 600">“Ótimo atendimento! A corretora esclareceu todas as minhas dúvidas…”</blockquote>
+<figcaption style="margin-top: auto; display: flex; align-items: center; gap: 10px"><span aria-hidden="true" style="width: 42px; height: 42px; border-radius: 999px; background: {{mar}}; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 800">G</span><span style="display: flex; flex-direction: column"><strong style="font-size: 15px">Gilberto</strong><span style="font-size: 13px; color: #4B5B58">Professor</span></span></figcaption>
+</figure>
+<figure style="width: 300px; margin: 0; background: #FFFFFF; color: #0E1F1D; border-radius: 24px; padding: 24px; display: flex; flex-direction: column; gap: 18px; box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.5)">
+<span style="align-self: flex-start; display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; background: {{marClaro}}; color: {{mar}}; padding: 6px 11px; border-radius: 999px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg>Bem atendida</span>
+<blockquote style="margin: 0; font-size: 18px; line-height: 1.45; font-weight: 600">“Fui muito bem atendida pelos corretores da Imobiliária A3.”</blockquote>
+<figcaption style="margin-top: auto; display: flex; align-items: center; gap: 10px"><span aria-hidden="true" style="width: 42px; height: 42px; border-radius: 999px; background: {{mar}}; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 800">E</span><span style="display: flex; flex-direction: column"><strong style="font-size: 15px">Estela</strong><span style="font-size: 13px; color: #4B5B58">Atendente</span></span></figcaption>
+</figure>
+</div>
+</section>
+
+<!-- Contato -->
+<section id="m-contato" aria-labelledby="m-contato-t" style="padding: 48px 16px; display: flex; flex-direction: column; gap: 18px; scroll-margin-top: 64px">
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: {{mar}}">Contato</span>
+<h2 id="m-contato-t" style="margin: 0; font-size: 30px; line-height: 1.05; font-weight: 800; font-stretch: 115%; letter-spacing: -0.025em">Fale com um corretor</h2>
+<p style="margin: 0; font-size: 16px; line-height: 1.6; color: #4B5B58">Chame no WhatsApp ou deixe seus dados — um corretor da A3 retorna para você.</p>
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column">
+<li><a href="https://wa.me/5581991483731" style="display: flex; gap: 14px; align-items: center; padding: 10px 0; text-decoration: none; color: #0E1F1D"><span style="width: 44px; height: 44px; border-radius: 12px; background: {{mar}}; color: #FFFFFF; display: flex; align-items: center; justify-content: center; flex: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 0 1-11.6 7.1L4 20l1-4.2A8 8 0 1 1 20 12z"></path></svg></span><span style="display: flex; flex-direction: column; min-width: 0"><span style="font-size: 12px; color: #4B5B58">WhatsApp e telefone</span><strong style="font-size: 17px; overflow-wrap: anywhere">(81) 99148-3731</strong></span></a></li>
+<li><a href="mailto:a3solucoesimobiliaria1@gmail.com" style="display: flex; gap: 14px; align-items: center; padding: 10px 0; text-decoration: none; color: #0E1F1D"><span style="width: 44px; height: 44px; border-radius: 12px; background: {{mar}}; color: #FFFFFF; display: flex; align-items: center; justify-content: center; flex: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3.5 6.5 8.5 6.5 8.5-6.5"></path></svg></span><span style="display: flex; flex-direction: column; min-width: 0"><span style="font-size: 12px; color: #4B5B58">E-mail</span><strong style="font-size: 14px; overflow-wrap: anywhere">a3solucoesimobiliaria1@gmail.com</strong></span></a></li>
+<li><a href="https://instagram.com/a3solucoesimobiliarias" style="display: flex; gap: 14px; align-items: center; padding: 10px 0; text-decoration: none; color: #0E1F1D"><span style="width: 44px; height: 44px; border-radius: 12px; background: {{mar}}; color: #FFFFFF; display: flex; align-items: center; justify-content: center; flex: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"></path><circle cx="12" cy="13" r="3.5"></circle></svg></span><span style="display: flex; flex-direction: column; min-width: 0"><span style="font-size: 12px; color: #4B5B58">Instagram</span><strong style="font-size: 16px; overflow-wrap: anywhere">@a3solucoesimobiliarias</strong></span></a></li>
+<li style="display: flex; gap: 14px; align-items: center; padding: 10px 0"><span style="width: 44px; height: 44px; border-radius: 12px; background: {{mar}}; color: #FFFFFF; display: flex; align-items: center; justify-content: center; flex: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z"></path><circle cx="12" cy="9.5" r="2.5"></circle></svg></span><span style="display: flex; flex-direction: column; min-width: 0"><span style="font-size: 12px; color: #4B5B58">Escritório</span><strong style="font-size: 15px; overflow-wrap: anywhere">Av. Dois, nº 09, Jaguaribe — Paulista/PE</strong></span></li>
+</ul>
+<div style="height: 150px; border-radius: 20px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; background: #EDEFE8">
+<img src="./assets/2bf554aeb7c7d926e8b2398cc5b1b32f.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
+<span style="position: relative; width: 40px; height: 40px; border-radius: 999px 999px 999px 0; transform: rotate(-45deg); background: {{mar}}; box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.4)"></span>
+<span style="position: absolute; left: 12px; bottom: 12px; font-size: 11px; color: #33433F; background: rgba(255, 255, 255, 0.78); padding: 5px 10px; border-radius: 999px">Mapa do Google · escritório A3</span>
+</div>
+<div style="background: #F1F5F3; border-radius: 22px; padding: 20px; display: flex; flex-direction: column; gap: 14px">
+<sc-if value="{{naoEnviado}}" hint-placeholder-val="{{ true }}">
+<h3 style="margin: 0; font-size: 22px; font-weight: 800; font-stretch: 112%">Quero ser atendido</h3>
+<form style="display: flex; flex-direction: column; gap: 14px; margin: 0">
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600; color: #3E4E4B"><span>Nome</span><input class="field" type="text" autocomplete="name" placeholder="Como podemos te chamar?"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600; color: #3E4E4B"><span>WhatsApp</span><input class="field" type="tel" autocomplete="tel" placeholder="(81) 9 0000-0000"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600; color: #3E4E4B"><span>E-mail</span><input class="field" type="email" autocomplete="email" placeholder="voce@email.com"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600; color: #3E4E4B"><span>Tenho interesse em</span><span style="position: relative; display: block"><select class="field"><option>Comprar um imóvel</option><option>Alugar um imóvel</option><option>Lançamentos e Minha Casa Minha Vida</option><option>Simular financiamento</option><option>Anunciar meu imóvel</option></select><span style="position: absolute; right: 12px; top: 16px; pointer-events: none; color: #4B5B58"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></span></span></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600; color: #3E4E4B"><span>Mensagem <span style="font-weight: 400; color: #4B5B58">(opcional)</span></span><textarea class="field" rows="3" placeholder="Conte o bairro e quantos quartos você procura"></textarea></label>
+<label style="display: flex; gap: 12px; align-items: flex-start; font-size: 13px; line-height: 1.45; color: #3E4E4B"><input type="checkbox" style="width: 20px; height: 20px; margin: 0; accent-color: #0B4A44; flex: none"><span>Autorizo a A3 a entrar em contato e concordo com a <a href="#" style="color: {{mar}}; font-weight: 600">Política de Privacidade</a>.</span></label>
+<button type="button" onClick="{{enviar}}" style="height: 54px; border: none; border-radius: 14px; background: {{sol}}; color: #0E1F1D; font-weight: 700; font-size: 16px">Enviar mensagem</button>
+</form>
+</sc-if>
+<sc-if value="{{enviado}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 12px; align-items: flex-start; padding: 12px 0">
+<span style="width: 56px; height: 56px; border-radius: 999px; background: {{mar}}; color: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg></span>
+<h3 style="margin: 0; font-size: 23px; font-weight: 800; font-stretch: 112%">Recebemos seus dados!</h3>
+<p style="margin: 0; font-size: 16px; line-height: 1.55; color: #3E4E4B">Um corretor da A3 vai falar com você pelo WhatsApp informado.</p>
+<button type="button" onClick="{{novo}}" style="height: 44px; padding: 0; border: none; background: none; color: {{mar}}; font-weight: 700; font-size: 15px">Enviar outra mensagem</button>
+</div>
+</sc-if>
+</div>
+</section>
+</main>
+
+<footer style="background: {{marEscuro}}; color: {{marTexto}}; padding: 40px 16px 28px; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<img src="./assets/50257d81843cc16b3fc7ae24d2719289.png" alt="A3 Soluções Imobiliárias" style="height: 72px; width: auto; display: block; align-self: flex-start">
+<p style="margin: 0; font-size: 15px; line-height: 1.6">Venda, aluguel e lançamentos de imóveis, com um corretor do primeiro contato à entrega das chaves.</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 16px; font-size: 15px">
+<nav aria-label="Rodapé" style="display: flex; flex-direction: column; gap: 12px">
+<strong style="color: #FFFFFF">Navegação</strong>
+<a class="flink" href="Busca-Mobile.dc.html">Imóveis à venda</a>
+<a class="flink" href="Busca-Mobile.dc.html">Para alugar</a>
+<a class="flink" href="Busca-Mobile.dc.html">Lançamentos</a>
+<a class="flink" href="#m-anunciar">Anunciar imóvel</a>
+<a class="flink" href="#m-quem">Quem somos</a>
+</nav>
+<nav aria-label="Buscas frequentes" style="display: flex; flex-direction: column; gap: 12px">
+<strong style="color: #FFFFFF">Buscas frequentes</strong>
+<a class="flink" href="Busca-Mobile.dc.html">Janga</a>
+<a class="flink" href="Busca-Mobile.dc.html">Pau Amarelo</a>
+<a class="flink" href="Busca-Mobile.dc.html">Jaguaribe</a>
+<a class="flink" href="Busca-Mobile.dc.html">Igarassu</a>
+<a class="flink" href="Busca-Mobile.dc.html">Recife</a>
+</nav>
+</div>
+<a href="#m-contato" style="height: 48px; align-self: flex-start; padding: 0 20px; border-radius: 999px; background: {{sol}}; color: #0E1F1D; display: flex; align-items: center; font-weight: 700; font-size: 15px; text-decoration: none">Fale conosco</a>
+<div style="border-top: 1px solid rgba(255, 255, 255, 0.16); padding-top: 20px; padding-right: 84px; display: flex; flex-direction: column; gap: 8px; font-size: 13px">
+<span>© 2026 A3 Soluções Imobiliárias · CRECI 18568PJ</span>
+<a class="flink" href="#" style="text-decoration: underline; text-underline-offset: 3px">Política de privacidade</a>
+</div>
+</footer>
+
+<a href="https://wa.me/5581991483731" aria-label="Falar no WhatsApp" style="position: fixed; right: 16px; bottom: 16px; z-index: 30; width: 60px; height: 60px; border-radius: 999px; background: {{sol}}; color: #0E1F1D; display: flex; align-items: center; justify-content: center; box-shadow: 0 16px 32px -12px rgba(0, 0, 0, 0.5)">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 0 1-11.6 7.1L4 20l1-4.2A8 8 0 1 1 20 12z"></path></svg>
+</a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"corPrincipal":{"editor":"color","default":"#0B4A44","options":["#0B4A44","#14406B","#3A2E5E","#22302E"],"section":"Marca"},"corDestaque":{"editor":"color","default":"#8EE07A","options":["#8EE07A","#F2894E","#86D1BC","#E8D36A"],"section":"Marca"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { menuAberto: true, enviado: false };
+  }
+  mix(hex, to, t) {
+    if (!/^#[0-9a-fA-F]{6}$/.test(hex || '')) hex = '#0B4A44';
+    const p = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+    const a = p(hex);
+    const b = p(to);
+    return '#' + a.map((v, i) => Math.round(v + (b[i] - v) * t).toString(16).padStart(2, '0')).join('');
+  }
+  toggleIn(key, val) {
+    const arr = this.state[key];
+    this.setState({ [key]: arr.includes(val) ? arr.filter((x) => x !== val) : arr.concat(val) });
+  }
+  juntar(arr, sep) {
+    if (arr.length <= 1) return arr.join('');
+    return arr.slice(0, -1).join(', ') + sep + arr[arr.length - 1];
+  }
+  renderVals() {
+    const s = this.state;
+    const mar = this.props.corPrincipal ?? '#0B4A44';
+    const sol = this.props.corDestaque ?? '#8EE07A';
+    const marEscuro = this.mix(mar, '#000000', 0.36);
+    const marTexto = this.mix(mar, '#FFFFFF', 0.82);
+    const marClaro = this.mix(mar, '#FFFFFF', 0.9);
+    const menu = { menuAberto: !!s.menuAberto, abrirMenu: () => this.setState({ menuAberto: true }), fecharMenu: () => this.setState({ menuAberto: false }) };
+    const tags = { 'Lançamento': [sol, '#0E1F1D'], 'Em construção': [mar, '#FFFFFF'] };
+    const IMGS = { 'Viva Paineiras': './assets/c7be17520c0ba0b30d51459b0632bbb6.jpg', 'Janga Garden': './assets/8d508497af5c02ceae748f7c4a68676c.jpg', 'Bela Vista Living': './assets/4ad7ad6a16c4eba14f6ec9620eadec08.jpg', 'Villa Alta Vista': './assets/635ed544ab0a37ebc869960ee3bf01a0.jpg', 'Vila das Palmeiras': './assets/1865971c9c85a8b06d9db6caaf3211c7.jpg', 'Alameda dos Corais': './assets/44c7c94c6be68d1c1762847839b324b8.jpg', 'Privê San Sebastián': './assets/3df6fd790a7cfc926b513a029977c94b.jpg', 'Estrada dos Marcos II': './assets/e0db76d6afaf45b9bbf19e2cdd8922ff.jpg', 'Aurora de Roma': './assets/a20bbea6b706bcbb991b03e5be17e95c.jpg', 'Residencial Villa Júlia': './assets/d6fcb7b3764f4b70a560127bcab1d5e4.jpg' };
+    const destaques = [
+      { nome: 'Viva Paineiras', tipo: 'Apartamento', local: 'Eco Parque Paineiras, Paulista', situacao: 'Lançamento', area: '50 a 54 m²', quartos: '2 quartos', banheiros: '1 a 2 banh.', vagasLabel: '1 vaga', precoTxt: 'R$ 257.000', rodape: 'Entrega jan/2028' },
+      { nome: 'Janga Garden', tipo: 'Apartamento', local: 'Janga, Paulista', situacao: 'Em construção', area: '42 m²', quartos: '2 quartos', banheiros: '1 banh.', vagasLabel: '1 vaga', precoTxt: 'R$ 205.900', rodape: 'Entrega jan/2027' },
+      { nome: 'Bela Vista Living', tipo: 'Apartamento', local: 'Jaguaribe, Paulista', situacao: 'Lançamento', area: '50 a 91 m²', quartos: '2 ou 3 quartos', banheiros: '2 banh.', vagasLabel: '1 vaga', precoTxt: 'R$ 265.000', rodape: 'Entrega jan/2028' }
+    ].map((it) => ({ ...it, precoLabel: 'Investimento a partir de', img: IMGS[it.nome], tagBg: tags[it.situacao][0], tagFg: tags[it.situacao][1] }));
+    return {
+      mar, sol, marEscuro, marTexto, marClaro, ...menu,
+      destaques,
+      diferenciais: ['Atendimento próximo, pelo WhatsApp ou no escritório', 'Orientação sobre financiamento e documentação', 'Catálogo com mais de 300 imóveis'].map((label) => ({ label })),
+      enviado: s.enviado,
+      naoEnviado: !s.enviado,
+      enviar: () => this.setState({ enviado: true }),
+      novo: () => this.setState({ enviado: false })
+    };
+  }
+}
+</script>
+</body>
+</html>
