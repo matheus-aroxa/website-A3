@@ -56,6 +56,13 @@
   padding-inline: 16px 14px;
 }
 
+/* A lista de opções nunca passa da largura da tela (senão o navegador rola a página para a direita). */
+.campoEscuro :global(.seletor-lista) {
+  min-width: 100%;
+  width: max-content;
+  max-width: calc(100vw - 2 * var(--margem) - 16px);
+}
+
 .campoEscuro :global(.seletor-seta) {
   color: #fff;
 }
@@ -123,6 +130,10 @@
   padding: 0 8px 0 12px;
 }
 
+.passoTitulo {
+  display: contents;
+}
+
 .passo svg {
   flex: none;
 }
@@ -183,6 +194,12 @@
 }
 
 @media (max-width: 767px) {
+  /* Cidade fica na coluna da direita: a lista abre ancorada à direita do campo, para dentro da tela. */
+  .cidade :global(.seletor-lista) {
+    left: auto;
+    right: 0;
+  }
+
   .painel {
     grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: 10px;
@@ -217,16 +234,23 @@
     flex: 1;
     min-width: 0;
   }
-  .passo svg {
-    display: none;
-  }
-  .passoRotulo {
-    display: block;
+  /* Ícone e nome ficam juntos acima dos botões. */
+  .passoTitulo {
+    display: flex;
     flex-basis: 100%;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
     font-size: 12px;
     font-weight: 700;
-    text-align: center;
     color: rgba(255, 255, 255, 0.8);
+  }
+  .passoTitulo svg {
+    width: 16px;
+    height: 16px;
+  }
+  .passoRotulo {
+    display: inline;
   }
   .passo output {
     font-size: 14px;
@@ -234,5 +258,33 @@
   .passo button {
     width: 28px;
     height: 28px;
+  }
+}
+
+/* Telas muito estreitas: cada contador ocupa a linha toda (ícone e nome à esquerda, botões à direita). */
+@media (max-width: 359px) {
+  .linhaExtra > :nth-child(-n + 3) {
+    grid-column: span 6;
+  }
+  .passo {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    min-height: 52px;
+    padding: 0 8px 0 12px;
+  }
+  .passoTitulo {
+    flex: 1;
+    flex-basis: auto;
+    justify-content: flex-start;
+    font-size: 14px;
+    color: #fff;
+  }
+  .passoTitulo svg {
+    width: 20px;
+    height: 20px;
+  }
+  .passo output {
+    flex: none;
+    min-width: 36px;
   }
 }

@@ -38,8 +38,10 @@ function Passo({
 }) {
   return (
     <div className={s.passo} role="group" aria-label={`${rotulo} (mínimo)`} title={`${rotulo} (mínimo)`}>
-      <Icone nome={icone} tamanho={20} />
-      <span className={s.passoRotulo}>{rotulo}</span>
+      <span className={s.passoTitulo}>
+        <Icone nome={icone} tamanho={20} />
+        <span className={s.passoRotulo}>{rotulo}</span>
+      </span>
       <button type="button" aria-label={`Menos ${rotulo.toLowerCase()}`} disabled={valor === 0} onClick={() => aoMudar(valor - 1)}>
         −
       </button>
@@ -101,7 +103,7 @@ export function BuscaInicial({ cidades }: { cidades: Cidade[] }) {
           opcoes={[{ valor: '', rotulo: 'Tipo' }, ...TIPOS.map((t) => ({ valor: t, rotulo: rotuloTipoPlural[t] }))]}
         />
         <Seletor
-          className={s.campoEscuro}
+          className={`${s.campoEscuro} ${s.cidade}`}
           aria-label="Cidade"
           valor={cidadeSlug}
           aoMudar={(v) => {

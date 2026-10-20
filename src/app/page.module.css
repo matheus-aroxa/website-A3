@@ -645,7 +645,7 @@
   .heroConteudo {
     gap: 22px;
   }
-  /* No celular a ordem é: texto, filtros e só depois a foto do destaque. */
+  /* No celular a ordem é: texto, imóvel em destaque e só depois os filtros. */
   .heroTopo {
     display: contents;
   }
@@ -654,12 +654,12 @@
     flex: none; /* em coluna, o flex-basis de 480px viraria altura */
     gap: 12px;
   }
-  .heroBusca {
-    order: 2;
-  }
   .heroMidia {
-    order: 3;
+    order: 2;
     flex: none;
+  }
+  .heroBusca {
+    order: 3;
   }
   .heroTitulo {
     font-size: clamp(40px, 12.5vw, 52px);
