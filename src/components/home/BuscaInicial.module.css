@@ -173,11 +173,8 @@
 
 .mcmvLogo {
   flex: none;
-  width: 46px;
+  width: 44px;
   height: auto;
-  padding: 3px;
-  border-radius: 10px;
-  background: #fff; /* o logo tem texto escuro; precisa de fundo claro sobre o vidro */
 }
 
 .mcmv > span {
