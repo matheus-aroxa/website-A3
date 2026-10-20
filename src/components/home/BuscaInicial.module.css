@@ -164,15 +164,41 @@
 .mcmv {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 0 14px;
+  gap: 12px;
+  height: auto;
+  min-height: 60px;
+  padding: 8px 14px 8px 10px;
+  cursor: pointer;
+}
+
+.mcmvLogo {
+  flex: none;
+  width: 46px;
+  height: auto;
+  padding: 3px;
+  border-radius: 10px;
+  background: #fff; /* o logo tem texto escuro; precisa de fundo claro sobre o vidro */
+}
+
+.mcmv > span {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
   font-size: 15px;
   font-weight: 600;
-  cursor: pointer;
+}
+
+.mcmv > span span {
+  font-size: 12px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .mcmv input {
   accent-color: var(--sol);
+  width: 22px;
+  height: 22px;
 }
 
 .mcmv[data-desligado] {
