@@ -6,7 +6,7 @@
 
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import logoMcmv from '@/assets/marca/logo-mcmv.png'
 import { Icone, type NomeIcone } from '@/components/ui/Icone'
 import { Seletor } from '@/components/ui/Seletor'
@@ -66,9 +66,12 @@ export function BuscaInicial({ cidades }: { cidades: Cidade[] }) {
   const [banheiros, setBanheiros] = useState(0)
   const [vagas, setVagas] = useState(0)
   const [q, setQ] = useState('')
+  const [maisFiltros, setMaisFiltros] = useState(false)
+  const idMais = useId()
 
   const cidade = cidades.find((c) => c.slug === cidadeSlug)
   const aluguel = modo === 'aluguel'
+  const ativosMais = [quartos, banheiros, vagas].filter((v) => v > 0).length
 
   function buscar(e: React.FormEvent) {
     e.preventDefault()
@@ -89,7 +92,24 @@ export function BuscaInicial({ cidades }: { cidades: Cidade[] }) {
 
   return (
     <form className={s.painel} role="search" aria-label="Buscar imóveis" action="/imoveis" onSubmit={buscar}>
-      <h2 className={s.titulo}>Encontre seu imóvel</h2>
+      <div className={s.cabecalho}>
+        <h2 className={s.titulo}>Encontre seu imóvel</h2>
+        <button
+          type="button"
+          className={s.maisFiltros}
+          aria-expanded={maisFiltros}
+          aria-controls={idMais}
+          onClick={() => setMaisFiltros((v) => !v)}
+        >
+          <Icone nome="filtros" tamanho={15} />
+          {maisFiltros ? 'Menos filtros' : 'Mais filtros'}
+          {!maisFiltros && ativosMais > 0 && (
+            <span className={s.contagem} aria-label={`${ativosMais} ativo${ativosMais > 1 ? 's' : ''}`}>
+              {ativosMais}
+            </span>
+          )}
+        </button>
+      </div>
 
       <div className={s.abas} role="group" aria-label="Negociação">
         {MODOS.map((m) => (
@@ -146,7 +166,7 @@ export function BuscaInicial({ cidades }: { cidades: Cidade[] }) {
           />
         </label>
 
-        <div className={`${s.passos} ${s.extra}`}>
+        <div id={idMais} className={`${s.passos} ${s.extra}`} hidden={!maisFiltros}>
           <Passo icone="cama" rotulo="Quartos" valor={quartos} max={4} aoMudar={setQuartos} />
           <Passo icone="banheira" rotulo="Banheiros" valor={banheiros} max={3} aoMudar={setBanheiros} />
           <Passo icone="carro" rotulo="Vagas" valor={vagas} max={3} aoMudar={setVagas} />

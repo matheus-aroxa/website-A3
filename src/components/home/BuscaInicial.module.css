@@ -14,6 +14,13 @@
   box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.6);
 }
 
+.cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .titulo {
   font-size: 22px;
   font-weight: 800;
@@ -120,6 +127,52 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
+}
+
+.passos[hidden] {
+  display: none;
+}
+
+/* Botão que revela quartos, banheiros e vagas (escondidos por padrão): discreto, em forma de link. */
+.maisFiltros {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  margin: -6px -4px;
+  padding: 6px 4px;
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.35);
+  text-underline-offset: 3px;
+}
+
+.maisFiltros:hover {
+  color: #fff;
+  text-decoration-color: currentColor;
+}
+
+.maisFiltros svg {
+  width: 15px;
+  height: 15px;
+}
+
+.contagem {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--sol);
+  color: var(--tinta);
+  font-size: 11px;
+  font-weight: 800;
+  text-decoration: none;
 }
 
 .passo {
@@ -239,6 +292,11 @@
   }
   .campos {
     gap: 12px 10px;
+  }
+  /* Área de toque maior no celular, sem aumentar o espaço visual. */
+  .maisFiltros {
+    margin: -12px -4px;
+    padding: 12px 4px;
   }
   /* Tipo e cidade lado a lado; bairro ocupa a linha toda. Todos os filtros ficam visíveis. */
   .campos > label:nth-of-type(1) {
