@@ -113,7 +113,7 @@ export function BuscaInicial({ cidades }: { cidades: Cidade[] }) {
         <label className={s.campo}>
           Cidade
           <Seletor
-            className={s.escuro}
+            className={`${s.escuro} ${s.cidade}`}
             aria-label="Cidade"
             valor={cidadeSlug}
             aoMudar={(v) => {
@@ -126,7 +126,7 @@ export function BuscaInicial({ cidades }: { cidades: Cidade[] }) {
         <label className={s.campo}>
           Bairro
           <Seletor
-            className={s.escuro}
+            className={`${s.escuro} ${s.bairro}`}
             aria-label="Bairro"
             valor={cidadeSlug && bairroSlug ? `${cidadeSlug}/${bairroSlug}` : ''}
             aoMudar={(v) => {

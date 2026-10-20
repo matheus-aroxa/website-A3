@@ -627,7 +627,7 @@
 
 /* ---------- Celular (protótipo 390px) ---------- */
 
-/* Em telas estreitas o painel desce para baixo do texto; a foto do destaque vai por último. */
+/* Em telas estreitas a ordem é: texto, imóvel em destaque e filtros. */
 @media (max-width: 959px) {
   .hero {
     min-height: 0;
@@ -643,14 +643,14 @@
   .heroTexto {
     order: 1;
   }
-  .heroBusca {
+  .heroMidia {
     order: 2;
-    flex: none;
-    width: 100%;
     max-width: 560px;
   }
-  .heroMidia {
+  .heroBusca {
     order: 3;
+    flex: none;
+    width: 100%;
     max-width: 560px;
   }
   /* Com tudo em coluna, deslocar para os lados faria o conteúdo passar da largura da tela: sobe de baixo. */

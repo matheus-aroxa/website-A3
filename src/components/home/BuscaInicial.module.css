@@ -85,6 +85,19 @@
   font-weight: 500;
 }
 
+/* A lista de opções nunca passa da largura da tela (senão o navegador rola a página para a direita).
+   Bairro e, no celular, Cidade ficam na coluna da direita: a lista abre ancorada à direita do campo. */
+.escuro :global(.seletor-lista) {
+  min-width: 100%;
+  width: max-content;
+  max-width: calc(100vw - 2 * var(--margem) - 16px);
+}
+
+.bairro :global(.seletor-lista) {
+  left: auto;
+  right: 0;
+}
+
 .escuro :global(.seletor-seta) {
   color: #fff;
 }
@@ -237,8 +250,17 @@
   .passos {
     gap: 6px;
   }
+  .passoRotulo {
+    font-size: 12px;
+    gap: 4px;
+  }
   .passoRotulo svg {
-    display: none;
+    width: 16px;
+    height: 16px;
+  }
+  .cidade :global(.seletor-lista) {
+    left: auto;
+    right: 0;
   }
   .passoControle {
     gap: 2px;
@@ -250,5 +272,28 @@
   }
   .mcmv > span span {
     font-size: 11px;
+  }
+}
+
+/* Telas muito estreitas: cada contador ocupa a linha toda (ícone e nome à esquerda, botões à direita). */
+@media (max-width: 359px) {
+  .passos {
+    grid-template-columns: 1fr;
+  }
+  .passo {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .passoRotulo {
+    font-size: 14px;
+    color: #fff;
+  }
+  .passoRotulo svg {
+    width: 20px;
+    height: 20px;
+  }
+  .passoControle {
+    flex: 0 0 150px;
   }
 }
