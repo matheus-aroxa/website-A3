@@ -1,6 +1,6 @@
 'use client'
 
-// Painel de filtros flutuante da home. Monta a mesma URL que o painel de filtros da busca
+// Painel de filtros flutuante da home (sobre o fundo verde do hero). Monta a mesma URL que o painel de filtros da busca
 // (ex.: /imoveis/venda/apartamentos/paulista/jaguaribe?quartos=2) e navega até ela.
 // Sem JavaScript o formulário ainda funciona: envia ?q= para /imoveis.
 
@@ -62,7 +62,6 @@ export function BuscaInicial({ cidades }: { cidades: Cidade[] }) {
   const [banheiros, setBanheiros] = useState(0)
   const [vagas, setVagas] = useState(0)
   const [q, setQ] = useState('')
-  const [expandido, setExpandido] = useState(false) // só importa no celular
 
   const cidade = cidades.find((c) => c.slug === cidadeSlug)
   const aluguel = modo === 'aluguel'
@@ -85,14 +84,7 @@ export function BuscaInicial({ cidades }: { cidades: Cidade[] }) {
   }
 
   return (
-    <form
-      className={s.painel}
-      role="search"
-      aria-label="Buscar imóveis"
-      action="/imoveis"
-      data-expandido={expandido || undefined}
-      onSubmit={buscar}
-    >
+    <form className={s.painel} role="search" aria-label="Buscar imóveis" action="/imoveis" onSubmit={buscar}>
       <div className={s.linha}>
         <Seletor
           className={s.campoEscuro}
@@ -165,10 +157,6 @@ export function BuscaInicial({ cidades }: { cidades: Cidade[] }) {
           onChange={(e) => setQ(e.target.value)}
         />
       </div>
-
-      <button type="button" className={s.maisFiltros} aria-expanded={expandido} onClick={() => setExpandido((v) => !v)}>
-        {expandido ? 'Menos filtros' : 'Mais filtros'}
-      </button>
 
       <button type="submit" className={`btn btn-sol ${s.buscar}`}>
         <Icone nome="busca" tamanho={20} espessura={2.2} />

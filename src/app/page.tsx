@@ -11,7 +11,7 @@ import { Rodape } from '@/components/layout/Rodape'
 import { RevelarAoRolar } from '@/components/ui/RevelarAoRolar'
 import { Icone, type NomeIcone } from '@/components/ui/Icone'
 import { MapaEstatico } from '@/components/ui/MapaEstatico'
-import { formatarPreco, rotuloPreco } from '@/lib/imoveis/formato'
+import { etiquetaImovel, formatarPreco, rotuloPreco } from '@/lib/imoveis/formato'
 import { listarCidades, listarDestaques, obterImovelHeroi } from '@/lib/imoveis/repositorio'
 import { urlImovel } from '@/lib/imoveis/rotas'
 import { linkWhatsApp, mensagensWhatsApp, site } from '@/lib/site'
@@ -89,6 +89,7 @@ const DIFERENCIAIS = [
 export default async function Home() {
   const [heroi, destaques, cidades] = await Promise.all([obterImovelHeroi(), listarDestaques(), listarCidades()])
   const fotoHeroi = heroi?.fotos[0]
+  const capaHeroi = heroi && (heroi.capa ?? heroi.fotos[0])
 
   return (
     <>
@@ -96,45 +97,52 @@ export default async function Home() {
       <main id="conteudo">
         {/* Hero */}
         <section className={s.hero}>
-          {fotoHeroi && (
-            <div className={s.heroFundo}>
-              <Image
-                src={fotoHeroi.src}
-                alt={fotoHeroi.alt}
-                fill
-                sizes="100vw"
-                placeholder={fotoHeroi.blurDataURL ? 'blur' : 'empty'}
-                blurDataURL={fotoHeroi.blurDataURL}
-                loading="eager"
-                fetchPriority="high"
-              />
-            </div>
-          )}
           <div className={`container ${s.heroConteudo}`}>
-            <div className={s.heroTexto}>
-              <h1 className={s.heroTitulo}>
-                Seu lar <span>está aqui.</span>
-              </h1>
-              <p>
-                Na <strong>{site.nome}</strong> você encontra apartamentos, casas de condomínio e lançamentos para
-                comprar ou alugar — com um corretor do primeiro contato à entrega das chaves.
-              </p>
-              {heroi && (
-                <Link href={urlImovel(heroi.slug)} className={s.heroLink}>
-                  Em destaque: <strong>{heroi.nome}</strong> · {heroi.local.bairro}
-                  <span>
-                    {' '}
-                    {rotuloPreco(heroi.finalidade).toLowerCase()} {formatarPreco(heroi.preco, heroi.finalidade)}
-                  </span>
-                  <Icone nome="chevron-direita" tamanho={16} espessura={2.4} />
-                </Link>
+            <div className={s.heroTopo}>
+              <div className={s.heroTexto} data-revelar="esquerda">
+                <h1 className={s.heroTitulo}>
+                  Seu lar <span>está aqui.</span>
+                </h1>
+                <p>
+                  Na <strong>{site.nome}</strong> você encontra apartamentos, casas de condomínio e lançamentos para
+                  comprar ou alugar — com um corretor do primeiro contato à entrega das chaves.
+                </p>
+              </div>
+              {heroi && fotoHeroi && (
+                <div className={s.heroMidia} data-revelar="direita">
+                  <div className={s.heroFoto}>
+                    <Image
+                      src={fotoHeroi.src}
+                      alt={fotoHeroi.alt}
+                      fill
+                      sizes="(max-width: 767px) 100vw, (max-width: 1360px) 44vw, 560px"
+                      placeholder={fotoHeroi.blurDataURL ? 'blur' : 'empty'}
+                      blurDataURL={fotoHeroi.blurDataURL}
+                      loading="eager"
+                      fetchPriority="high"
+                    />
+                    <span className={s.ilustrativa}>Imagem ilustrativa</span>
+                  </div>
+                  <Link href={urlImovel(heroi.slug)} className={`elevar ${s.heroCard}`}>
+                    {capaHeroi && <Image src={capaHeroi.src} alt="" width={64} height={64} sizes="64px" />}
+                    <span className={s.heroCardTexto}>
+                      <span className={s.heroCardRotulo}>
+                        {etiquetaImovel(heroi)} · {heroi.local.bairro}
+                      </span>
+                      <strong>{heroi.nome}</strong>
+                      <span>
+                        {rotuloPreco(heroi.finalidade)} <b>{formatarPreco(heroi.preco, heroi.finalidade)}</b>
+                      </span>
+                    </span>
+                    <Icone nome="chevron-direita" espessura={2} className={s.heroCardSeta} />
+                  </Link>
+                </div>
               )}
             </div>
-            <div className={s.heroBusca}>
+            <div className={s.heroBusca} data-revelar>
               <BuscaInicial cidades={cidades} />
             </div>
           </div>
-          {fotoHeroi && <span className={s.ilustrativa}>Imagem ilustrativa</span>}
         </section>
 
         {/* Destaques */}

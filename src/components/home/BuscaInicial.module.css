@@ -1,13 +1,13 @@
-/* Painel de filtros flutuando sobre a foto do hero (vidro escuro, duas linhas de campos). */
+/* Painel de filtros flutuando no hero, em vidro translúcido sobre o fundo verde (duas linhas de campos). */
 
 .painel {
   display: grid;
   grid-template-columns: repeat(20, minmax(0, 1fr));
   gap: 12px;
   padding: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 20px;
-  background: rgba(7, 47, 44, 0.5);
+  background: rgba(255, 255, 255, 0.08);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   color: #fff;
@@ -160,10 +160,6 @@
   cursor: default;
 }
 
-.maisFiltros {
-  display: none;
-}
-
 @media (max-width: 959px) {
   .linha:first-child > :nth-child(-n + 4) {
     grid-column: span 10;
@@ -171,8 +167,12 @@
   .linha:first-child > :nth-child(5) {
     grid-column: span 20;
   }
-  .linhaExtra > :nth-child(-n + 3) {
+  .linhaExtra > :nth-child(1) {
     grid-column: span 6;
+  }
+  .linhaExtra > :nth-child(2),
+  .linhaExtra > :nth-child(3) {
+    grid-column: span 7;
   }
   .linhaExtra > :nth-child(4) {
     grid-column: span 20;
@@ -193,8 +193,7 @@
   .linha:first-child > :nth-child(4),
   .linha:first-child > :nth-child(5),
   .linhaExtra > :nth-child(4),
-  .buscar,
-  .maisFiltros {
+  .buscar {
     grid-column: span 6;
   }
   .linha:first-child > :nth-child(2),
@@ -203,12 +202,6 @@
   }
   .linhaExtra > :nth-child(-n + 3) {
     grid-column: span 2;
-  }
-
-  /* Recolhido: só negociação, tipo, cidade e bairro. */
-  .painel:not([data-expandido]) .linha:first-child > :nth-child(5),
-  .painel:not([data-expandido]) .linhaExtra > * {
-    display: none;
   }
 
   .passo {
@@ -241,17 +234,5 @@
   .passo button {
     width: 28px;
     height: 28px;
-  }
-
-  .maisFiltros {
-    display: block;
-    height: 44px;
-    border: 0;
-    background: transparent;
-    color: #fff;
-    font-weight: 700;
-    font-size: 15px;
-    text-decoration: underline;
-    text-underline-offset: 4px;
   }
 }
