@@ -1,7 +1,7 @@
 'use client'
 
-// Painel de filtros flutuante da home. Monta a mesma URL que o painel de filtros da busca
-// (ex.: /imoveis/venda/apartamentos/paulista/jaguaribe?quartos=2) e navega até ela.
+// Painel de filtros em vidro, na lateral direita do hero. Monta a mesma URL que o painel de filtros
+// da busca (ex.: /imoveis/venda/apartamentos/paulista/jaguaribe?quartos=2) e navega até ela.
 // Sem JavaScript o formulário ainda funciona: envia ?q= para /imoveis.
 
 import { useRouter } from 'next/navigation'
@@ -35,16 +35,20 @@ function Passo({
   aoMudar: (v: number) => void
 }) {
   return (
-    <div className={s.passo} role="group" aria-label={`${rotulo} (mínimo)`} title={`${rotulo} (mínimo)`}>
-      <Icone nome={icone} tamanho={20} />
-      <span className={s.passoRotulo}>{rotulo}</span>
-      <button type="button" aria-label={`Menos ${rotulo.toLowerCase()}`} disabled={valor === 0} onClick={() => aoMudar(valor - 1)}>
-        −
-      </button>
-      <output aria-live="polite">{valor === 0 ? '0' : `${valor}+`}</output>
-      <button type="button" aria-label={`Mais ${rotulo.toLowerCase()}`} disabled={valor === max} onClick={() => aoMudar(valor + 1)}>
-        +
-      </button>
+    <div className={s.passo} role="group" aria-label={`${rotulo} (mínimo)`}>
+      <span className={s.passoRotulo}>
+        <Icone nome={icone} tamanho={18} />
+        {rotulo}
+      </span>
+      <div className={s.passoControle}>
+        <button type="button" aria-label={`Menos ${rotulo.toLowerCase()}`} disabled={valor === 0} onClick={() => aoMudar(valor - 1)}>
+          −
+        </button>
+        <output aria-live="polite">{valor === 0 ? '0' : `${valor}+`}</output>
+        <button type="button" aria-label={`Mais ${rotulo.toLowerCase()}`} disabled={valor === max} onClick={() => aoMudar(valor + 1)}>
+          +
+        </button>
+      </div>
     </div>
   )
 }
@@ -91,51 +95,83 @@ export function BuscaInicial({ cidades }: { cidades: Cidade[] }) {
       data-expandido={expandido || undefined}
       onSubmit={buscar}
     >
-      <div className={s.linha}>
-        <Seletor
-          className={s.campoEscuro}
-          aria-label="Negociação"
-          valor={modo}
-          aoMudar={(v) => setModo(v as Modo)}
-          opcoes={MODOS.map((m) => ({ valor: m.valor, rotulo: m.rotulo }))}
-        />
-        <Seletor
-          className={s.campoEscuro}
-          aria-label="Tipo de imóvel"
-          valor={tipo}
-          aoMudar={(v) => setTipo(v as TipoImovel | '')}
-          opcoes={[{ valor: '', rotulo: 'Tipo' }, ...TIPOS.map((t) => ({ valor: t, rotulo: rotuloTipoPlural[t] }))]}
-        />
-        <Seletor
-          className={s.campoEscuro}
-          aria-label="Cidade"
-          valor={cidadeSlug}
-          aoMudar={(v) => {
-            setCidadeSlug(v)
-            setBairroSlug('')
-          }}
-          opcoes={[{ valor: '', rotulo: 'Cidade' }, ...cidades.map((c) => ({ valor: c.slug, rotulo: c.nome }))]}
-        />
-        <Seletor
-          className={s.campoEscuro}
-          aria-label="Bairro"
-          valor={cidadeSlug && bairroSlug ? `${cidadeSlug}/${bairroSlug}` : ''}
-          aoMudar={(v) => {
-            const [c, b] = v.split('/')
-            if (b) {
-              setCidadeSlug(c!)
-              setBairroSlug(b)
-            } else setBairroSlug('')
-          }}
-          opcoes={[
-            { valor: '', rotulo: 'Bairro' },
-            ...(cidade ? [cidade] : cidades).map((c) => ({
-              rotulo: c.nome,
-              opcoes: c.bairros.map((b) => ({ valor: `${c.slug}/${b.slug}`, rotulo: b.nome })),
-            })),
-          ]}
-        />
-        <label className={s.mcmv} data-desligado={aluguel || undefined}>
+      <h2 className={s.titulo}>Encontre seu imóvel</h2>
+
+      <div className={s.abas} role="group" aria-label="Negociação">
+        {MODOS.map((m) => (
+          <button key={m.valor} type="button" aria-pressed={modo === m.valor} onClick={() => setModo(m.valor)}>
+            {m.rotulo}
+          </button>
+        ))}
+      </div>
+
+      <div className={s.campos}>
+        <label className={s.campo}>
+          Tipo de imóvel
+          <Seletor
+            className={s.escuro}
+            aria-label="Tipo de imóvel"
+            valor={tipo}
+            aoMudar={(v) => setTipo(v as TipoImovel | '')}
+            opcoes={[{ valor: '', rotulo: 'Todos' }, ...TIPOS.map((t) => ({ valor: t, rotulo: rotuloTipoPlural[t] }))]}
+          />
+        </label>
+        <label className={s.campo}>
+          Cidade
+          <Seletor
+            className={s.escuro}
+            aria-label="Cidade"
+            valor={cidadeSlug}
+            aoMudar={(v) => {
+              setCidadeSlug(v)
+              setBairroSlug('')
+            }}
+            opcoes={[{ valor: '', rotulo: 'Todas' }, ...cidades.map((c) => ({ valor: c.slug, rotulo: c.nome }))]}
+          />
+        </label>
+        <label className={s.campo}>
+          Bairro
+          <Seletor
+            className={s.escuro}
+            aria-label="Bairro"
+            valor={cidadeSlug && bairroSlug ? `${cidadeSlug}/${bairroSlug}` : ''}
+            aoMudar={(v) => {
+              const [c, b] = v.split('/')
+              if (b) {
+                setCidadeSlug(c!)
+                setBairroSlug(b)
+              } else setBairroSlug('')
+            }}
+            opcoes={[
+              { valor: '', rotulo: 'Todos' },
+              ...(cidade ? [cidade] : cidades).map((c) => ({
+                rotulo: c.nome,
+                opcoes: c.bairros.map((b) => ({ valor: `${c.slug}/${b.slug}`, rotulo: b.nome })),
+              })),
+            ]}
+          />
+        </label>
+
+        <div className={`${s.passos} ${s.extra}`}>
+          <Passo icone="cama" rotulo="Quartos" valor={quartos} max={4} aoMudar={setQuartos} />
+          <Passo icone="banheira" rotulo="Banheiros" valor={banheiros} max={3} aoMudar={setBanheiros} />
+          <Passo icone="carro" rotulo="Vagas" valor={vagas} max={3} aoMudar={setVagas} />
+        </div>
+
+        <label className={`${s.campo} ${s.extra}`}>
+          Empreendimento ou código
+          <input
+            className={s.codigo}
+            type="search"
+            name="q"
+            enterKeyHint="search"
+            placeholder="Ex.: Bela Vista"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+          />
+        </label>
+
+        <label className={`${s.mcmv} ${s.extra}`} data-desligado={aluguel || undefined}>
           <input
             type="checkbox"
             className="caixa"
@@ -147,29 +183,13 @@ export function BuscaInicial({ cidades }: { cidades: Cidade[] }) {
         </label>
       </div>
 
-      <div className={`${s.linha} ${s.linhaExtra}`}>
-        <Passo icone="cama" rotulo="Quartos" valor={quartos} max={4} aoMudar={setQuartos} />
-        <Passo icone="banheira" rotulo="Banheiros" valor={banheiros} max={3} aoMudar={setBanheiros} />
-        <Passo icone="carro" rotulo="Vagas" valor={vagas} max={3} aoMudar={setVagas} />
-        <input
-          className={s.codigo}
-          type="search"
-          name="q"
-          enterKeyHint="search"
-          aria-label="Buscar por empreendimento ou código"
-          placeholder="Empreendimento ou código"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-        />
-      </div>
-
       <button type="button" className={s.maisFiltros} aria-expanded={expandido} onClick={() => setExpandido((v) => !v)}>
         {expandido ? 'Menos filtros' : 'Mais filtros'}
       </button>
 
       <button type="submit" className={`btn btn-sol ${s.buscar}`}>
-        <Icone nome="busca" tamanho={20} espessura={2.2} />
-        Buscar
+        <Icone nome="busca" tamanho={22} espessura={2.2} />
+        Buscar imóveis
       </button>
     </form>
   )

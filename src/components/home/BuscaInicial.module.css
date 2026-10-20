@@ -1,84 +1,164 @@
-/* Painel de filtros flutuando sobre a foto do hero (vidro escuro, duas linhas de campos). */
+/* Painel de vidro escuro na lateral direita do hero, com os campos empilhados. */
 
 .painel {
-  display: grid;
-  grid-template-columns: repeat(20, minmax(0, 1fr));
-  gap: 12px;
-  padding: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.65);
-  border-radius: 20px;
-  background: rgba(7, 47, 44, 0.5);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 24px;
+  background: rgba(7, 47, 44, 0.55);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
   color: #fff;
   box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.6);
 }
 
-.linha {
-  display: contents;
+.titulo {
+  font-size: 22px;
+  font-weight: 800;
+  font-stretch: 112%;
+  letter-spacing: -0.02em;
 }
 
-/* Linha 1: cinco campos de 4 colunas. */
-.linha:first-child > * {
-  grid-column: span 4;
+/* Abas em trilho, no estilo do site, mas em vidro. */
+.abas {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 4px;
+  padding: 4px;
+  border-radius: 14px;
+  background: rgba(7, 47, 44, 0.7);
 }
 
-/* Linha 2: três contadores, código e botão. */
-.linhaExtra > :nth-child(-n + 3) {
-  grid-column: span 3;
-}
-
-.linhaExtra > :nth-child(4) {
-  grid-column: span 7;
-}
-
-.buscar {
-  grid-column: span 4;
-  height: 52px;
-  border-radius: 10px;
-  font-size: 17px;
-}
-
-/* Campos escuros, como na referência. O Seletor é global; só a aparência muda aqui. */
-.campoEscuro :global(.seletor-botao),
-.codigo,
-.mcmv,
-.passo {
-  height: 52px;
+.abas button {
+  height: 44px;
+  padding: 0 6px;
   border: 0;
   border-radius: 10px;
-  background: rgba(7, 47, 44, 0.92);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.abas button[aria-pressed='true'] {
+  background: var(--sol);
+  color: var(--tinta);
+}
+
+.campos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 10px;
+}
+
+/* Tipo ocupa a linha toda; cidade e bairro ficam lado a lado; os extras também ocupam a linha toda. */
+.campos > label:nth-of-type(1),
+.campos > .extra {
+  grid-column: 1 / -1;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Campos escuros; o Seletor é global, só a aparência muda aqui. */
+.escuro :global(.seletor-botao),
+.codigo,
+.passoControle,
+.mcmv {
+  height: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  background: rgba(7, 47, 44, 0.85);
   color: #fff;
   font-size: 16px;
+  font-weight: 500;
 }
 
-.campoEscuro :global(.seletor-botao) {
-  padding-inline: 16px 14px;
-}
-
-.campoEscuro :global(.seletor-seta) {
+.escuro :global(.seletor-seta) {
   color: #fff;
-}
-
-.campoEscuro :global(.seletor[data-aberto] .seletor-botao),
-.campoEscuro:global(.seletor[data-aberto]) :global(.seletor-botao) {
-  box-shadow: 0 0 0 3px var(--sol);
 }
 
 .codigo {
   width: 100%;
-  min-width: 0;
-  padding: 0 16px;
+  padding: 0 14px;
 }
 
 .codigo::placeholder {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.6);
 }
 
-.codigo:focus-visible,
-.mcmv:has(:focus-visible) {
+.codigo:focus-visible {
   outline: 3px solid var(--sol);
   outline-offset: 2px;
+}
+
+.passos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.passo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.passoRotulo {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.passoControle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 6px;
+}
+
+.passoControle output {
+  flex: 1;
+  text-align: center;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.passoControle button {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.passoControle button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.passoControle button:disabled {
+  opacity: 0.35;
+  cursor: default;
 }
 
 .mcmv {
@@ -91,146 +171,52 @@
   cursor: pointer;
 }
 
+.mcmv input {
+  accent-color: var(--sol);
+}
+
 .mcmv[data-desligado] {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.mcmv input {
-  accent-color: var(--sol);
-}
-
-/* Contador (quartos, banheiros, vagas). */
-.passo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0 8px 0 12px;
-}
-
-.passo svg {
-  flex: none;
-}
-
-.passoRotulo {
-  display: none;
-}
-
-.passo output {
-  flex: 1;
-  text-align: center;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-.passo button {
-  flex: none;
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  border: 0;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.16);
-  color: #fff;
-  font-size: 18px;
-  line-height: 1;
-}
-
-.passo button:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-.passo button:disabled {
-  opacity: 0.35;
-  cursor: default;
+.buscar {
+  height: 54px;
+  border-radius: 12px;
+  font-size: 17px;
 }
 
 .maisFiltros {
   display: none;
 }
 
-@media (max-width: 959px) {
-  .linha:first-child > :nth-child(-n + 4) {
-    grid-column: span 10;
-  }
-  .linha:first-child > :nth-child(5) {
-    grid-column: span 20;
-  }
-  .linhaExtra > :nth-child(-n + 3) {
-    grid-column: span 6;
-  }
-  .linhaExtra > :nth-child(4) {
-    grid-column: span 20;
-  }
-  .buscar {
-    grid-column: span 20;
-  }
-}
-
 @media (max-width: 767px) {
   .painel {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 10px;
+    gap: 12px;
     padding: 16px;
-    border-radius: 18px;
+    border-radius: 20px;
   }
-  .linha:first-child > :nth-child(1),
-  .linha:first-child > :nth-child(4),
-  .linha:first-child > :nth-child(5),
-  .linhaExtra > :nth-child(4),
-  .buscar,
-  .maisFiltros {
-    grid-column: span 6;
+  .titulo {
+    display: none;
   }
-  .linha:first-child > :nth-child(2),
-  .linha:first-child > :nth-child(3) {
-    grid-column: span 3;
+  .campos {
+    gap: 10px;
   }
-  .linhaExtra > :nth-child(-n + 3) {
-    grid-column: span 2;
+  .campos > label:nth-of-type(1) {
+    grid-column: auto;
+  }
+  .campos > label:nth-of-type(3) {
+    grid-column: 1 / -1;
   }
 
   /* Recolhido: só negociação, tipo, cidade e bairro. */
-  .painel:not([data-expandido]) .linha:first-child > :nth-child(5),
-  .painel:not([data-expandido]) .linhaExtra > * {
+  .painel:not([data-expandido]) .extra {
     display: none;
-  }
-
-  .passo {
-    height: auto;
-    min-height: 74px;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-content: center;
-    gap: 6px 4px;
-    padding: 8px;
-  }
-  .passo output {
-    flex: 1;
-    min-width: 0;
-  }
-  .passo svg {
-    display: none;
-  }
-  .passoRotulo {
-    display: block;
-    flex-basis: 100%;
-    font-size: 12px;
-    font-weight: 700;
-    text-align: center;
-    color: rgba(255, 255, 255, 0.8);
-  }
-  .passo output {
-    font-size: 14px;
-  }
-  .passo button {
-    width: 28px;
-    height: 28px;
   }
 
   .maisFiltros {
     display: block;
-    height: 44px;
+    height: 40px;
     border: 0;
     background: transparent;
     color: #fff;
