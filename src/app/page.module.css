@@ -6,30 +6,48 @@
 
 /* ---------- Hero ---------- */
 
+/* Fundo verde liso (só dois brilhos suaves de cor), para o texto ficar sempre legível. */
 .hero {
-  background: var(--mar);
-  color: #fff;
-  padding: clamp(48px, 7vw, 96px) 0 clamp(64px, 7vw, 104px);
-}
-
-.heroGrade {
+  position: relative;
+  isolation: isolate;
   display: flex;
-  flex-wrap: wrap;
-  gap: 56px;
-  align-items: center;
+  flex-direction: column;
+  min-height: clamp(660px, calc(100svh - var(--altura-cabecalho)), 820px);
+  background:
+    radial-gradient(60% 90% at 90% 0%, rgba(142, 224, 122, 0.2), transparent 62%),
+    radial-gradient(50% 70% at 0% 100%, rgba(255, 255, 255, 0.07), transparent 60%),
+    var(--mar);
+  color: #fff;
+  padding: clamp(36px, 5vw, 64px) 0 clamp(28px, 3.5vw, 48px);
 }
 
-.heroTexto {
-  flex: 1 1 520px;
+.heroConteudo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 48px;
+}
+
+.heroEsquerda {
+  flex: 1 1 0;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 32px;
+}
+
+.heroTexto {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+  max-width: 720px;
 }
 
 .heroTitulo {
-  font-size: clamp(52px, 7vw, 108px);
-  line-height: 0.9;
+  font-size: clamp(46px, 6vw, 92px);
+  line-height: 0.92;
   font-weight: 800;
   font-stretch: 122%;
   letter-spacing: -0.04em;
@@ -41,8 +59,8 @@
 }
 
 .heroTexto p {
-  max-width: 540px;
-  font-size: clamp(17px, 1.4vw, 20px);
+  max-width: 560px;
+  font-size: clamp(16px, 1.4vw, 19px);
   line-height: 1.55;
   color: var(--mar-texto);
   text-wrap: pretty;
@@ -53,15 +71,14 @@
 }
 
 .heroMidia {
-  flex: 1 1 440px;
-  min-width: 0;
   position: relative;
+  --atraso: 100ms;
 }
 
 .heroFoto {
   position: relative;
-  aspect-ratio: 5 / 4;
-  border-radius: 28px;
+  aspect-ratio: 21 / 9;
+  border-radius: 24px;
   overflow: hidden;
   background: #15574f;
 }
@@ -83,14 +100,14 @@
 
 .heroCard {
   position: absolute;
-  left: 20px;
-  bottom: -32px;
-  max-width: 380px;
+  left: 16px;
+  bottom: 16px;
+  max-width: calc(100% - 32px);
   display: flex;
   gap: 14px;
   align-items: center;
-  padding: 14px 18px 14px 14px;
-  border-radius: 20px;
+  padding: 10px 18px 10px 10px;
+  border-radius: 18px;
   background: #fff;
   color: var(--tinta);
   text-decoration: none;
@@ -99,23 +116,23 @@
 
 .heroCard img {
   flex: none;
-  width: 76px;
-  height: 76px;
-  border-radius: 14px;
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
   object-fit: cover;
 }
 
 .heroCardTexto {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
   min-width: 0;
-  font-size: 14px;
+  font-size: 13px;
   color: var(--texto-2);
 }
 
 .heroCardTexto strong {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 800;
   font-stretch: 112%;
   color: var(--tinta);
@@ -126,7 +143,7 @@
 }
 
 .heroCardRotulo {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -137,6 +154,13 @@
   display: none;
   flex: none;
   margin-left: auto;
+}
+
+.heroBusca {
+  position: relative;
+  z-index: 2; /* a lista do seletor abre por cima da foto */
+  flex: 0 0 min(440px, 40%);
+  --atraso: 150ms; /* o painel entra logo depois do texto */
 }
 
 /* ---------- Destaques ---------- */
@@ -603,56 +627,79 @@
 
 /* ---------- Celular (protótipo 390px) ---------- */
 
-@media (max-width: 767px) {
+/* Em telas estreitas a ordem é: texto, imóvel em destaque e filtros. */
+@media (max-width: 959px) {
   .hero {
-    padding: 32px 0 64px;
+    min-height: 0;
   }
-  .heroGrade {
-    gap: 24px;
+  .heroConteudo {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 28px;
+  }
+  .heroEsquerda {
+    display: contents;
   }
   .heroTexto {
-    flex-basis: 100%;
-    gap: 18px;
+    order: 1;
+  }
+  .heroMidia {
+    order: 2;
+    max-width: 560px;
+  }
+  .heroBusca {
+    order: 3;
+    flex: none;
+    width: 100%;
+    max-width: 560px;
+  }
+  /* Com tudo em coluna, deslocar para os lados faria o conteúdo passar da largura da tela: sobe de baixo. */
+  :global([data-revelar-ativo]) .heroTexto[data-revelar].revelado,
+  :global([data-revelar-ativo]) .heroMidia[data-revelar].revelado,
+  :global([data-revelar-ativo]) .heroBusca[data-revelar].revelado {
+    --deslocamento: translateY(28px);
+  }
+}
+
+@media (max-width: 767px) {
+  .hero {
+    padding: 28px 0 32px;
+  }
+  .heroBusca,
+  .heroMidia {
+    max-width: none;
+  }
+  .heroConteudo {
+    gap: 22px;
+  }
+  .heroTexto {
+    gap: 12px;
   }
   .heroTitulo {
-    font-size: 54px;
-    line-height: 0.92;
+    font-size: clamp(40px, 12.5vw, 52px);
     font-stretch: 118%;
   }
   .heroTexto p {
-    font-size: 16px;
-  }
-  .heroMidia {
-    flex-basis: 100%;
+    font-size: 15px;
+    line-height: 1.5;
   }
   .heroFoto {
     aspect-ratio: auto;
-    height: 230px;
+    height: 220px;
     border-radius: 22px;
   }
   .heroCard {
     left: 12px;
     right: 12px;
-    bottom: -30px;
+    bottom: 12px;
     max-width: none;
     gap: 12px;
-    padding: 12px;
-    border-radius: 18px;
+    padding: 10px;
+    border-radius: 16px;
   }
   .heroCard img {
-    width: 60px;
-    height: 60px;
-    border-radius: 12px;
-  }
-  .heroCardTexto {
-    gap: 3px;
-    font-size: 13px;
-  }
-  .heroCardTexto strong {
-    font-size: 17px;
-  }
-  .heroCardRotulo {
-    font-size: 11px;
+    width: 56px;
+    height: 56px;
   }
   .heroCardSeta {
     display: block;

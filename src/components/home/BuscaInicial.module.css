@@ -1,0 +1,357 @@
+/* Painel de vidro na lateral direita do hero (sobre o fundo verde), com os campos empilhados. */
+
+.painel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.08);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  color: #fff;
+  box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.6);
+}
+
+.cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.titulo {
+  font-size: 22px;
+  font-weight: 800;
+  font-stretch: 112%;
+  letter-spacing: -0.02em;
+}
+
+/* Abas em trilho, no estilo do site, mas em vidro. */
+.abas {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 4px;
+  padding: 4px;
+  border-radius: 14px;
+  background: rgba(7, 47, 44, 0.7);
+}
+
+.abas button {
+  height: 44px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.abas button[aria-pressed='true'] {
+  background: var(--sol);
+  color: var(--tinta);
+}
+
+.campos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 10px;
+}
+
+/* Tipo ocupa a linha toda; cidade e bairro ficam lado a lado; os extras também ocupam a linha toda. */
+.campos > label:nth-of-type(1),
+.campos > .extra {
+  grid-column: 1 / -1;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Campos escuros; o Seletor é global, só a aparência muda aqui. */
+.escuro :global(.seletor-botao),
+.codigo,
+.passoControle,
+.mcmv {
+  height: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  background: rgba(7, 47, 44, 0.85);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* A lista de opções nunca passa da largura da tela (senão o navegador rola a página para a direita).
+   Bairro e, no celular, Cidade ficam na coluna da direita: a lista abre ancorada à direita do campo. */
+.escuro :global(.seletor-lista) {
+  min-width: 100%;
+  width: max-content;
+  max-width: calc(100vw - 2 * var(--margem) - 16px);
+}
+
+.bairro :global(.seletor-lista) {
+  left: auto;
+  right: 0;
+}
+
+.escuro :global(.seletor-seta) {
+  color: #fff;
+}
+
+.codigo {
+  width: 100%;
+  padding: 0 14px;
+}
+
+.codigo::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.codigo:focus-visible {
+  outline: 3px solid var(--sol);
+  outline-offset: 2px;
+}
+
+.passos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.passos[hidden] {
+  display: none;
+}
+
+/* Botão que revela quartos, banheiros e vagas (escondidos por padrão): discreto, em forma de link. */
+.maisFiltros {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  margin: -6px -4px;
+  padding: 6px 4px;
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.35);
+  text-underline-offset: 3px;
+}
+
+.maisFiltros:hover {
+  color: #fff;
+  text-decoration-color: currentColor;
+}
+
+.maisFiltros svg {
+  width: 15px;
+  height: 15px;
+}
+
+.contagem {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--sol);
+  color: var(--tinta);
+  font-size: 11px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.passo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.passoRotulo {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.passoControle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 6px;
+}
+
+.passoControle output {
+  flex: 1;
+  text-align: center;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.passoControle button {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.passoControle button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.passoControle button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.mcmv {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: auto;
+  min-height: 60px;
+  padding: 8px 14px 8px 10px;
+  border-color: transparent;
+  background: var(--mar-claro); /* linha clara: o logo tem texto escuro */
+  color: var(--tinta);
+  cursor: pointer;
+}
+
+.mcmvLogo {
+  flex: none;
+  width: 44px;
+  height: auto;
+}
+
+.mcmv > span {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.mcmv > span span {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--texto-3);
+}
+
+.mcmv input {
+  accent-color: var(--mar);
+  width: 22px;
+  height: 22px;
+}
+
+.mcmv[data-desligado] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.buscar {
+  height: 54px;
+  border-radius: 12px;
+  font-size: 17px;
+}
+
+@media (max-width: 767px) {
+  .painel {
+    gap: 14px;
+    padding: 16px;
+    border-radius: 20px;
+  }
+  .titulo {
+    font-size: 19px;
+  }
+  .abas button {
+    font-size: 14px;
+  }
+  .campos {
+    gap: 12px 10px;
+  }
+  /* Área de toque maior no celular, sem aumentar o espaço visual. */
+  .maisFiltros {
+    margin: -12px -4px;
+    padding: 12px 4px;
+  }
+  /* Tipo e cidade lado a lado; bairro ocupa a linha toda. Todos os filtros ficam visíveis. */
+  .campos > label:nth-of-type(1) {
+    grid-column: auto;
+  }
+  .campos > label:nth-of-type(3) {
+    grid-column: 1 / -1;
+  }
+  .passos {
+    gap: 6px;
+  }
+  .passoRotulo {
+    font-size: 12px;
+    gap: 4px;
+  }
+  .passoRotulo svg {
+    width: 16px;
+    height: 16px;
+  }
+  .cidade :global(.seletor-lista) {
+    left: auto;
+    right: 0;
+  }
+  .passoControle {
+    gap: 2px;
+    padding: 0 4px;
+  }
+  .passoControle button {
+    width: 28px;
+    height: 28px;
+  }
+  .mcmv > span span {
+    font-size: 11px;
+  }
+}
+
+/* Telas muito estreitas: cada contador ocupa a linha toda (ícone e nome à esquerda, botões à direita). */
+@media (max-width: 359px) {
+  .passos {
+    grid-template-columns: 1fr;
+  }
+  .passo {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .passoRotulo {
+    font-size: 14px;
+    color: #fff;
+  }
+  .passoRotulo svg {
+    width: 20px;
+    height: 20px;
+  }
+  .passoControle {
+    flex: 0 0 150px;
+  }
+}
