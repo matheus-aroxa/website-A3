@@ -1,13 +1,13 @@
-/* Painel de vidro escuro na lateral direita do hero, com os campos empilhados. */
+/* Painel de vidro na lateral direita do hero (sobre o fundo verde), com os campos empilhados. */
 
 .painel {
   display: flex;
   flex-direction: column;
   gap: 16px;
   padding: 26px;
-  border: 1px solid rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 24px;
-  background: rgba(7, 47, 44, 0.55);
+  background: rgba(255, 255, 255, 0.08);
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
   color: #fff;

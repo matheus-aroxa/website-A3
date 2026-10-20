@@ -6,35 +6,19 @@
 
 /* ---------- Hero ---------- */
 
+/* Fundo verde liso (só dois brilhos suaves de cor), para o texto ficar sempre legível. */
 .hero {
   position: relative;
   isolation: isolate;
   display: flex;
   flex-direction: column;
   min-height: clamp(660px, calc(100svh - var(--altura-cabecalho)), 820px);
-  background: var(--mar);
+  background:
+    radial-gradient(60% 90% at 90% 0%, rgba(142, 224, 122, 0.2), transparent 62%),
+    radial-gradient(50% 70% at 0% 100%, rgba(255, 255, 255, 0.07), transparent 60%),
+    var(--mar);
   color: #fff;
   padding: clamp(36px, 5vw, 64px) 0 clamp(28px, 3.5vw, 48px);
-}
-
-/* Foto em tela cheia; só um degradê leve em cima (texto) e embaixo (painel). */
-.heroFundo {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  overflow: hidden;
-  background: #15574f;
-}
-
-.heroFundo img {
-  object-fit: cover;
-}
-
-.heroFundo::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, rgba(7, 47, 44, 0.72) 0%, rgba(7, 47, 44, 0.25) 55%, rgba(7, 47, 44, 0.1) 100%);
 }
 
 .heroConteudo {
@@ -45,13 +29,20 @@
   gap: 48px;
 }
 
+.heroEsquerda {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
 .heroTexto {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 18px;
   max-width: 720px;
-  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.35);
 }
 
 .heroTitulo {
@@ -70,7 +61,8 @@
 .heroTexto p {
   max-width: 560px;
   font-size: clamp(16px, 1.4vw, 19px);
-  line-height: 1.5;
+  line-height: 1.55;
+  color: var(--mar-texto);
   text-wrap: pretty;
 }
 
@@ -78,32 +70,21 @@
   color: #fff;
 }
 
-.heroLink {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px;
-  min-height: 44px;
-  padding: 8px 16px;
-  border-radius: 999px;
-  background: rgba(7, 47, 44, 0.72);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
-  font-size: 15px;
-  color: #fff;
-  text-decoration: none;
-  text-shadow: none;
-}
-
-.heroLink span {
-  color: var(--sol);
-}
-
-.heroBusca {
+.heroMidia {
   position: relative;
-  z-index: 2; /* a lista do seletor abre por cima da foto */
-  flex: 0 0 min(440px, 40%);
-  --atraso: 150ms; /* o painel entra logo depois do texto */
+  --atraso: 100ms;
+}
+
+.heroFoto {
+  position: relative;
+  aspect-ratio: 21 / 9;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #15574f;
+}
+
+.heroFoto img {
+  object-fit: cover;
 }
 
 .ilustrativa {
@@ -115,6 +96,71 @@
   background: rgba(14, 31, 29, 0.6);
   font-size: 11px;
   color: #fff;
+}
+
+.heroCard {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  max-width: calc(100% - 32px);
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 10px 18px 10px 10px;
+  border-radius: 18px;
+  background: #fff;
+  color: var(--tinta);
+  text-decoration: none;
+  box-shadow: 0 24px 48px -20px rgba(0, 0, 0, 0.5);
+}
+
+.heroCard img {
+  flex: none;
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.heroCardTexto {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--texto-2);
+}
+
+.heroCardTexto strong {
+  font-size: 17px;
+  font-weight: 800;
+  font-stretch: 112%;
+  color: var(--tinta);
+}
+
+.heroCardTexto b {
+  color: var(--tinta);
+}
+
+.heroCardRotulo {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--verde-rotulo) !important;
+}
+
+.heroCardSeta {
+  display: none;
+  flex: none;
+  margin-left: auto;
+}
+
+.heroBusca {
+  position: relative;
+  z-index: 2; /* a lista do seletor abre por cima da foto */
+  flex: 0 0 min(440px, 40%);
+  --atraso: 150ms; /* o painel entra logo depois do texto */
 }
 
 /* ---------- Destaques ---------- */
@@ -581,7 +627,7 @@
 
 /* ---------- Celular (protótipo 390px) ---------- */
 
-/* Em telas estreitas o painel desce para baixo do texto. */
+/* Em telas estreitas o painel desce para baixo do texto; a foto do destaque vai por último. */
 @media (max-width: 959px) {
   .hero {
     min-height: 0;
@@ -591,16 +637,25 @@
     align-items: stretch;
     gap: 28px;
   }
+  .heroEsquerda {
+    display: contents;
+  }
+  .heroTexto {
+    order: 1;
+  }
   .heroBusca {
+    order: 2;
     flex: none;
     width: 100%;
     max-width: 560px;
   }
-  .heroFundo::after {
-    background: linear-gradient(180deg, rgba(7, 47, 44, 0.78) 0%, rgba(7, 47, 44, 0.3) 50%, rgba(7, 47, 44, 0.45) 100%);
+  .heroMidia {
+    order: 3;
+    max-width: 560px;
   }
   /* Com tudo em coluna, deslocar para os lados faria o conteúdo passar da largura da tela: sobe de baixo. */
   :global([data-revelar-ativo]) .heroTexto[data-revelar].revelado,
+  :global([data-revelar-ativo]) .heroMidia[data-revelar].revelado,
   :global([data-revelar-ativo]) .heroBusca[data-revelar].revelado {
     --deslocamento: translateY(28px);
   }
@@ -608,13 +663,14 @@
 
 @media (max-width: 767px) {
   .hero {
-    padding: 24px 0 44px; /* a faixa de baixo abriga o selo "Imagem ilustrativa" */
+    padding: 28px 0 32px;
   }
-  .heroBusca {
+  .heroBusca,
+  .heroMidia {
     max-width: none;
   }
   .heroConteudo {
-    gap: 20px;
+    gap: 22px;
   }
   .heroTexto {
     gap: 12px;
@@ -625,19 +681,28 @@
   }
   .heroTexto p {
     font-size: 15px;
-    line-height: 1.45;
+    line-height: 1.5;
   }
-  .heroLink {
-    min-height: 40px;
-    padding: 6px 14px;
-    font-size: 14px;
-    line-height: 1.3;
+  .heroFoto {
+    aspect-ratio: auto;
+    height: 220px;
+    border-radius: 22px;
   }
-  .ilustrativa {
-    top: auto;
-    right: var(--margem);
+  .heroCard {
+    left: 12px;
+    right: 12px;
     bottom: 12px;
-    font-size: 10px;
+    max-width: none;
+    gap: 12px;
+    padding: 10px;
+    border-radius: 16px;
+  }
+  .heroCard img {
+    width: 56px;
+    height: 56px;
+  }
+  .heroCardSeta {
+    display: block;
   }
 
   .destaques {
