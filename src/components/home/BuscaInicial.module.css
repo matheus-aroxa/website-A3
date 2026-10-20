@@ -85,10 +85,24 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 0 14px;
-  font-size: 15px;
-  font-weight: 600;
+  padding: 0 14px 0 8px;
+  background: var(--mar-claro); /* linha clara: o logo tem texto escuro */
+  color: var(--tinta);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.15;
   cursor: pointer;
+}
+
+.mcmvLogo {
+  flex: none;
+  width: 40px;
+  height: auto;
+}
+
+.mcmv > span {
+  flex: 1;
+  min-width: 0;
 }
 
 .mcmv[data-desligado] {
@@ -97,7 +111,8 @@
 }
 
 .mcmv input {
-  accent-color: var(--sol);
+  flex: none;
+  accent-color: var(--mar);
 }
 
 /* Contador (quartos, banheiros, vagas). */

@@ -4,8 +4,10 @@
 // (ex.: /imoveis/venda/apartamentos/paulista/jaguaribe?quartos=2) e navega até ela.
 // Sem JavaScript o formulário ainda funciona: envia ?q= para /imoveis.
 
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import logoMcmv from '@/assets/marca/logo-mcmv.png'
 import { Icone, type NomeIcone } from '@/components/ui/Icone'
 import { Seletor } from '@/components/ui/Seletor'
 import { TIPOS, rotuloTipoPlural } from '@/lib/imoveis/formato'
@@ -136,6 +138,8 @@ export function BuscaInicial({ cidades }: { cidades: Cidade[] }) {
           ]}
         />
         <label className={s.mcmv} data-desligado={aluguel || undefined}>
+          <Image src={logoMcmv} alt="" width={40} height={40} className={s.mcmvLogo} />
+          <span>Minha Casa Minha Vida</span>
           <input
             type="checkbox"
             className="caixa"
@@ -143,7 +147,6 @@ export function BuscaInicial({ cidades }: { cidades: Cidade[] }) {
             disabled={aluguel}
             onChange={(e) => setMcmv(e.target.checked)}
           />
-          Minha Casa Minha Vida
         </label>
       </div>
 
