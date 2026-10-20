@@ -9,11 +9,12 @@ export function BotaoWhatsApp({ mensagem, somenteDesktop = false }: { mensagem?:
       href={linkWhatsApp(mensagem)}
       target="_blank"
       rel="noopener"
-      aria-label="Falar no WhatsApp"
+      aria-label="Fale conosco pelo WhatsApp"
       className={`btn btn-sol ${s.botao}`}
       data-somente-desktop={somenteDesktop || undefined}
     >
-      <Icone nome="whatsapp-logo" tamanho={28} preenchido />
+      <Icone nome="whatsapp-logo" tamanho={26} preenchido />
+      <span className={s.rotulo}>Fale conosco</span>
     </a>
   )
 }

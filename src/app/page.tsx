@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import equipe from '@/assets/site/equipe-a3-solucoes-imobiliarias.jpg'
+import { BuscaInicial } from '@/components/home/BuscaInicial'
 import { CardImovel } from '@/components/imoveis/CardImovel'
 import { FormularioContato } from '@/components/formularios/FormularioContato'
 import { BotaoWhatsApp } from '@/components/layout/BotaoWhatsApp'
@@ -10,8 +11,8 @@ import { Rodape } from '@/components/layout/Rodape'
 import { RevelarAoRolar } from '@/components/ui/RevelarAoRolar'
 import { Icone, type NomeIcone } from '@/components/ui/Icone'
 import { MapaEstatico } from '@/components/ui/MapaEstatico'
-import { etiquetaImovel, formatarPreco, rotuloPreco } from '@/lib/imoveis/formato'
-import { listarDestaques, obterImovelHeroi } from '@/lib/imoveis/repositorio'
+import { formatarPreco, rotuloPreco } from '@/lib/imoveis/formato'
+import { listarCidades, listarDestaques, obterImovelHeroi } from '@/lib/imoveis/repositorio'
 import { urlImovel } from '@/lib/imoveis/rotas'
 import { linkWhatsApp, mensagensWhatsApp, site } from '@/lib/site'
 import s from './page.module.css'
@@ -86,9 +87,8 @@ const DIFERENCIAIS = [
 ]
 
 export default async function Home() {
-  const [heroi, destaques] = await Promise.all([obterImovelHeroi(), listarDestaques()])
+  const [heroi, destaques, cidades] = await Promise.all([obterImovelHeroi(), listarDestaques(), listarCidades()])
   const fotoHeroi = heroi?.fotos[0]
-  const capaHeroi = heroi && (heroi.capa ?? heroi.fotos[0])
 
   return (
     <>
@@ -96,8 +96,22 @@ export default async function Home() {
       <main id="conteudo">
         {/* Hero */}
         <section className={s.hero}>
-          <div className={`container ${s.heroGrade}`}>
-            <div className={s.heroTexto} data-revelar="esquerda">
+          {fotoHeroi && (
+            <div className={s.heroFundo}>
+              <Image
+                src={fotoHeroi.src}
+                alt={fotoHeroi.alt}
+                fill
+                sizes="100vw"
+                placeholder={fotoHeroi.blurDataURL ? 'blur' : 'empty'}
+                blurDataURL={fotoHeroi.blurDataURL}
+                loading="eager"
+                fetchPriority="high"
+              />
+            </div>
+          )}
+          <div className={`container ${s.heroConteudo}`}>
+            <div className={s.heroTexto}>
               <h1 className={s.heroTitulo}>
                 Seu lar <span>está aqui.</span>
               </h1>
@@ -105,38 +119,22 @@ export default async function Home() {
                 Na <strong>{site.nome}</strong> você encontra apartamentos, casas de condomínio e lançamentos para
                 comprar ou alugar — com um corretor do primeiro contato à entrega das chaves.
               </p>
-            </div>
-            {heroi && fotoHeroi && (
-              <div className={s.heroMidia} data-revelar="direita">
-                <div className={s.heroFoto}>
-                  <Image
-                    src={fotoHeroi.src}
-                    alt={fotoHeroi.alt}
-                    fill
-                    sizes="(max-width: 767px) 100vw, (max-width: 1360px) 48vw, 640px"
-                    placeholder={fotoHeroi.blurDataURL ? 'blur' : 'empty'}
-                    blurDataURL={fotoHeroi.blurDataURL}
-                    loading="eager"
-                    fetchPriority="high"
-                  />
-                  <span className={s.ilustrativa}>Imagem ilustrativa</span>
-                </div>
-                <Link href={urlImovel(heroi.slug)} className={`elevar ${s.heroCard}`}>
-                  {capaHeroi && <Image src={capaHeroi.src} alt="" width={76} height={76} sizes="76px" />}
-                  <span className={s.heroCardTexto}>
-                    <span className={s.heroCardRotulo}>
-                      {etiquetaImovel(heroi)} · {heroi.local.bairro}
-                    </span>
-                    <strong>{heroi.nome}</strong>
-                    <span>
-                      {rotuloPreco(heroi.finalidade)} <b>{formatarPreco(heroi.preco, heroi.finalidade)}</b>
-                    </span>
+              {heroi && (
+                <Link href={urlImovel(heroi.slug)} className={s.heroLink}>
+                  Em destaque: <strong>{heroi.nome}</strong> · {heroi.local.bairro}
+                  <span>
+                    {' '}
+                    {rotuloPreco(heroi.finalidade).toLowerCase()} {formatarPreco(heroi.preco, heroi.finalidade)}
                   </span>
-                  <Icone nome="chevron-direita" espessura={2} className={s.heroCardSeta} />
+                  <Icone nome="chevron-direita" tamanho={16} espessura={2.4} />
                 </Link>
-              </div>
-            )}
+              )}
+            </div>
+            <div className={s.heroBusca}>
+              <BuscaInicial cidades={cidades} />
+            </div>
           </div>
+          {fotoHeroi && <span className={s.ilustrativa}>Imagem ilustrativa</span>}
         </section>
 
         {/* Destaques */}

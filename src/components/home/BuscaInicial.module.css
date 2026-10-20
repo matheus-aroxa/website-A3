@@ -1,0 +1,242 @@
+/* Painel de filtros flutuando sobre a foto do hero (vidro escuro, duas linhas de campos). */
+
+.painel {
+  display: grid;
+  grid-template-columns: repeat(20, minmax(0, 1fr));
+  gap: 12px;
+  padding: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 20px;
+  background: rgba(7, 47, 44, 0.5);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.6);
+}
+
+.linha {
+  display: contents;
+}
+
+/* Linha 1: cinco campos de 4 colunas. */
+.linha:first-child > * {
+  grid-column: span 4;
+}
+
+/* Linha 2: três contadores, código e botão. */
+.linhaExtra > :nth-child(-n + 3) {
+  grid-column: span 3;
+}
+
+.linhaExtra > :nth-child(4) {
+  grid-column: span 7;
+}
+
+.buscar {
+  grid-column: span 4;
+  height: 52px;
+  border-radius: 10px;
+  font-size: 17px;
+}
+
+/* Campos escuros, como na referência. O Seletor é global; só a aparência muda aqui. */
+.campoEscuro :global(.seletor-botao),
+.codigo,
+.mcmv,
+.passo {
+  height: 52px;
+  border: 0;
+  border-radius: 10px;
+  background: rgba(7, 47, 44, 0.92);
+  color: #fff;
+  font-size: 16px;
+}
+
+.campoEscuro :global(.seletor-botao) {
+  padding-inline: 16px 14px;
+}
+
+.campoEscuro :global(.seletor-seta) {
+  color: #fff;
+}
+
+.campoEscuro :global(.seletor[data-aberto] .seletor-botao),
+.campoEscuro:global(.seletor[data-aberto]) :global(.seletor-botao) {
+  box-shadow: 0 0 0 3px var(--sol);
+}
+
+.codigo {
+  width: 100%;
+  min-width: 0;
+  padding: 0 16px;
+}
+
+.codigo::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.codigo:focus-visible,
+.mcmv:has(:focus-visible) {
+  outline: 3px solid var(--sol);
+  outline-offset: 2px;
+}
+
+.mcmv {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mcmv[data-desligado] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.mcmv input {
+  accent-color: var(--sol);
+}
+
+/* Contador (quartos, banheiros, vagas). */
+.passo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px 0 12px;
+}
+
+.passo svg {
+  flex: none;
+}
+
+.passoRotulo {
+  display: none;
+}
+
+.passo output {
+  flex: 1;
+  text-align: center;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.passo button {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.passo button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.passo button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.maisFiltros {
+  display: none;
+}
+
+@media (max-width: 959px) {
+  .linha:first-child > :nth-child(-n + 4) {
+    grid-column: span 10;
+  }
+  .linha:first-child > :nth-child(5) {
+    grid-column: span 20;
+  }
+  .linhaExtra > :nth-child(-n + 3) {
+    grid-column: span 6;
+  }
+  .linhaExtra > :nth-child(4) {
+    grid-column: span 20;
+  }
+  .buscar {
+    grid-column: span 20;
+  }
+}
+
+@media (max-width: 767px) {
+  .painel {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 10px;
+    padding: 16px;
+    border-radius: 18px;
+  }
+  .linha:first-child > :nth-child(1),
+  .linha:first-child > :nth-child(4),
+  .linha:first-child > :nth-child(5),
+  .linhaExtra > :nth-child(4),
+  .buscar,
+  .maisFiltros {
+    grid-column: span 6;
+  }
+  .linha:first-child > :nth-child(2),
+  .linha:first-child > :nth-child(3) {
+    grid-column: span 3;
+  }
+  .linhaExtra > :nth-child(-n + 3) {
+    grid-column: span 2;
+  }
+
+  /* Recolhido: só negociação, tipo, cidade e bairro. */
+  .painel:not([data-expandido]) .linha:first-child > :nth-child(5),
+  .painel:not([data-expandido]) .linhaExtra > * {
+    display: none;
+  }
+
+  .passo {
+    height: auto;
+    min-height: 74px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-content: center;
+    gap: 6px 4px;
+    padding: 8px;
+  }
+  .passo output {
+    flex: 1;
+    min-width: 0;
+  }
+  .passo svg {
+    display: none;
+  }
+  .passoRotulo {
+    display: block;
+    flex-basis: 100%;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.8);
+  }
+  .passo output {
+    font-size: 14px;
+  }
+  .passo button {
+    width: 28px;
+    height: 28px;
+  }
+
+  .maisFiltros {
+    display: block;
+    height: 44px;
+    border: 0;
+    background: transparent;
+    color: #fff;
+    font-weight: 700;
+    font-size: 15px;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+}
