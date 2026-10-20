@@ -111,7 +111,7 @@ export default async function Home() {
             </div>
           )}
           <div className={`container ${s.heroConteudo}`}>
-            <div className={s.heroTexto}>
+            <div className={s.heroTexto} data-revelar="esquerda">
               <h1 className={s.heroTitulo}>
                 Seu lar <span>está aqui.</span>
               </h1>
@@ -130,7 +130,7 @@ export default async function Home() {
                 </Link>
               )}
             </div>
-            <div className={s.heroBusca}>
+            <div className={s.heroBusca} data-revelar="direita">
               <BuscaInicial cidades={cidades} />
             </div>
           </div>

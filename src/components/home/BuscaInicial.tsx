@@ -66,7 +66,6 @@ export function BuscaInicial({ cidades }: { cidades: Cidade[] }) {
   const [banheiros, setBanheiros] = useState(0)
   const [vagas, setVagas] = useState(0)
   const [q, setQ] = useState('')
-  const [expandido, setExpandido] = useState(false) // só importa no celular
 
   const cidade = cidades.find((c) => c.slug === cidadeSlug)
   const aluguel = modo === 'aluguel'
@@ -89,14 +88,7 @@ export function BuscaInicial({ cidades }: { cidades: Cidade[] }) {
   }
 
   return (
-    <form
-      className={s.painel}
-      role="search"
-      aria-label="Buscar imóveis"
-      action="/imoveis"
-      data-expandido={expandido || undefined}
-      onSubmit={buscar}
-    >
+    <form className={s.painel} role="search" aria-label="Buscar imóveis" action="/imoveis" onSubmit={buscar}>
       <h2 className={s.titulo}>Encontre seu imóvel</h2>
 
       <div className={s.abas} role="group" aria-label="Negociação">
@@ -188,10 +180,6 @@ export function BuscaInicial({ cidades }: { cidades: Cidade[] }) {
           />
         </label>
       </div>
-
-      <button type="button" className={s.maisFiltros} aria-expanded={expandido} onClick={() => setExpandido((v) => !v)}>
-        {expandido ? 'Menos filtros' : 'Mais filtros'}
-      </button>
 
       <button type="submit" className={`btn btn-sol ${s.buscar}`}>
         <Icone nome="busca" tamanho={22} espessura={2.2} />
