@@ -125,6 +125,93 @@ const CAMINHOS = {
   ),
   externo: <path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" />,
   coracao: <path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" />,
+  // Painel administrativo
+  editar: (
+    <>
+      <path d="M4 20h4L19 9l-4-4L4 16z" />
+      <path d="m13.5 6.5 4 4" />
+    </>
+  ),
+  olho: (
+    <>
+      <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" />
+      <circle cx="12" cy="12" r="3" />
+    </>
+  ),
+  'olho-fechado': (
+    <>
+      <path d="M3 3l18 18" />
+      <path d="M10.6 6A9.7 9.7 0 0 1 12 5.5c6 0 9.5 6.5 9.5 6.5a17 17 0 0 1-3 3.8M6.6 6.6A16.6 16.6 0 0 0 2.5 12S6 18.5 12 18.5a9.3 9.3 0 0 0 4.4-1.1" />
+    </>
+  ),
+  lixeira: (
+    <>
+      <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" />
+      <path d="M10 11v6M14 11v6" />
+    </>
+  ),
+  restaurar: (
+    <>
+      <path d="M4 4v6h6" />
+      <path d="M4.5 15a8 8 0 1 0 1.9-8.3L4 10" />
+    </>
+  ),
+  estrela: <path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z" />,
+  sair: (
+    <>
+      <path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4" />
+      <path d="M10 16l4-4-4-4M14 12H4" />
+    </>
+  ),
+  enviar: (
+    <>
+      <path d="M12 16V4M6 10l6-6 6 6" />
+      <path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" />
+    </>
+  ),
+  mais: <path d="M12 5v14M5 12h14" />,
+  'seta-cima': <path d="M12 19V5M6 11l6-6 6 6" />,
+  'seta-baixo': <path d="M12 5v14M6 13l6 6 6-6" />,
+  'seta-esquerda': <path d="M19 12H5M11 6l-6 6 6 6" />,
+  texto: <path d="M5 6h14M5 11h14M5 16h9" />,
+  dinheiro: (
+    <>
+      <rect x="3" y="6" width="18" height="12" rx="2" />
+      <circle cx="12" cy="12" r="2.6" />
+      <path d="M6.5 9.5v.01M17.5 14.5v.01" />
+    </>
+  ),
+  imagem: (
+    <>
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <circle cx="9" cy="10" r="1.8" />
+      <path d="m21 16-5-5-9 8" />
+    </>
+  ),
+  usuario: (
+    <>
+      <circle cx="12" cy="8.5" r="3.5" />
+      <path d="M5 20a7 7 0 0 1 14 0" />
+    </>
+  ),
+  cadeado: (
+    <>
+      <rect x="5" y="11" width="14" height="9" rx="2" />
+      <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+    </>
+  ),
+  alerta: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 11v5M12 7.5v.5" />
+    </>
+  ),
+  historico: (
+    <>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 7.5V12l3 2" />
+    </>
+  ),
 } as const
 
 export type NomeIcone = keyof typeof CAMINHOS

@@ -114,3 +114,15 @@ export function slugificar(texto: string) {
 export function normalizarBusca(texto: string) {
   return texto.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim()
 }
+
+/**
+ * Número digitado no formato brasileiro: "265.000", "50,84", "1.234,5" (e também "50.84").
+ * `undefined` para vazio, `NaN` para texto que não é número.
+ */
+export function lerNumeroBr(texto: string) {
+  let bruto = texto.replace(/\s/g, '')
+  if (!bruto) return undefined
+  if (bruto.includes(',')) bruto = bruto.replace(/\./g, '').replace(',', '.')
+  else if (/^\d{1,3}(\.\d{3})+$/.test(bruto)) bruto = bruto.replace(/\./g, '')
+  return /^\d+(\.\d+)?$/.test(bruto) ? Number(bruto) : NaN
+}

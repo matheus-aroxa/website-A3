@@ -28,6 +28,7 @@ Copie `.env.example` para `.env.local` e ajuste `NEXT_PUBLIC_SITE_URL` para o do
 | `/sitemap.xml`, `/robots.txt`, `/manifest.webmanifest` | SEO técnico | Gerados |
 | `/api/imoveis` | JSON do "Carregar mais" (celular) | Dinâmica |
 | `/api/revalidar` | Webhook do CRM para atualizar o cache | Dinâmica |
+| `/admin` | Painel administrativo (login, imóveis, vitrine da home) | Dinâmica, `noindex` |
 
 Filtros que não viram página (quartos, vagas, área, ordem, página…) vão na query string
 (`?quartos=2&ordem=menor-preco`) e apontam o `canonical` para a página limpa.
@@ -86,6 +87,34 @@ Se o catálogo crescer muito (milhares de imóveis), troque a filtragem em memó
 Os formulários (contato, agendar visita, falar com corretor) usam Server Actions
 (`src/app/acoes.ts`): validam no servidor, têm campo-armadilha anti-robô e funcionam até
 sem JavaScript. Hoje o adaptador mock só registra o lead no log do servidor.
+
+## Painel administrativo (`/admin`)
+
+Permite à equipe editar imóveis, desativá-los (somem do site, continuam no painel), excluí-los
+(com opção de restaurar) e escolher o imóvel do topo da home e os destaques.
+
+**Admin padrão em desenvolvimento:** com `npm run dev` e `ADMIN_USUARIOS` vazio, entre com
+usuário `admin` e senha `admin`. Em produção esse acesso não existe: configure as variáveis abaixo.
+
+**Sem banco de dados:**
+
+- **Login**: os admins ficam na variável `ADMIN_USUARIOS` (`email:hash`, separados por vírgula).
+  O hash é scrypt com sal; gere cada entrada com `node scripts/gerar-senha-admin.mjs email@a3.com.br`.
+  A sessão é um cookie `httpOnly` assinado com HMAC (`ADMIN_SESSAO_SEGREDO`, gere com
+  `node scripts/gerar-senha-admin.mjs --segredo`), válido por 8 h e encerrado ao fechar o navegador;
+  com "Manter conectado" marcado no login, vale por 30 dias. Trocar a senha de alguém derruba
+  as sessões dele; trocar o segredo derruba todas. Há limite de tentativas de login por IP.
+- **Alterações**: gravadas em `ADMIN_DADOS_DIR/ajustes-catalogo.json` (padrão `./dados`, fora do git),
+  por cima do catálogo do CRM — só os campos alterados são guardados, então reimportar o catálogo
+  não desfaz edições, desativações nem exclusões. Cada gravação invalida o cache e o site se atualiza na hora.
+- **Fotos enviadas pelo painel**: ficam em `ADMIN_DADOS_DIR/fotos/` (JPG, PNG ou WebP, até 15 MB, formato
+  conferido pelo conteúdo do arquivo) e são servidas pelo próprio site em `/fotos/<id>`. O envio usa a rota
+  `POST /admin/enviar-foto`, que exige a sessão do painel.
+
+> A pasta de dados precisa ser **gravável e persistente** (VPS, container com volume etc.). Em
+> hospedagem serverless com disco efêmero (ex.: Vercel) os ajustes e as fotos enviadas se perderiam — aí seria preciso
+> trocar `src/lib/imoveis/ajustes.ts` e `src/lib/admin/fotos.ts` por um armazenamento externo (Blob/KV),
+> mantendo a mesma interface.
 
 ## Pendências antes de ir ao ar
 

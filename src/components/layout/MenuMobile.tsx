@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import logo from '@/assets/marca/logo-a3.png'
 import { Icone } from '@/components/ui/Icone'
 import { linkWhatsApp, site } from '@/lib/site'
@@ -14,7 +14,16 @@ interface LinkMenu {
   chave: string
 }
 
-export function MenuMobile({ links, ativo }: { links: readonly LinkMenu[]; ativo?: string }) {
+export function MenuMobile({
+  links,
+  ativo,
+  rodape,
+}: {
+  links: readonly LinkMenu[]
+  ativo?: string
+  /** Substitui o "Fale conosco" e o CRECI do fim do menu (o painel usa para o "Sair"). */
+  rodape?: ReactNode
+}) {
   const [aberto, setAberto] = useState(false)
   const botaoRef = useRef<HTMLButtonElement>(null)
   const fecharRef = useRef<HTMLButtonElement>(null)
@@ -73,11 +82,15 @@ export function MenuMobile({ links, ativo }: { links: readonly LinkMenu[]; ativo
                 </li>
               ))}
             </ul>
-            <a className="btn btn-sol btn-bloco" style={{ height: 54, fontSize: 16 }} href={linkWhatsApp()} target="_blank" rel="noopener">
-              <Icone nome="whatsapp" tamanho={19} />
-              Fale conosco
-            </a>
-            <span className={s.creci}>{site.creci}</span>
+            {rodape ?? (
+              <>
+                <a className="btn btn-sol btn-bloco" style={{ height: 54, fontSize: 16 }} href={linkWhatsApp()} target="_blank" rel="noopener">
+                  <Icone nome="whatsapp" tamanho={19} />
+                  Fale conosco
+                </a>
+                <span className={s.creci}>{site.creci}</span>
+              </>
+            )}
           </nav>
         </>
       )}

@@ -145,30 +145,32 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Destaques */}
-        <section aria-labelledby="t-destaques" className={s.destaques}>
-          <div className={`container ${s.pilha}`}>
-            <div className={s.cabecalhoSecao} data-revelar>
-              <div className={s.tituloGrupo}>
-                <span className="sobretitulo">Destaques</span>
-                <h2 id="t-destaques" className="titulo-secao">
-                  Lançamentos e empreendimentos em destaque
-                </h2>
+        {/* Destaques (a seção some se o painel não tiver nenhum escolhido) */}
+        {destaques.length > 0 && (
+          <section aria-labelledby="t-destaques" className={s.destaques}>
+            <div className={`container ${s.pilha}`}>
+              <div className={s.cabecalhoSecao} data-revelar>
+                <div className={s.tituloGrupo}>
+                  <span className="sobretitulo">Destaques</span>
+                  <h2 id="t-destaques" className="titulo-secao">
+                    Lançamentos e empreendimentos em destaque
+                  </h2>
+                </div>
+                <Link href="/imoveis" className={`btn btn-sol btn-g ${s.verTodos}`}>
+                  Ver todos os imóveis <Icone nome="seta" tamanho={18} espessura={2} />
+                </Link>
               </div>
-              <Link href="/imoveis" className={`btn btn-sol btn-g ${s.verTodos}`}>
+              <div className={`${s.gradeDestaques} carrossel-mobile`} data-revelar-filhos>
+                {destaques.map((im) => (
+                  <CardImovel key={im.id} imovel={im} variante="destaque" />
+                ))}
+              </div>
+              <Link href="/imoveis" className={`btn btn-sol btn-g btn-bloco ${s.verTodosMobile}`}>
                 Ver todos os imóveis <Icone nome="seta" tamanho={18} espessura={2} />
               </Link>
             </div>
-            <div className={`${s.gradeDestaques} carrossel-mobile`} data-revelar-filhos>
-              {destaques.map((im) => (
-                <CardImovel key={im.id} imovel={im} variante="destaque" />
-              ))}
-            </div>
-            <Link href="/imoveis" className={`btn btn-sol btn-g btn-bloco ${s.verTodosMobile}`}>
-              Ver todos os imóveis <Icone nome="seta" tamanho={18} espessura={2} />
-            </Link>
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* Serviços */}
         <section id="servicos" aria-labelledby="t-servicos" className={s.servicos}>

@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next'
+import { HOSTS_FOTOS } from './src/lib/imoveis/hosts-fotos'
 
 const nextConfig: NextConfig = {
   // Shell estático + streaming (Partial Prerendering). Páginas de imóvel e a home
@@ -9,11 +10,7 @@ const nextConfig: NextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'],
     // Fotos do catálogo vêm do CDN do Supremo.
-    remotePatterns: [
-      { protocol: 'https', hostname: 'cdn.sistemasupremo.com.br' },
-      { protocol: 'https', hostname: 'ss.cloudadmin.com.br' },
-      { protocol: 'https', hostname: 'arquivos.sistemasupremo.com.br' },
-    ],
+    remotePatterns: HOSTS_FOTOS.map((hostname) => ({ protocol: 'https' as const, hostname })),
   },
   async headers() {
     return [
@@ -24,6 +21,14 @@ const nextConfig: NextConfig = {
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+        ],
+      },
+      {
+        // Painel administrativo: fora dos buscadores e sem cache intermediário.
+        source: '/admin/:path*',
+        headers: [
+          { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+          { key: 'Cache-Control', value: 'no-store' },
         ],
       },
     ]

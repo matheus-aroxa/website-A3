@@ -22,3 +22,6 @@ npm-debug.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# ajustes do catálogo feitos pelo painel (estado do servidor, não do código)
+/dados/
