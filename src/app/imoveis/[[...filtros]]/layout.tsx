@@ -7,16 +7,17 @@ import { AreaResultados } from '@/components/busca/Resultados'
 import { BotaoWhatsApp } from '@/components/layout/BotaoWhatsApp'
 import { Cabecalho } from '@/components/layout/Cabecalho'
 import { Rodape } from '@/components/layout/Rodape'
+import { TopoAoEntrar } from '@/components/layout/TopoAoEntrar'
 import { Migalhas } from '@/components/ui/Migalhas'
 import { interpretarSegmentos, segmentosDaRota } from '@/lib/imoveis/filtros'
-import { listarCidades, listarImoveis } from '@/lib/imoveis/repositorio'
+import { listarCidades, listarIndice } from '@/lib/imoveis/repositorio'
 import { combinacoesDeRota, migalhasDaBusca, textosDaBusca } from '@/lib/imoveis/rotas'
 import s from '@/components/busca/Busca.module.css'
 
 // Pré-gera todas as páginas de busca que têm imóveis (categoria × tipo × cidade × bairro).
 // Combinações novas que surgirem no CRM são geradas no primeiro acesso e ficam em cache.
 export async function generateStaticParams() {
-  const imoveis = await listarImoveis()
+  const imoveis = await listarIndice()
   return combinacoesDeRota(imoveis).map((rota) => ({ filtros: segmentosDaRota(rota) }))
 }
 
@@ -28,6 +29,7 @@ export default async function LayoutBusca({ params, children }: LayoutProps<'/im
 
   return (
     <>
+      <TopoAoEntrar />
       <Cabecalho ativo="imoveis" />
       <main id="conteudo">
         <section className={s.topo}>

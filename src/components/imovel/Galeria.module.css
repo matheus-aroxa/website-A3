@@ -67,16 +67,8 @@
   color: #fff;
 }
 
-.legendaPrincipal {
-  display: none;
-}
-
 .item[data-principal] .legenda {
   padding: 6px 12px;
-}
-
-.item[data-principal] .legendaPrincipal {
-  display: inline;
 }
 
 .verTodas {
@@ -213,10 +205,6 @@
 
   .item .legenda {
     padding: 5px 10px;
-  }
-
-  .item .legendaPrincipal {
-    display: inline;
   }
 
   .verTodas {

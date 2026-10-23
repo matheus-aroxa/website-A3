@@ -55,7 +55,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={archivo.variable} data-scroll-behavior="smooth">
+    <html lang="pt-BR" className={archivo.variable}>
       <body>
         <a href="#conteudo" className="pular-conteudo">
           Pular para o conteúdo

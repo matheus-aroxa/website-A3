@@ -6,6 +6,8 @@ export interface EstadoFormulario {
   erros?: Partial<Record<string, string>>
   /** Valores enviados, devolvidos em caso de erro para não apagar o que a pessoa digitou. */
   valores?: Record<string, string>
+  /** Link do WhatsApp com a mensagem pronta, quando o formulário termina abrindo uma conversa. */
+  whatsapp?: string
 }
 
 export const ESTADO_INICIAL: EstadoFormulario = { status: 'inicial' }

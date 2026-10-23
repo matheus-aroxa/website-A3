@@ -7,11 +7,12 @@ import { Icone } from '@/components/ui/Icone'
 import { Seletor } from '@/components/ui/Seletor'
 import type { OpcaoVitrine } from '@/lib/admin/catalogo'
 import { ESTADO_INICIAL } from '@/lib/formularios'
-import type { Vitrine } from '@/lib/imoveis/ajustes'
+import type { Vitrine } from '@/lib/imoveis/painel'
 import { useAvisar } from './Avisos'
 import { Confirmacao, type PedidoConfirmacao } from './Confirmacao'
 import { Secao } from './TopoPagina'
 import s from './Admin.module.css'
+import carregadorImagem from '@/lib/imoveis/carregador-imagem'
 
 const rotulo = (o: OpcaoVitrine) => `${o.nome} — ${o.bairro}, ${o.cidade} (cód. ${o.codigo})`
 
@@ -25,10 +26,10 @@ function PreviaTopo({ imovel }: { imovel?: OpcaoVitrine }) {
       {imovel?.foto ? (
         <div className={s.previaTopoMidia}>
           <div className={s.previaTopoFoto}>
-            <Image src={imovel.foto} alt="" fill sizes="(max-width: 767px) 90vw, 420px" />
+            <Image loader={carregadorImagem} src={imovel.foto} alt="" fill sizes="(max-width: 767px) 90vw, 420px" />
           </div>
           <span className={s.previaTopoCartao}>
-            {imovel.capa && <Image src={imovel.capa} alt="" width={40} height={40} />}
+            {imovel.capa && <Image loader={carregadorImagem} src={imovel.capa} alt="" width={40} height={40} />}
             <span>
               <span className={s.previaTopoRotulo}>
                 {imovel.etiqueta} · {imovel.bairro}
@@ -168,7 +169,7 @@ export function EditorVitrine({
               <li key={id} className={s.destaque}>
                 <div className={s.destaqueTopo}>
                   <span className={s.ordem}>{i + 1}</span>
-                  <div className={s.destaqueFoto}>{o?.capa && <Image src={o.capa} alt="" fill sizes="72px" />}</div>
+                  <div className={s.destaqueFoto}>{o?.capa && <Image loader={carregadorImagem} src={o.capa} alt="" fill sizes="72px" />}</div>
                   <div className={s.destaqueTexto}>
                     <strong>{o?.nome ?? id}</strong>
                     <span>{o && `${o.bairro}, ${o.cidade}`}</span>
@@ -239,7 +240,7 @@ export function EditorVitrine({
                 return o ? (
                   <div key={o.id} className={s.miniCard}>
                     <div className={s.miniCardFoto}>
-                      {o.capa && <Image src={o.capa} alt="" fill sizes="210px" />}
+                      {o.capa && <Image loader={carregadorImagem} src={o.capa} alt="" fill sizes="210px" />}
                       <span className={`etiqueta etiqueta-${o.classeEtiqueta} ${s.etiquetaP}`}>{o.etiqueta}</span>
                     </div>
                     <div className={s.miniCardTexto}>

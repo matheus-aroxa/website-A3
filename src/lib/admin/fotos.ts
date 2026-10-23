@@ -1,10 +1,10 @@
-// Fotos enviadas pelo painel. Ficam na mesma pasta de dados dos ajustes (ADMIN_DADOS_DIR/fotos)
+// Fotos enviadas pelo painel. Ficam em ADMIN_DADOS_DIR/fotos
 // e são servidas por /fotos/[arquivo] (src/app/fotos/[arquivo]/route.ts).
 import 'server-only'
 import { randomUUID } from 'node:crypto'
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises'
 import path from 'node:path'
-import { pastaDados } from '@/lib/imoveis/ajustes'
+import { pastaDados } from './dados'
 import { NOME_FOTO_ENVIADA } from '@/lib/imoveis/hosts-fotos'
 
 export const TAMANHO_MAXIMO_FOTO = 15 * 1024 * 1024

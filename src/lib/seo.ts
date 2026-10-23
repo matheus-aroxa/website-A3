@@ -1,4 +1,5 @@
 // Dados estruturados (schema.org / JSON-LD) para o Google entender a imobiliária e os anúncios.
+import { fotosComCapaPrimeiro } from './imoveis/busca'
 import { formatarArea, rotuloTipo } from './imoveis/formato'
 import type { Migalha } from './imoveis/rotas'
 import { urlImovel } from './imoveis/rotas'
@@ -104,7 +105,7 @@ export function schemaAnuncio(im: Imovel) {
     description: im.descricao.join(' '),
     datePosted: im.publicadoEm,
     dateModified: im.atualizadoEm,
-    image: im.fotos.map((f) => urlAbsoluta(f.src)),
+    image: fotosComCapaPrimeiro(im).map((f) => urlAbsoluta(f.src)),
     identifier: im.codigo,
     provider: { '@id': ID_ORGANIZACAO },
     about: residencia,

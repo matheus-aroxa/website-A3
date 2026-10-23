@@ -105,8 +105,15 @@ export function migalhasDoImovel(im: Imovel): Migalha[] {
   ]
 }
 
+/** O mínimo de um imóvel publicado para gerar rotas e sitemap (um `Imovel` completo também serve). */
+export interface IndiceImovel extends Pick<Imovel, 'slug' | 'finalidade' | 'situacao' | 'tipo' | 'atualizadoEm'> {
+  local: Pick<Imovel['local'], 'cidadeSlug' | 'bairroSlug'>
+  /** Só no sitemap: src das fotos, na ordem da galeria. */
+  fotos?: string[]
+}
+
 /** Combinações de caminho que geram páginas de busca (para generateStaticParams e sitemap). */
-export function combinacoesDeRota(imoveis: Imovel[]): FiltrosRota[] {
+export function combinacoesDeRota(imoveis: IndiceImovel[]): FiltrosRota[] {
   const chaves = new Set<string>()
   const rotas: FiltrosRota[] = []
   for (const im of imoveis) {

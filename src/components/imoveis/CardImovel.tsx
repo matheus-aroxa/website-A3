@@ -15,6 +15,7 @@ import {
 import { urlImovel } from '@/lib/imoveis/rotas'
 import type { ImovelResumo } from '@/lib/imoveis/tipos'
 import s from './CardImovel.module.css'
+import carregadorImagem from '@/lib/imoveis/carregador-imagem'
 
 const SIZES = {
   destaque: '(max-width: 767px) 300px, (max-width: 1100px) 50vw, 440px',
@@ -40,6 +41,7 @@ export function CardImovel({
     <article className={`elevar ${s.card}`} data-variante={variante}>
       <div className={s.foto}>
         <Image
+          loader={carregadorImagem}
           src={imovel.capa.src}
           alt={imovel.capa.alt}
           fill

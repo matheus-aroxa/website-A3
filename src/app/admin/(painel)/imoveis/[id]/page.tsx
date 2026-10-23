@@ -23,7 +23,7 @@ async function Edicao({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const dados = await obterImovelAdmin(id)
   if (!dados) notFound()
-  const { imovel: im, status, editado } = dados
+  const { imovel: im, status, editado, criado } = dados
   const classe = im.finalidade === 'aluguel' ? 'aluguel' : im.situacao
 
   return (
@@ -53,11 +53,11 @@ async function Edicao({ params }: { params: Promise<{ id: string }> }) {
       {status === 'excluido' ? (
         <CorpoPagina estreito>
           <Secao icone={<Icone nome="lixeira" />} titulo="Imóvel excluído" descricao="Ele não aparece no site, na busca nem na vitrine. Restaure para voltar a editá-lo.">
-            <Publicacao imovel={im} status={status} editado={editado} />
+            <Publicacao imovel={im} status={status} editado={editado} criado={criado} />
           </Secao>
         </CorpoPagina>
       ) : (
-        <FormularioImovel imovel={im} status={status} editado={editado} />
+        <FormularioImovel imovel={im} status={status} editado={editado} criado={criado} />
       )}
     </>
   )

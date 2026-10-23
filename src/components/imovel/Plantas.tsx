@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { formatarArea } from '@/lib/imoveis/formato'
 import type { Planta } from '@/lib/imoveis/tipos'
 import s from './Imovel.module.css'
+import carregadorImagem from '@/lib/imoveis/carregador-imagem'
 
 /** Desktop: grade com todas as plantas. Celular: uma planta grande + seletor (protótipo mobile). */
 export function Plantas({ plantas }: { plantas: Planta[] }) {
@@ -15,7 +16,7 @@ export function Plantas({ plantas }: { plantas: Planta[] }) {
         {plantas.map((p, i) => (
           <figure key={p.foto.src} className={s.planta} data-selecionada={i === selecionada || undefined}>
             <div className={s.plantaImagem}>
-              <Image src={p.foto.src} alt={p.foto.alt} fill sizes="(max-width: 767px) 100vw, 300px" />
+              <Image loader={carregadorImagem} src={p.foto.src} alt={p.foto.alt} fill sizes="(max-width: 767px) 100vw, 300px" />
             </div>
             <figcaption>
               <strong>{p.titulo}</strong>

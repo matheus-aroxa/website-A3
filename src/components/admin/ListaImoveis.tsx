@@ -2,17 +2,19 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useDeferredValue, useOptimistic, useState } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
+import { useEffect, useOptimistic, useRef, useState, useTransition } from 'react'
 import { Icone } from '@/components/ui/Icone'
 import { Seletor } from '@/components/ui/Seletor'
-import type { ItemAdmin } from '@/lib/admin/catalogo'
-import type { StatusImovel } from '@/lib/imoveis/ajustes'
-import { SITUACOES, etiquetaImovel, formatarPreco, normalizarBusca, rotuloPreco, rotuloSituacao } from '@/lib/imoveis/formato'
+import type { CatalogoAdmin, FiltroAdmin, ItemAdmin } from '@/lib/admin/catalogo'
+import type { StatusImovel } from '@/lib/imoveis/painel'
+import { SITUACOES, etiquetaImovel, formatarPreco, rotuloPreco, rotuloSituacao } from '@/lib/imoveis/formato'
 import { urlImovel } from '@/lib/imoveis/rotas'
 import { Confirmacao, type PedidoConfirmacao } from './Confirmacao'
 import { TEXTO_EXCLUSAO, useMudarStatus } from './status'
 import { CorpoPagina, TopoPagina } from './TopoPagina'
 import s from './Admin.module.css'
+import carregadorImagem from '@/lib/imoveis/carregador-imagem'
 
 const ABAS = [
   { valor: 'ativo', rotulo: 'No site', resumo: 'publicados no site' },
@@ -34,8 +36,8 @@ const VAZIOS: Record<Aba, [string, string]> = {
 
 const OPCOES_SITUACAO = [
   { valor: '', rotulo: 'Todas as situações' },
-  ...SITUACOES.map((st) => ({ valor: rotuloSituacao[st], rotulo: rotuloSituacao[st] })),
-  { valor: 'Para alugar', rotulo: 'Para alugar' },
+  ...SITUACOES.map((st) => ({ valor: st, rotulo: rotuloSituacao[st] })),
+  { valor: 'alugar', rotulo: 'Para alugar' },
 ]
 
 const OPCOES_FINALIDADE = [
@@ -44,13 +46,8 @@ const OPCOES_FINALIDADE = [
   { valor: 'aluguel', rotulo: 'Aluguel' },
 ]
 
-const POR_PAGINA = 24
-
-function naAba(item: ItemAdmin, aba: Aba) {
-  if (aba === 'vitrine') return item.status === 'ativo' && (item.heroi || item.destaque)
-  if (aba === 'editado') return item.editado && item.status !== 'excluido'
-  return item.status === aba
-}
+/** Espera o fim da digitação antes de buscar no servidor. */
+const ESPERA_BUSCA_MS = 350
 
 function Etiquetas({ item }: { item: ItemAdmin }) {
   const classe = item.finalidade === 'aluguel' ? 'aluguel' : item.situacao
@@ -67,6 +64,7 @@ function Etiquetas({ item }: { item: ItemAdmin }) {
           <Icone nome="estrela" tamanho={11} espessura={2} /> Vitrine
         </span>
       )}
+      {item.criado && <span className={`${s.marcador} ${s.marcadorEditado}`}>Cadastrado no painel</span>}
       {item.editado && <span className={`${s.marcador} ${s.marcadorEditado}`}>Editado</span>}
       {item.status === 'inativo' && <span className={`${s.marcador} ${s.marcadorDesativado}`}>Desativado</span>}
       {item.status === 'excluido' && <span className={`${s.marcador} ${s.marcadorExcluido}`}>Excluído</span>}
@@ -75,47 +73,63 @@ function Etiquetas({ item }: { item: ItemAdmin }) {
 }
 
 export function ListaImoveis({
-  itens,
+  catalogo,
+  filtro,
   titulo,
   descricao,
   alteracao,
 }: {
-  itens: ItemAdmin[]
+  catalogo: CatalogoAdmin
+  filtro: FiltroAdmin
   titulo: string
   descricao: string
   alteracao: string
 }) {
+  const { itens, total, pagina, totalPaginas, contagens } = catalogo
+  const aba = filtro.aba
   const [lista, aplicarStatus] = useOptimistic(itens, (atual, { id, status }: { id: string; status: StatusImovel }) =>
     atual.map((i) => (i.id === id ? { ...i, status } : i)),
   )
   const { executar } = useMudarStatus((id, status) => aplicarStatus({ id, status }))
   const [pedido, setPedido] = useState<PedidoConfirmacao | null>(null)
 
-  const [aba, setAba] = useState<Aba>('ativo')
-  const [busca, setBusca] = useState('')
-  const [situacao, setSituacao] = useState('')
-  const [finalidade, setFinalidade] = useState('')
-  const [limite, setLimite] = useState(POR_PAGINA)
-  const termos = normalizarBusca(useDeferredValue(busca)).split(/\s+/).filter(Boolean)
-  const filtrando = termos.length > 0 || situacao !== '' || finalidade !== ''
+  // Aba, busca, filtros e página moram na URL: o servidor devolve só a página pedida.
+  const router = useRouter()
+  const caminho = usePathname()
+  const [navegando, navegar] = useTransition()
+  const [busca, setBusca] = useState(filtro.q)
+  const espera = useRef<ReturnType<typeof setTimeout>>(undefined)
+  useEffect(() => () => clearTimeout(espera.current), [])
 
-  // Mudou o filtro: volta para a primeira página.
-  const filtrar =
-    <T,>(definir: (v: T) => void) =>
-    (v: T) => {
-      definir(v)
-      setLimite(POR_PAGINA)
-    }
+  const href = (mudanca: Partial<FiltroAdmin>) => {
+    const f = { ...filtro, ...mudanca }
+    const sp = new URLSearchParams()
+    if (f.aba !== 'ativo') sp.set('aba', f.aba)
+    if (f.q.trim()) sp.set('q', f.q.trim())
+    if (f.situacao) sp.set('situacao', f.situacao)
+    if (f.finalidade) sp.set('finalidade', f.finalidade)
+    if (f.pagina > 1) sp.set('pagina', String(f.pagina))
+    const query = sp.toString()
+    return query ? `${caminho}?${query}` : caminho
+  }
+  // Mudou a aba ou o filtro: volta para a primeira página.
+  const ir = (mudanca: Partial<FiltroAdmin>) => navegar(() => router.replace(href({ pagina: 1, ...mudanca }), { scroll: false }))
+  const buscar = (q: string) => {
+    setBusca(q)
+    clearTimeout(espera.current)
+    espera.current = setTimeout(() => ir({ q }), ESPERA_BUSCA_MS)
+  }
 
-  const encontrados = lista.filter(
-    (item) =>
-      naAba(item, aba) &&
-      (!situacao || etiquetaImovel(item) === situacao) &&
-      (!finalidade || item.finalidade === finalidade) &&
-      termos.every((t) => normalizarBusca(`${item.nome} ${item.codigo} ${item.bairro} ${item.cidade}`).includes(t)),
-  )
-  const visiveis = encontrados.slice(0, limite)
+  const filtrando = Boolean(filtro.q.trim() || filtro.situacao || filtro.finalidade)
   const abaAtual = ABAS.find((a) => a.valor === aba)!
+  // Até o servidor responder, o imóvel que mudou de status já sai da aba onde estava e as contagens acompanham.
+  const visiveis = lista.filter((i) => aba === 'vitrine' ? i.status === 'ativo' : aba === 'editado' ? i.status !== 'excluido' : i.status === aba)
+  const statusNoServidor = new Map(itens.map((i) => [i.id, i.status]))
+  const movidos = lista.filter((i) => statusNoServidor.get(i.id) !== i.status)
+  const contagem = (a: Aba) =>
+    a === 'ativo' || a === 'inativo' || a === 'excluido'
+      ? contagens[a] - movidos.filter((i) => statusNoServidor.get(i.id) === a).length + movidos.filter((i) => i.status === a).length
+      : contagens[a]
 
   const excluir = (item: ItemAdmin) =>
     setPedido({
@@ -135,17 +149,22 @@ export function ListaImoveis({
               type="button"
               className={s.aba}
               aria-pressed={aba === a.valor}
-              onClick={() => filtrar(setAba)(a.valor)}
+              onClick={() => ir({ aba: a.valor })}
             >
               <span>{a.rotulo}</span>
-              <strong>{lista.filter((i) => naAba(i, a.valor)).length}</strong>
+              <strong>{contagem(a.valor)}</strong>
             </button>
           ))}
         </div>
-        <p className={s.topoStatus}>
-          <span className={s.ponto} aria-hidden="true" />
-          {alteracao}
-        </p>
+        <Link href="/admin/imoveis/novo" className={`${s.botao} ${s.botaoSol} ${s.botaoG}`}>
+          <Icone nome="mais" tamanho={17} espessura={2.4} /> Novo imóvel
+        </Link>
+        {alteracao && (
+          <p className={s.topoStatus}>
+            <span className={s.ponto} aria-hidden="true" />
+            {alteracao}
+          </p>
+        )}
       </TopoPagina>
 
       <CorpoPagina>
@@ -158,17 +177,17 @@ export function ListaImoveis({
               type="search"
               placeholder="Nome, código ou bairro"
               value={busca}
-              onChange={(e) => filtrar(setBusca)(e.target.value)}
+              onChange={(e) => buscar(e.target.value)}
             />
           </label>
-          <Seletor aria-label="Situação" className={s.filtro} valor={situacao} aoMudar={filtrar(setSituacao)} opcoes={OPCOES_SITUACAO} />
-          <Seletor aria-label="Finalidade" className={s.filtro} valor={finalidade} aoMudar={filtrar(setFinalidade)} opcoes={OPCOES_FINALIDADE} />
+          <Seletor aria-label="Situação" className={s.filtro} valor={filtro.situacao} aoMudar={(situacao) => ir({ situacao })} opcoes={OPCOES_SITUACAO} />
+          <Seletor aria-label="Finalidade" className={s.filtro} valor={filtro.finalidade} aoMudar={(finalidade) => ir({ finalidade })} opcoes={OPCOES_FINALIDADE} />
         </div>
 
         <div className={s.contagemLinha}>
           <p className={s.contagem} aria-live="polite">
             <strong>
-              {encontrados.length} {encontrados.length === 1 ? 'imóvel' : 'imóveis'}
+              {total} {total === 1 ? 'imóvel' : 'imóveis'}
             </strong>{' '}
             {abaAtual.resumo}
           </p>
@@ -178,9 +197,7 @@ export function ListaImoveis({
               className={s.limpar}
               onClick={() => {
                 setBusca('')
-                setSituacao('')
-                setFinalidade('')
-                setLimite(POR_PAGINA)
+                ir({ q: '', situacao: '', finalidade: '' })
               }}
             >
               Limpar
@@ -190,14 +207,14 @@ export function ListaImoveis({
 
         {visiveis.length ? (
           <>
-            <ul className={s.lista}>
+            <ul className={s.lista} aria-busy={navegando} style={navegando ? { opacity: 0.55 } : undefined}>
               {visiveis.map((item) => {
                 const editar = `/admin/imoveis/${item.id}`
                 return (
                   <li key={item.id}>
                     <article className={s.item} data-status={item.status}>
                       <div className={s.itemTopo}>
-                        <div className={s.miniatura}>{item.capa && <Image src={item.capa} alt="" fill sizes="92px" />}</div>
+                        <div className={s.miniatura}>{item.capa && <Image loader={carregadorImagem} src={item.capa} alt="" fill sizes="92px" />}</div>
                         <div className={s.itemTexto}>
                           <Etiquetas item={item} />
                           <Link href={editar} className={s.itemNome}>
@@ -265,15 +282,24 @@ export function ListaImoveis({
                 )
               })}
             </ul>
-            {encontrados.length > visiveis.length && (
-              <div className={s.paginar}>
-                <button type="button" className={`${s.botao} ${s.botaoLinha} ${s.botaoG}`} onClick={() => setLimite(limite + POR_PAGINA)}>
-                  Carregar mais imóveis
-                </button>
+            {totalPaginas > 1 && (
+              <nav className={s.paginar} aria-label="Páginas">
+                <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+                  {pagina > 1 && (
+                    <Link href={href({ pagina: pagina - 1 })} scroll className={`${s.botao} ${s.botaoLinha} ${s.botaoG}`} prefetch={false}>
+                      Anterior
+                    </Link>
+                  )}
+                  {pagina < totalPaginas && (
+                    <Link href={href({ pagina: pagina + 1 })} scroll className={`${s.botao} ${s.botaoLinha} ${s.botaoG}`} prefetch={false}>
+                      Próxima
+                    </Link>
+                  )}
+                </div>
                 <p>
-                  Mostrando {visiveis.length} de {encontrados.length}
+                  Página {pagina} de {totalPaginas}
                 </p>
-              </div>
+              </nav>
             )}
           </>
         ) : (

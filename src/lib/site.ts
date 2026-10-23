@@ -25,12 +25,40 @@ export const site = {
   areaAtendida: ['Paulista', 'Igarassu', 'Recife', 'Olinda', 'Jaboatão dos Guararapes'],
 } as const
 
+/** Endereço público do bucket S3 com as imagens do site (imóveis em `imoveis/` e `empreendimentos/`, institucionais em `site/`). */
+export const URL_IMAGENS = 'https://a3-imoveis-fotos.s3.sa-east-1.amazonaws.com'
+
+/** Imagens institucionais no S3. O nome leva o hash do conteúdo, então o cache pode ser eterno: ao trocar a foto, suba outra e mude o nome aqui. */
+export const imagensSite = {
+  equipe: {
+    src: `${URL_IMAGENS}/site/equipe-a3-solucoes-imobiliarias-469d92656a.jpg`,
+    width: 1200,
+    height: 800,
+    // Miniatura de 16 px embutida, para o espaço não ficar vazio enquanto a foto carrega.
+    blurDataURL: 'data:image/jpeg;base64,/9j/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCAALABADASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAABQIE/8QAHxAAAgICAQUAAAAAAAAAAAAAAQIEEQADIQUSMUFh/8QAFAEBAAAAAAAAAAAAAAAAAAAAAv/EABcRAQEBAQAAAAAAAAAAAAAAAAERACH/2gAMAwEAAhEDEQA/AK6XLeZGrb3GgRhmyO8eSu2yXL+a9YvuVVk7FUUBVAcZoCqE2Ghwtj5hXlyCs3//2Q==',
+  },
+}
+
 export const anoAtual = new Date().getFullYear()
 
 export const mensagensWhatsApp = {
   padrao: 'Olá! Vim pelo site da A3 Soluções Imobiliárias e gostaria de falar com um corretor.',
   financiamento: 'Olá! Vim pelo site da A3 e gostaria de simular um financiamento imobiliário.',
   anunciar: 'Olá! Vim pelo site da A3 e quero anunciar meu imóvel para venda ou aluguel.',
+}
+
+/** Mensagem do formulário "Quero ser atendido", com o que a pessoa preencheu (campos vazios ficam de fora). */
+export function mensagemAtendimento(d: { nome: string; whatsapp: string; email?: string; interesse?: string; mensagem?: string }) {
+  const linhas = [
+    ['Nome', d.nome],
+    ['WhatsApp', d.whatsapp],
+    ['E-mail', d.email],
+    ['Interesse', d.interesse],
+    ['Mensagem', d.mensagem],
+  ]
+    .filter(([, valor]) => valor)
+    .map(([rotulo, valor]) => `${rotulo}: ${valor}`)
+  return `Olá! Vim pelo site da A3 e quero ser atendido.\n\n${linhas.join('\n')}`
 }
 
 export function linkWhatsApp(mensagem: string = mensagensWhatsApp.padrao) {

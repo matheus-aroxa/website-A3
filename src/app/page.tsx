@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import equipe from '@/assets/site/equipe-a3-solucoes-imobiliarias.jpg'
 import { BuscaInicial } from '@/components/home/BuscaInicial'
 import { CardImovel } from '@/components/imoveis/CardImovel'
 import { FormularioContato } from '@/components/formularios/FormularioContato'
@@ -14,8 +13,9 @@ import { MapaEstatico } from '@/components/ui/MapaEstatico'
 import { etiquetaImovel, formatarPreco, rotuloPreco } from '@/lib/imoveis/formato'
 import { listarCidades, listarDestaques, obterImovelHeroi } from '@/lib/imoveis/repositorio'
 import { urlImovel } from '@/lib/imoveis/rotas'
-import { linkWhatsApp, mensagensWhatsApp, site } from '@/lib/site'
+import { imagensSite, linkWhatsApp, mensagensWhatsApp, site } from '@/lib/site'
 import s from './page.module.css'
+import carregadorImagem from '@/lib/imoveis/carregador-imagem'
 
 // A home inteira é gerada estaticamente (e regenerada quando o catálogo muda).
 export const ensureStatic = 'navigation'
@@ -88,8 +88,9 @@ const DIFERENCIAIS = [
 
 export default async function Home() {
   const [heroi, destaques, cidades] = await Promise.all([obterImovelHeroi(), listarDestaques(), listarCidades()])
-  const fotoHeroi = heroi?.fotos[0]
+  // O topo da home usa a capa escolhida no painel (sem escolha, a primeira foto).
   const capaHeroi = heroi && (heroi.capa ?? heroi.fotos[0])
+  const fotoHeroi = capaHeroi
 
   return (
     <>
@@ -112,6 +113,7 @@ export default async function Home() {
                 <div className={s.heroMidia} data-revelar="esquerda">
                   <div className={s.heroFoto}>
                     <Image
+                      loader={carregadorImagem}
                       src={fotoHeroi.src}
                       alt={fotoHeroi.alt}
                       fill
@@ -121,10 +123,9 @@ export default async function Home() {
                       loading="eager"
                       fetchPriority="high"
                     />
-                    <span className={s.ilustrativa}>Imagem ilustrativa</span>
                   </div>
                   <Link href={urlImovel(heroi.slug)} className={`elevar ${s.heroCard}`}>
-                    {capaHeroi && <Image src={capaHeroi.src} alt="" width={64} height={64} sizes="64px" />}
+                    {capaHeroi && <Image loader={carregadorImagem} src={capaHeroi.src} alt="" width={64} height={64} sizes="64px" />}
                     <span className={s.heroCardTexto}>
                       <span className={s.heroCardRotulo}>
                         {etiquetaImovel(heroi)} · {heroi.local.bairro}
@@ -238,7 +239,7 @@ export default async function Home() {
           <div className={`container ${s.quemGrade}`}>
             <div className={s.quemFoto} data-revelar="esquerda">
               <Image
-                src={equipe}
+                {...imagensSite.equipe}
                 alt="Equipe da A3 Soluções Imobiliárias"
                 sizes="(max-width: 767px) 100vw, 45vw"
                 placeholder="blur"

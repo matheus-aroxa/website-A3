@@ -10,7 +10,8 @@ import {
   validarNome,
   validarWhatsapp,
 } from '@/lib/formularios'
-import { listarImoveis } from '@/lib/imoveis/repositorio'
+import { obterImovelPorId } from '@/lib/imoveis/repositorio'
+import { linkWhatsApp, mensagemAtendimento } from '@/lib/site'
 
 type Erros = NonNullable<EstadoFormulario['erros']>
 
@@ -41,7 +42,7 @@ async function registrar(lead: Omit<Lead, 'criadoEm' | 'consentimento'>, sucesso
 
 async function imovelDoFormulario(fd: FormData) {
   const id = texto(fd, 'imovel', 100)
-  const imovel = (await listarImoveis()).find((im) => im.id === id)
+  const imovel = await obterImovelPorId(id)
   return imovel ? { id: imovel.id, codigo: imovel.codigo, nome: imovel.nome } : undefined
 }
 
@@ -65,10 +66,12 @@ export async function enviarContato(_: EstadoFormulario, fd: FormData): Promise<
   }
   if (!semErros(erros)) return { status: 'erro', erros, valores: valoresDe(fd) }
 
-  return registrar(
+  const resultado = await registrar(
     { origem: 'contato-home', ...dados, email: dados.email || undefined },
-    'Um corretor da A3 vai falar com você pelo WhatsApp informado.'
+    'Mensagem enviada para o WhatsApp da A3.'
   )
+  // A conversa é aberta no WhatsApp da A3, já com os dados preenchidos no formulário.
+  return resultado.status === 'sucesso' ? { ...resultado, whatsapp: linkWhatsApp(mensagemAtendimento(dados)) } : resultado
 }
 
 export async function solicitarVisita(_: EstadoFormulario, fd: FormData): Promise<EstadoFormulario> {

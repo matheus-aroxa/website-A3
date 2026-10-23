@@ -174,24 +174,17 @@
 
 /* Cartões de contagem (No site, Desativados…) */
 .abas {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
-  margin: 4px calc(-1 * var(--margem)) 0;
-  padding: 0 var(--margem) 2px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.abas::-webkit-scrollbar {
-  display: none;
+  margin: 4px 0 0;
 }
 
 .aba {
-  flex: none;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  width: 132px;
+  min-width: 0;
   padding: 14px 16px;
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 18px;
@@ -208,7 +201,6 @@
 .aba span {
   font-size: 13px;
   font-weight: 600;
-  white-space: nowrap;
   color: var(--mar-texto);
 }
 
@@ -248,14 +240,8 @@
     font-size: 17px;
   }
   .abas {
-    display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
     margin: 8px 0 0;
-    padding: 0;
-    overflow: visible;
-  }
-  .aba {
-    width: auto;
   }
 }
 
@@ -771,50 +757,6 @@
 }
 
 /* ---------- Edição ---------- */
-
-.secoes {
-  position: sticky;
-  top: var(--altura-cabecalho);
-  z-index: 10;
-  display: flex;
-  gap: 10px;
-  margin: -20px calc(-1 * var(--margem)) -2px;
-  padding: 12px var(--margem);
-  overflow-x: auto;
-  background: var(--fundo-2);
-  scrollbar-width: none;
-}
-
-.secoes::-webkit-scrollbar {
-  display: none;
-}
-
-.secoes a {
-  flex: none;
-  display: flex;
-  align-items: center;
-  height: 38px;
-  padding: 0 14px;
-  border: 1px solid var(--borda-campo);
-  border-radius: 999px;
-  background: #fff;
-  color: var(--tinta);
-  font-size: 14px;
-  font-weight: 700;
-  white-space: nowrap;
-  text-decoration: none;
-}
-
-.secoes a:hover {
-  border-color: var(--mar);
-  color: var(--mar);
-}
-
-@media (min-width: 960px) {
-  .secoes {
-    margin-top: -28px;
-  }
-}
 
 .formulario {
   display: flex;

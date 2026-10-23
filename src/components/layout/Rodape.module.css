@@ -70,6 +70,12 @@
   font-size: 14px;
 }
 
+.linksBase {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+}
+
 @media (max-width: 767px) {
   .rodape {
     padding: 40px 0 28px;
@@ -102,6 +108,10 @@
     gap: 8px;
     padding: 20px 84px 0 0;
     font-size: 13px;
+  }
+  .linksBase {
+    flex-direction: column;
+    gap: 8px;
   }
   .base .link {
     text-decoration: underline;

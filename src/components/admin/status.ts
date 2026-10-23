@@ -2,7 +2,7 @@
 
 import { useTransition } from 'react'
 import { mudarStatus, type AcaoStatus } from '@/app/admin/acoes'
-import type { StatusImovel } from '@/lib/imoveis/ajustes'
+import type { StatusImovel } from '@/lib/imoveis/painel'
 import { useAvisar } from './Avisos'
 
 export const STATUS_APOS: Record<AcaoStatus, StatusImovel> = {

@@ -130,7 +130,7 @@ export function Sucesso({
   aoRefazer,
 }: {
   titulo: string
-  children: React.ReactNode
+  children?: React.ReactNode
   acao: string
   aoRefazer: () => void
 }) {

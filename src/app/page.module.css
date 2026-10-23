@@ -87,17 +87,6 @@
   object-fit: cover;
 }
 
-.ilustrativa {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  padding: 5px 10px;
-  border-radius: 999px;
-  background: rgba(14, 31, 29, 0.6);
-  font-size: 11px;
-  color: #fff;
-}
-
 .heroCard {
   position: absolute;
   left: 16px;

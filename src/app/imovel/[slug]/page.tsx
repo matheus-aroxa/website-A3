@@ -14,6 +14,7 @@ import { BotaoCompartilhar } from '@/components/ui/BotaoCompartilhar'
 import { Icone, type NomeIcone } from '@/components/ui/Icone'
 import { MapaEstatico } from '@/components/ui/MapaEstatico'
 import { Migalhas } from '@/components/ui/Migalhas'
+import { fotosComCapaPrimeiro } from '@/lib/imoveis/busca'
 import { caminhoDaRota, ROTA_VAZIA } from '@/lib/imoveis/filtros'
 import {
   SITUACOES,
@@ -27,7 +28,7 @@ import {
   rotuloSituacao,
   rotuloTipo,
 } from '@/lib/imoveis/formato'
-import { listarImoveis, listarSemelhantes, obterImovelPorSlug } from '@/lib/imoveis/repositorio'
+import { listarIndice, listarSemelhantes, obterImovelPorSlug } from '@/lib/imoveis/repositorio'
 import { categoriaDoImovel, migalhasDoImovel, urlImovel } from '@/lib/imoveis/rotas'
 import type { Imovel } from '@/lib/imoveis/tipos'
 import { schemaAnuncio } from '@/lib/seo'
@@ -39,7 +40,7 @@ import s from '@/components/imovel/Imovel.module.css'
 export const ensureStatic = 'navigation'
 
 export async function generateStaticParams() {
-  const imoveis = await listarImoveis()
+  const imoveis = await listarIndice()
   return imoveis.map((im) => ({ slug: im.slug }))
 }
 
@@ -69,7 +70,7 @@ export async function generateMetadata({ params }: PageProps<'/imovel/[slug]'>):
       title: titulo,
       description: descricao,
       url,
-      images: im.fotos.slice(0, 4).map((f) => ({ url: f.src, width: f.width, height: f.height, alt: f.alt })),
+      images: fotosComCapaPrimeiro(im).slice(0, 4).map((f) => ({ url: f.src, width: f.width, height: f.height, alt: f.alt })),
     },
   }
 }
@@ -123,7 +124,7 @@ export default async function PaginaImovel({ params }: PageProps<'/imovel/[slug]
         <div className={`container ${s.topo}`}>
           <Migalhas itens={migalhasDoImovel(im)} className={s.migalhas} />
           <div className={s.galeriaMargem}>
-            <Galeria fotos={im.fotos} ilustrativas={im.situacao !== 'pronto'} />
+            <Galeria fotos={fotosComCapaPrimeiro(im)} />
           </div>
         </div>
 

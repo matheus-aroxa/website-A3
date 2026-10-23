@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useState } from 'react'
+import { useActionState, useEffect, useState } from 'react'
 import { enviarContato } from '@/app/acoes'
 import { Seletor } from '@/components/ui/Seletor'
 import { ESTADO_INICIAL } from '@/lib/formularios'
@@ -17,12 +17,16 @@ const INTERESSES = [
 
 function Formulario({ aoRefazer }: { aoRefazer: () => void }) {
   const [estado, acao] = useActionState(enviarContato, ESTADO_INICIAL)
+  const whatsapp = estado.status === 'sucesso' ? estado.whatsapp : undefined
+
+  // Abre o WhatsApp da A3 com a mensagem pronta. Na mesma aba: não depende de permitir pop-ups.
+  useEffect(() => {
+    if (whatsapp) window.location.assign(whatsapp)
+  }, [whatsapp])
 
   if (estado.status === 'sucesso')
     return (
-      <Sucesso titulo="Recebemos seus dados!" acao="Enviar outra mensagem" aoRefazer={aoRefazer}>
-        <p>{estado.mensagem}</p>
-      </Sucesso>
+      <Sucesso titulo="Recebemos seus dados!" acao="Enviar outra mensagem" aoRefazer={aoRefazer} />
     )
 
   return (

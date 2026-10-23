@@ -2,14 +2,14 @@
 
 import Image from 'next/image'
 import { useEffect, useRef, useState, useTransition, type ReactNode } from 'react'
-import { descartarEdicoes, salvarImovel } from '@/app/admin/acoes'
+import { criarImovel, descartarEdicoes, salvarImovel } from '@/app/admin/acoes'
 import logoMcmv from '@/assets/marca/logo-mcmv.png'
 import { CardImovel } from '@/components/imoveis/CardImovel'
 import { Icone } from '@/components/ui/Icone'
 import { MapaEstatico } from '@/components/ui/MapaEstatico'
 import { Seletor } from '@/components/ui/Seletor'
 import { ESTADO_INICIAL, type EstadoFormulario } from '@/lib/formularios'
-import type { StatusImovel } from '@/lib/imoveis/ajustes'
+import type { StatusImovel } from '@/lib/imoveis/painel'
 import { SITUACOES, TIPOS, lerNumeroBr, rotuloSituacao, rotuloTipo } from '@/lib/imoveis/formato'
 import { urlImovel } from '@/lib/imoveis/rotas'
 import type { Faixa, Imovel, ImovelResumo } from '@/lib/imoveis/tipos'
@@ -18,6 +18,7 @@ import { Confirmacao, type PedidoConfirmacao } from './Confirmacao'
 import { TEXTO_EXCLUSAO, useMudarStatus } from './status'
 import { Secao } from './TopoPagina'
 import s from './Admin.module.css'
+import carregadorImagem from '@/lib/imoveis/carregador-imagem'
 
 // ---------- Valores do formulário (tudo texto, como nos campos) ----------
 
@@ -50,6 +51,8 @@ interface Valores {
   lazer: string
   proximidades: string
   fotos: string[]
+  /** Foto dos cards (src). Vazio ou fora da lista: vale a primeira. */
+  capa: string
 }
 
 const numeroBr = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 })
@@ -64,14 +67,14 @@ function valoresDe(im: Imovel): Valores {
     finalidade: im.finalidade,
     situacao: im.situacao,
     mcmv: im.mcmv,
-    preco: formatar(im.preco),
-    areaMin: formatar(im.area.min),
-    areaMax: formatar(im.area.max),
-    quartosMin: formatar(im.quartos.min),
-    quartosMax: formatar(im.quartos.max),
+    preco: im.preco ? formatar(im.preco) : '',
+    areaMin: im.area.min ? formatar(im.area.min) : '',
+    areaMax: im.area.max ? formatar(im.area.max) : '',
+    quartosMin: im.quartos.max ? formatar(im.quartos.min) : '',
+    quartosMax: im.quartos.max ? formatar(im.quartos.max) : '',
     suites: formatar(im.suites),
-    banheirosMin: formatar(im.banheiros.min),
-    banheirosMax: formatar(im.banheiros.max),
+    banheirosMin: im.banheiros.max ? formatar(im.banheiros.min) : '',
+    banheirosMax: im.banheiros.max ? formatar(im.banheiros.max) : '',
     vagasMin: formatar(im.vagas?.min),
     vagasMax: formatar(im.vagas?.max),
     entregaMes: mes,
@@ -86,7 +89,35 @@ function valoresDe(im: Imovel): Valores {
     lazer: im.lazer.join('\n'),
     proximidades: im.proximidades.join('\n'),
     fotos: im.fotos.map((f) => f.src),
+    capa: (im.capa ?? im.fotos[0])?.src ?? '',
   }
+}
+
+/** Ponto de partida do cadastro: escolhas comuns já marcadas, o resto em branco. */
+const IMOVEL_VAZIO: Imovel = {
+  id: '',
+  codigo: '',
+  slug: '',
+  nome: '',
+  tipo: 'apartamento',
+  finalidade: 'venda',
+  situacao: 'lancamento',
+  local: { bairro: '', bairroSlug: '', cidade: '', cidadeSlug: '', uf: 'PE' },
+  preco: 0,
+  area: { min: 0, max: 0 },
+  quartos: { min: 0, max: 0 },
+  banheiros: { min: 0, max: 0 },
+  vagas: null,
+  mcmv: false,
+  destaque: false,
+  publicadoEm: '',
+  atualizadoEm: '',
+  chamada: '',
+  descricao: [],
+  fotos: [],
+  plantas: [],
+  lazer: [],
+  proximidades: [],
 }
 
 const MESES = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
@@ -154,12 +185,17 @@ const invalido = (erros: EstadoFormulario['erros'], campo: string) =>
 
 function EditorFotos({
   fotos,
+  capa,
   mudar,
+  escolherCapa,
   nome,
   erro,
 }: {
   fotos: string[]
+  /** Capa já resolvida: sempre uma das fotos da lista. */
+  capa: string
   mudar: (atualizar: (fotos: string[]) => string[]) => void
+  escolherCapa: (src: string) => void
   nome: string
   erro?: string
 }) {
@@ -203,19 +239,27 @@ function EditorFotos({
       {fotos.map((src) => (
         <input key={src} type="hidden" name="fotos" value={src} />
       ))}
+      <input type="hidden" name="capa" value={capa} />
       <ul className={s.fotos}>
         {fotos.map((src, i) => (
-          <li key={src} className={s.foto} data-capa={i === 0 || undefined}>
+          <li key={src} className={s.foto} data-capa={src === capa || undefined}>
             <div className={s.fotoImagem}>
-              <Image src={src} alt={`${nome} – foto ${i + 1}`} fill sizes="(max-width: 767px) 50vw, 220px" />
-              {i === 0 && <span className={s.fotoCapa}>Capa</span>}
+              <Image loader={carregadorImagem} src={src} alt={`${nome} – foto ${i + 1}`} fill sizes="(max-width: 767px) 50vw, 220px" />
+              {src === capa && <span className={s.fotoCapa}>Capa</span>}
               <span className={s.fotoNumero}>{i + 1}</span>
             </div>
             <div className={s.fotoBotoes}>
               <button type="button" className={s.quadrado} onClick={() => mover(i, i - 1)} disabled={i === 0} aria-label={`Mover foto ${i + 1} para a esquerda`}>
                 <Icone nome="seta-esquerda" tamanho={16} espessura={2} />
               </button>
-              <button type="button" className={s.quadrado} onClick={() => mover(i, 0)} disabled={i === 0} aria-label={`Usar foto ${i + 1} como capa`} title="Usar como capa">
+              <button
+                type="button"
+                className={s.quadrado}
+                onClick={() => escolherCapa(src)}
+                disabled={src === capa}
+                aria-label={src === capa ? `Foto ${i + 1} é a capa` : `Usar foto ${i + 1} como capa`}
+                title={src === capa ? 'Esta é a capa' : 'Usar como capa'}
+              >
                 <Icone nome="estrela" tamanho={16} espessura={2} />
               </button>
               <button
@@ -283,7 +327,7 @@ const SITUACAO_SITE: Record<StatusImovel, string> = {
   excluido: 'Excluído',
 }
 
-export function Publicacao({ imovel: im, status, editado }: { imovel: Imovel; status: StatusImovel; editado: boolean }) {
+export function Publicacao({ imovel: im, status, editado, criado = false }: { imovel: Imovel; status: StatusImovel; editado: boolean; criado?: boolean }) {
   const { executar, pendente } = useMudarStatus()
   const avisar = useAvisar()
   const [pedido, setPedido] = useState<PedidoConfirmacao | null>(null)
@@ -301,10 +345,10 @@ export function Publicacao({ imovel: im, status, editado }: { imovel: Imovel; st
         </div>
         <div>
           <dt>Origem</dt>
-          <dd>{editado ? 'CRM + edições do painel' : 'Igual ao CRM'}</dd>
+          <dd>{criado ? 'Cadastrado no painel' : editado ? 'CRM + edições do painel' : 'Igual ao CRM'}</dd>
         </div>
         <div>
-          <dt>Código no CRM</dt>
+          <dt>{criado ? 'Código' : 'Código no CRM'}</dt>
           <dd>{im.codigo}</dd>
         </div>
         <div className={s.dadosBloco}>
@@ -381,16 +425,20 @@ export function Publicacao({ imovel: im, status, editado }: { imovel: Imovel; st
 
 // ---------- Formulário ----------
 
-const SECOES = [
-  { id: 'apresentacao', rotulo: 'Apresentação' },
-  { id: 'valores', rotulo: 'Valores' },
-  { id: 'localizacao', rotulo: 'Localização' },
-  { id: 'textos', rotulo: 'Textos' },
-  { id: 'fotos', rotulo: 'Fotos' },
-  { id: 'publicacao', rotulo: 'Publicação' },
-]
-
-export function FormularioImovel({ imovel: im, status, editado }: { imovel: Imovel; status: StatusImovel; editado: boolean }) {
+export function FormularioImovel({
+  imovel,
+  status = 'ativo',
+  editado = false,
+  criado = false,
+}: {
+  /** Ausente: formulário de cadastro de um imóvel novo. */
+  imovel?: Imovel
+  status?: StatusImovel
+  editado?: boolean
+  criado?: boolean
+}) {
+  const novo = !imovel
+  const im = imovel ?? IMOVEL_VAZIO
   const avisar = useAvisar()
   const formulario = useRef<HTMLFormElement>(null)
   const [estado, setEstado] = useState<EstadoFormulario>(ESTADO_INICIAL)
@@ -428,6 +476,8 @@ export function FormularioImovel({ imovel: im, status, editado }: { imovel: Imov
   const aluguel = v.finalidade === 'aluguel'
   const entrega = v.entregaMes || v.entregaAno ? `${v.entregaAno}-${v.entregaMes}` : ''
 
+  // A capa pode ser qualquer foto da lista; se a escolhida saiu, vale a primeira.
+  const capa = v.fotos.includes(v.capa) ? v.capa : (v.fotos[0] ?? '')
   const previa: ImovelResumo | null = v.fotos[0]
     ? {
         id: im.id,
@@ -444,7 +494,7 @@ export function FormularioImovel({ imovel: im, status, editado }: { imovel: Imov
         banheiros: faixaPrevia(v.banheirosMin, v.banheirosMax, im.banheiros),
         vagas: v.vagasMin ? faixaPrevia(v.vagasMin, v.vagasMax, im.vagas ?? { min: 0, max: 0 }) : null,
         entrega: /^\d{4}-\d{2}$/.test(entrega) ? entrega : undefined,
-        capa: { src: v.fotos[0], width: 1600, height: 1200, alt: '' },
+        capa: { src: capa, width: 1600, height: 1200, alt: '' },
       }
     : null
 
@@ -455,7 +505,7 @@ export function FormularioImovel({ imovel: im, status, editado }: { imovel: Imov
     iniciar(async () => {
       let resultado: EstadoFormulario
       try {
-        resultado = await salvarImovel(im.id, ESTADO_INICIAL, dados)
+        resultado = novo ? await criarImovel(ESTADO_INICIAL, dados) : await salvarImovel(im.id, ESTADO_INICIAL, dados)
       } catch {
         avisar('Não foi possível salvar. Confira a conexão e tente de novo.', { erro: true })
         return
@@ -463,7 +513,7 @@ export function FormularioImovel({ imovel: im, status, editado }: { imovel: Imov
       setEstado(resultado)
       if (resultado.status === 'sucesso') {
         setPublicado(true)
-        avisar(status === 'ativo' ? 'Alterações publicadas no site.' : 'Alterações salvas.')
+        if (!novo) avisar(status === 'ativo' ? 'Alterações publicadas no site.' : 'Alterações salvas.')
       } else {
         avisar(resultado.mensagem ?? 'Confira os campos destacados.', { erro: true })
         requestAnimationFrame(() => form.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus())
@@ -471,7 +521,11 @@ export function FormularioImovel({ imovel: im, status, editado }: { imovel: Imov
     })
   }
 
-  const estadoTexto = sujo
+  const estadoTexto = novo
+    ? sujo
+      ? 'O imóvel só vai ao site depois de cadastrado.'
+      : 'Preencha os dados do imóvel para cadastrá-lo.'
+    : sujo
     ? 'Você tem alterações que ainda não estão no site.'
     : status === 'inativo'
       ? 'Imóvel desativado: as alterações ficam guardadas para quando ele voltar ao site.'
@@ -482,14 +536,6 @@ export function FormularioImovel({ imovel: im, status, editado }: { imovel: Imov
   return (
     <>
       <div className={`container ${s.corpo}`} data-estreito>
-        <nav className={s.secoes} aria-label="Seções do formulário">
-          {SECOES.map((secao) => (
-            <a key={secao.id} href={`#${secao.id}`}>
-              {secao.rotulo}
-            </a>
-          ))}
-        </nav>
-
         <form
           ref={formulario}
           id="formulario-imovel"
@@ -680,16 +726,25 @@ export function FormularioImovel({ imovel: im, status, editado }: { imovel: Imov
             id="fotos"
             icone={<Icone nome="imagem" />}
             titulo="Fotos"
-            descricao="A primeira é a capa. Use as setas para reordenar e a estrela para escolher a capa."
+            descricao="A foto marcada como Capa aparece nos cards do site. Use a estrela para trocar a capa e as setas para reordenar a galeria."
             extra={<span className={s.secaoExtra}>{v.fotos.length === 1 ? '1 foto' : `${v.fotos.length} fotos`}</span>}
           >
-            <EditorFotos fotos={v.fotos} mudar={(f) => setV((atual) => ({ ...atual, fotos: f(atual.fotos) }))} nome={v.nome} erro={erros?.fotos} />
+            <EditorFotos
+              fotos={v.fotos}
+              capa={capa}
+              mudar={(f) => setV((atual) => ({ ...atual, fotos: f(atual.fotos) }))}
+              escolherCapa={(src) => mudar('capa', src)}
+              nome={v.nome}
+              erro={erros?.fotos}
+            />
           </Secao>
         </form>
 
-        <Secao id="publicacao" icone={<Icone nome="externo" />} titulo="Publicação" descricao="Situação do imóvel no site.">
-          <Publicacao imovel={im} status={status} editado={editado} />
-        </Secao>
+        {!novo && (
+          <Secao id="publicacao" icone={<Icone nome="externo" />} titulo="Publicação" descricao="Situação do imóvel no site.">
+            <Publicacao imovel={im} status={status} editado={editado} criado={criado} />
+          </Secao>
+        )}
       </div>
 
       <div className={s.barraSalvar} data-barra-salvar>
@@ -706,14 +761,14 @@ export function FormularioImovel({ imovel: im, status, editado }: { imovel: Imov
               onClick={() => {
                 setV(inicial)
                 setEstado(ESTADO_INICIAL)
-                avisar('Alterações descartadas.')
+                avisar(novo ? 'Formulário limpo.' : 'Alterações descartadas.')
               }}
             >
               Descartar
             </button>
             <button type="submit" form="formulario-imovel" className={`${s.botao} ${s.botaoSol} ${s.botaoG}`} disabled={!sujo || salvando}>
               <Icone nome="check" tamanho={17} espessura={2.4} />
-              {salvando ? 'Salvando…' : status === 'ativo' ? 'Salvar e publicar' : 'Salvar'}
+              {salvando ? (novo ? 'Cadastrando…' : 'Salvando…') : novo ? 'Cadastrar e publicar' : status === 'ativo' ? 'Salvar e publicar' : 'Salvar'}
             </button>
           </div>
         </div>

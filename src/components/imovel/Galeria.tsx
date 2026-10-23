@@ -5,20 +5,20 @@ import { useEffect, useRef, useState } from 'react'
 import { Icone } from '@/components/ui/Icone'
 import type { Foto } from '@/lib/imoveis/tipos'
 import s from './Galeria.module.css'
+import carregadorImagem from '@/lib/imoveis/carregador-imagem'
 
 /**
  * Desktop: mosaico (foto principal + 4 miniaturas; clicar numa miniatura a promove).
  * Celular: carrossel com swipe, setas, pontos e contador.
  * As mesmas <img> servem aos dois layouts (via CSS), então nada é baixado em dobro.
  */
-export function Galeria({ fotos, ilustrativas }: { fotos: Foto[]; ilustrativas: boolean }) {
+export function Galeria({ fotos }: { fotos: Foto[] }) {
   const [principal, setPrincipal] = useState(0)
   const [visivel, setVisivel] = useState(0)
   const [ampliada, setAmpliada] = useState<number | null>(null)
   const trilho = useRef<HTMLDivElement>(null)
   const dialogo = useRef<HTMLDialogElement>(null)
   const total = fotos.length
-  const sufixo = ilustrativas ? ' · imagem ilustrativa' : ''
 
   // Miniaturas do mosaico: as 4 primeiras fotos que não são a principal.
   const miniaturas = fotos.map((_, i) => i).filter((i) => i !== principal).slice(0, 4)
@@ -71,6 +71,7 @@ export function Galeria({ fotos, ilustrativas }: { fotos: Foto[]; ilustrativas: 
               aria-label={ehPrincipal ? `Ampliar foto: ${foto.legenda ?? foto.alt}` : `Mostrar foto: ${foto.legenda ?? foto.alt}`}
             >
               <Image
+                loader={carregadorImagem}
                 src={foto.src}
                 alt={foto.alt}
                 fill
@@ -81,10 +82,7 @@ export function Galeria({ fotos, ilustrativas }: { fotos: Foto[]; ilustrativas: 
                 fetchPriority={i === 0 ? 'high' : undefined}
               />
               {foto.legenda && (
-                <span className={s.legenda}>
-                  {foto.legenda}
-                  <span className={s.legendaPrincipal}>{sufixo}</span>
-                </span>
+                <span className={s.legenda}>{foto.legenda}</span>
               )}
             </button>
           )
@@ -137,13 +135,10 @@ export function Galeria({ fotos, ilustrativas }: { fotos: Foto[]; ilustrativas: 
         {ampliada !== null && (
           <figure className={s.lightboxFigura}>
             <div className={s.lightboxImagem}>
-              <Image src={fotos[ampliada]!.src} alt={fotos[ampliada]!.alt} fill sizes="100vw" />
+              <Image loader={carregadorImagem} src={fotos[ampliada]!.src} alt={fotos[ampliada]!.alt} fill sizes="100vw" />
             </div>
             <figcaption>
-              <span>
-                {fotos[ampliada]!.legenda}
-                {sufixo}
-              </span>
+              <span>{fotos[ampliada]!.legenda}</span>
               <span>
                 {ampliada + 1} / {total}
               </span>

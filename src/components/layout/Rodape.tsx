@@ -56,9 +56,6 @@ export function Rodape({ comBarraInferior = false }: { comBarraInferior?: boolea
               </a>
               <span>{site.endereco.exibicao}</span>
             </address>
-            <a className="btn btn-sol btn-p" href={linkWhatsApp()} target="_blank" rel="noopener">
-              Fale conosco
-            </a>
           </div>
         </div>
         <div className={s.base}>
@@ -66,9 +63,14 @@ export function Rodape({ comBarraInferior = false }: { comBarraInferior?: boolea
             © {anoAtual} {site.nome} · {site.creci}
           </span>
           {/* scroll={false}: a própria página anima a rolagem até o topo (RolarAoTopo). */}
-          <Link href="/politica-de-privacidade" scroll={false} className={s.link}>
-            Política de privacidade
-          </Link>
+          <div className={s.linksBase}>
+            <Link href="/politica-de-privacidade" scroll={false} className={s.link}>
+              Política de privacidade
+            </Link>
+            <Link href="/admin" className={s.link}>
+              Área administrativa
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
