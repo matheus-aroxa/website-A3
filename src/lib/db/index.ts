@@ -10,11 +10,23 @@ function criarPool() {
   const url = process.env.DATABASE_URL
   if (!url) throw new Error('DATABASE_URL não definida (veja .env.example).')
   const local = /@(localhost|127\.0\.0\.1)[:/]/.test(url)
+  // A conexão direta do Supabase (db.<projeto>.supabase.co) só tem IPv6, e a Vercel só sai por IPv4:
+  // o build e as funções não conseguem conectar. Em produção é preciso usar o pooler (…pooler.supabase.com).
+  if (process.env.VERCEL && /@db\.[^.:/]+\.supabase\.co[:/]/.test(url)) {
+    throw new Error(
+      'DATABASE_URL usa a conexão direta do Supabase, que não funciona na Vercel (só IPv6). ' +
+        'Use a string do "Transaction pooler" (porta 6543, host …pooler.supabase.com), em Supabase > Connect.',
+    )
+  }
+  // No build, vários processos geram páginas ao mesmo tempo; em produção, cada instância é pequena.
+  // O pooler do Supabase junta as conexões, então poucas por processo bastam.
+  const construindo = process.env.NEXT_PHASE === 'phase-production-build'
   return new pg.Pool({
     connectionString: url,
     ssl: local ? undefined : { rejectUnauthorized: false },
-    max: 5,
+    max: Number(process.env.DATABASE_POOL_MAX) || (construindo || process.env.VERCEL ? 3 : 5),
     idleTimeoutMillis: 30_000,
+    connectionTimeoutMillis: 15_000,
   })
 }
 
