@@ -8,8 +8,12 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   images: {
     formats: ['image/avif', 'image/webp'],
-    // Quando o CRM servir as fotos de um domínio próprio, libere-o aqui, por exemplo:
-    // remotePatterns: [{ protocol: 'https', hostname: 'fotos.seucrm.com.br' }],
+    // Fotos do catálogo vêm do CDN do Supremo.
+    remotePatterns: [
+      { protocol: 'https', hostname: 'cdn.sistemasupremo.com.br' },
+      { protocol: 'https', hostname: 'ss.cloudadmin.com.br' },
+      { protocol: 'https', hostname: 'arquivos.sistemasupremo.com.br' },
+    ],
   },
   async headers() {
     return [
