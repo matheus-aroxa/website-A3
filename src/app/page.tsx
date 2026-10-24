@@ -5,6 +5,7 @@ import { BuscaInicial } from '@/components/home/BuscaInicial'
 import { CardImovel } from '@/components/imoveis/CardImovel'
 import { CarrosselDestaques } from '@/components/imoveis/CarrosselDestaques'
 import { FormularioContato } from '@/components/formularios/FormularioContato'
+import { ImoveisPorCidade } from '@/components/home/ImoveisPorCidade'
 import { BotaoWhatsApp } from '@/components/layout/BotaoWhatsApp'
 import { Cabecalho } from '@/components/layout/Cabecalho'
 import { Rodape } from '@/components/layout/Rodape'
@@ -12,9 +13,18 @@ import { RevelarAoRolar } from '@/components/ui/RevelarAoRolar'
 import { Icone, type NomeIcone } from '@/components/ui/Icone'
 import { MapaEstatico } from '@/components/ui/MapaEstatico'
 import { etiquetaImovel, formatarPreco, rotuloPreco } from '@/lib/imoveis/formato'
-import { DESTAQUES_POR_VEZ, listarCidades, listarDestaques, obterImovelHeroi } from '@/lib/imoveis/repositorio'
+import { CAMINHO_MCMV } from '@/lib/imoveis/mcmv'
+import { cidadesEmDestaque } from '@/lib/imoveis/paginas'
+import {
+  DESTAQUES_POR_VEZ,
+  listarCidades,
+  listarDestaques,
+  listarIndice,
+  listarPaginasDeBusca,
+  obterImovelHeroi,
+} from '@/lib/imoveis/repositorio'
 import { urlImovel } from '@/lib/imoveis/rotas'
-import { imagensSite, linkWhatsApp, mensagensWhatsApp, site } from '@/lib/site'
+import { imagensSite, linkWhatsApp, mensagensWhatsApp, openGraphBase, site } from '@/lib/site'
 import s from './page.module.css'
 import carregadorImagem from '@/lib/imoveis/carregador-imagem'
 
@@ -23,7 +33,7 @@ export const ensureStatic = 'navigation'
 
 export const metadata: Metadata = {
   alternates: { canonical: '/' },
-  openGraph: { url: '/' },
+  openGraph: { ...openGraphBase, url: '/' },
 }
 
 const SERVICOS: { icone: NomeIcone; titulo: string; texto: string; link: string; href: string }[] = [
@@ -88,7 +98,14 @@ const DIFERENCIAIS = [
 ]
 
 export default async function Home() {
-  const [heroi, destaques, cidades] = await Promise.all([obterImovelHeroi(), listarDestaques(), listarCidades()])
+  const [heroi, destaques, cidades, paginas, indice] = await Promise.all([
+    obterImovelHeroi(),
+    listarDestaques(),
+    listarCidades(),
+    listarPaginasDeBusca(),
+    listarIndice(),
+  ])
+  const totalMcmv = indice.filter((im) => im.mcmv).length
   // O topo da home usa a capa escolhida no painel (sem escolha, a primeira foto).
   const capaHeroi = heroi && (heroi.capa ?? heroi.fotos[0])
   const fotoHeroi = capaHeroi
@@ -107,7 +124,7 @@ export default async function Home() {
                 </h1>
                 <p>
                   Na <strong>{site.nome}</strong> você encontra apartamentos, casas de condomínio e lançamentos para
-                  comprar ou alugar — com um corretor do primeiro contato à entrega das chaves.
+                  comprar ou alugar em Paulista, Recife e região — com um corretor do primeiro contato à entrega das chaves.
                 </p>
               </div>
               {heroi && fotoHeroi && (
@@ -209,6 +226,12 @@ export default async function Home() {
             </div>
           </div>
         </section>
+
+        {/* Imóveis por cidade (links para as buscas por local) */}
+        <ImoveisPorCidade
+          cidades={cidadesEmDestaque(paginas, cidades)}
+          mcmv={totalMcmv > 0 ? { href: CAMINHO_MCMV, total: totalMcmv } : undefined}
+        />
 
         {/* Anunciar */}
         <section id="anunciar" aria-labelledby="t-anunciar" className={s.anunciar}>

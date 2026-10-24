@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Cabecalho } from '@/components/layout/Cabecalho'
 import { Rodape } from '@/components/layout/Rodape'
 import { Migalhas } from '@/components/ui/Migalhas'
-import { site } from '@/lib/site'
+import { imagemCompartilhamento, openGraphBase, site } from '@/lib/site'
 import s from '@/components/layout/PaginaTexto.module.css'
 
 export const ensureStatic = 'navigation'
@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   title: 'Política de privacidade',
   description: `Como a ${site.nome} trata os dados informados nos formulários do site e pelo WhatsApp, conforme a LGPD.`,
   alternates: { canonical: '/politica-de-privacidade' },
+  openGraph: { ...openGraphBase, url: '/politica-de-privacidade', images: [imagemCompartilhamento] },
 }
 
 // Texto-base. Deve ser revisado pelo jurídico/encarregado de dados da A3 antes da publicação.

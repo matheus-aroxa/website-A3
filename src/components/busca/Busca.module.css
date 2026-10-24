@@ -443,7 +443,35 @@
   display: none;
 }
 
-/* ---------- Links para outras buscas (SEO interno) ---------- */
+/* ---------- Texto descritivo e links para outras buscas (SEO interno) ---------- */
+
+.textoSeo {
+  margin-top: 24px;
+  padding: 36px 40px 40px;
+  border: 1px solid var(--borda);
+  border-radius: 24px;
+  background: #fff;
+}
+
+.textoSeoCorpo {
+  max-width: 780px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 36px;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--texto-4);
+}
+
+.textoSeoCorpo h2 {
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 800;
+  font-stretch: 110%;
+  color: var(--tinta);
+  text-wrap: balance;
+}
 
 .explorar {
   background: #fff;
@@ -740,5 +768,16 @@
 
   .explorar {
     padding: 40px 0;
+  }
+
+  .textoSeo {
+    margin-top: 16px;
+    padding: 24px 20px 28px;
+    border-radius: 20px;
+  }
+
+  .textoSeoCorpo {
+    font-size: 16px;
+    margin-bottom: 28px;
   }
 }

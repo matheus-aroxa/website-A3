@@ -1,6 +1,9 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import logoNegativo from '@/assets/marca/logo-a3-negativo.png'
+import { CAMINHO_MCMV } from '@/lib/imoveis/mcmv'
+import { cidadesEmDestaque } from '@/lib/imoveis/paginas'
+import { listarCidades, listarPaginasDeBusca } from '@/lib/imoveis/repositorio'
 import { anoAtual, linkWhatsApp, mensagensWhatsApp, site } from '@/lib/site'
 import s from './Rodape.module.css'
 
@@ -11,15 +14,19 @@ const NAVEGACAO = [
   { href: '/#quem-somos', rotulo: 'Quem somos' },
 ]
 
-const BUSCAS_FREQUENTES = [
-  { href: '/imoveis/apartamentos/paulista/janga', rotulo: 'Apartamentos no Janga' },
-  { href: '/imoveis/casas/paulista/pau-amarelo', rotulo: 'Casas em Pau Amarelo' },
-  { href: '/imoveis/lancamentos/paulista/jaguaribe', rotulo: 'Lançamentos em Jaguaribe' },
-  { href: '/imoveis/igarassu', rotulo: 'Imóveis em Igarassu' },
-  { href: '/imoveis/apartamentos/recife', rotulo: 'Apartamentos no Recife' },
-]
+/** As três cidades e os três bairros com mais imóveis: links de todas as páginas para as buscas que mais importam. */
+function buscasFrequentes(paginas: Awaited<ReturnType<typeof listarPaginasDeBusca>>, cidades: Awaited<ReturnType<typeof listarCidades>>) {
+  const destaques = cidadesEmDestaque(paginas, cidades, 3)
+  const bairros = destaques.flatMap((c) => c.bairros.map((b) => ({ href: b.href, total: b.total, rotulo: `Imóveis em ${b.nome}, ${c.nome}` })))
+  return [
+    ...destaques.slice(0, 3).map((c) => ({ href: c.href, rotulo: `Imóveis em ${c.nome}` })),
+    ...bairros.sort((a, b) => b.total - a.total).slice(0, 3),
+  ]
+}
 
-export function Rodape({ comBarraInferior = false }: { comBarraInferior?: boolean }) {
+export async function Rodape({ comBarraInferior = false }: { comBarraInferior?: boolean }) {
+  const [cidades, paginas] = await Promise.all([listarCidades(), listarPaginasDeBusca()])
+  const temMcmv = (paginas.find((p) => p.caminho === '/imoveis')?.mcmv ?? 0) > 0
   return (
     <footer className={s.rodape} data-barra-inferior={comBarraInferior || undefined}>
       <div className={`container ${s.interno}`}>
@@ -35,13 +42,18 @@ export function Rodape({ comBarraInferior = false }: { comBarraInferior?: boolea
                 {l.rotulo}
               </Link>
             ))}
+            {temMcmv && (
+              <Link href={CAMINHO_MCMV} className={s.link}>
+                Minha Casa Minha Vida
+              </Link>
+            )}
             <a href={linkWhatsApp(mensagensWhatsApp.anunciar)} target="_blank" rel="noopener" className={s.link}>
               Anunciar meu imóvel
             </a>
           </nav>
           <nav aria-label="Buscas frequentes" className={s.coluna}>
             <strong>Buscas frequentes</strong>
-            {BUSCAS_FREQUENTES.map((l) => (
+            {buscasFrequentes(paginas, cidades).map((l) => (
               <Link key={l.href} href={l.href} className={s.link}>
                 {l.rotulo}
               </Link>

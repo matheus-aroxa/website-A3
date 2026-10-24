@@ -2,7 +2,7 @@
 // Sem cache aqui: o cache do site fica em repositorio.ts, e o painel sempre lê o estado atual.
 import 'server-only'
 import { banco, transacao, type Cliente } from '@/lib/db'
-import { slugificar } from './formato'
+import { altDaFoto, nomeDoLocal, slugificar } from './formato'
 import type { StatusImovel, Vitrine } from './painel'
 import type { Finalidade, Foto, Imovel, Planta, Situacao, TipoImovel } from './tipos'
 
@@ -106,18 +106,19 @@ export interface Linha {
   plantas: LinhaPlanta[]
 }
 
-function paraFoto(f: LinhaFoto): Foto {
+function paraFoto(f: LinhaFoto, alt = f.alt): Foto {
   return {
     src: f.src,
     width: f.width,
     height: f.height,
-    alt: f.alt,
+    alt,
     ...(f.legenda ? { legenda: f.legenda } : {}),
     ...(f.blurDataURL ? { blurDataURL: f.blurDataURL } : {}),
   }
 }
 
 export function paraImovel(l: Linha): Imovel {
+  const bairro = nomeDoLocal(l.bairro)
   const capa = l.fotos.find((f) => f.capa)
   const plantas: Planta[] = l.plantas.map((p) => ({
     titulo: p.titulo,
@@ -134,7 +135,7 @@ export function paraImovel(l: Linha): Imovel {
     finalidade: l.finalidade,
     situacao: l.situacao,
     local: {
-      bairro: l.bairro,
+      bairro,
       bairroSlug: l.bairro_slug,
       cidade: l.cidade,
       cidadeSlug: l.cidade_slug,
@@ -156,8 +157,8 @@ export function paraImovel(l: Linha): Imovel {
     atualizadoEm: l.atualizado_em,
     chamada: l.chamada,
     descricao: l.descricao,
-    fotos: l.fotos.map(paraFoto),
-    capa: capa ? paraFoto(capa) : undefined,
+    fotos: l.fotos.map((f, i) => paraFoto(f, altDaFoto({ ...l, bairro }, i))),
+    capa: capa ? paraFoto(capa, altDaFoto({ ...l, bairro }, l.fotos.indexOf(capa))) : undefined,
     plantas,
     lazer: l.lazer,
     proximidades: l.proximidades,

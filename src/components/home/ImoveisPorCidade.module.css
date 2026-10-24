@@ -1,0 +1,130 @@
+.secao {
+  background: #fff;
+  padding: 64px 0 8px;
+}
+
+.pilha {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 760px;
+}
+
+.cabecalho p {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--texto-2);
+}
+
+.grade {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(270px, 100%), 1fr));
+  gap: 16px;
+}
+
+.cidade {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px 24px;
+  border-radius: 20px;
+  background: var(--fundo-2);
+  border: 1px solid var(--borda);
+}
+
+.cidadeLink {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: var(--tinta);
+  text-decoration: none;
+}
+
+.cidadeLink strong {
+  font-size: 21px;
+  line-height: 1.15;
+  font-weight: 800;
+  font-stretch: 108%;
+}
+
+.cidadeLink strong span {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--texto-2);
+}
+
+.cidadeLink > span {
+  font-size: 15px;
+  color: var(--texto-2);
+}
+
+.cidadeLink:hover strong {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.bairros {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.bairros a {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid var(--borda-2);
+  font-size: 14px;
+  color: var(--texto-3);
+  text-decoration: none;
+}
+
+.bairros a:hover {
+  border-color: var(--mar);
+  color: var(--mar);
+}
+
+/* O programa ocupa a linha toda e se destaca dos cartões de cidade. */
+.programa {
+  grid-column: 1 / -1;
+  padding: 0;
+  background: var(--mar);
+  border-color: var(--mar);
+}
+
+/* O link ocupa a faixa toda: a faixa inteira é clicável. */
+.programa .cidadeLink {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 20px;
+  padding: 20px 28px;
+  color: #fff;
+}
+
+.programa .cidadeLink > span {
+  color: var(--mar-texto);
+}
+
+@media (max-width: 767px) {
+  .secao {
+    padding: 48px 0 0;
+  }
+  .cidade {
+    padding: 18px 20px;
+  }
+}

@@ -49,6 +49,7 @@ export function CardImovel({
           placeholder={imovel.capa.blurDataURL ? 'blur' : 'empty'}
           blurDataURL={imovel.capa.blurDataURL}
           loading={prioritario ? 'eager' : 'lazy'}
+          fetchPriority={prioritario ? 'high' : undefined}
         />
         <span className={`etiqueta ${classeEtiqueta} ${s.etiqueta}`}>{etiquetaImovel(imovel)}</span>
       </div>

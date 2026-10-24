@@ -40,6 +40,14 @@ export function formatarPreco(valor: number, finalidade: Finalidade) {
   return finalidade === 'aluguel' ? `${texto}/mês` : texto
 }
 
+/**
+ * Venda abaixo de R$ 20 mil (ou aluguel abaixo de R$ 100) é erro de cadastro: o painel aceita qualquer valor. Esse preço não
+ * vai para resultados do Google nem para dados estruturados, onde um valor absurdo desacredita o anúncio.
+ */
+export function precoPlausivel(finalidade: Finalidade, preco: number) {
+  return finalidade === 'aluguel' ? preco >= 100 : preco >= 20_000
+}
+
 export function rotuloPreco(finalidade: Finalidade) {
   return finalidade === 'aluguel' ? 'Aluguel' : 'Investimento a partir de'
 }
@@ -107,8 +115,18 @@ export function rodapeCard(imovel: Pick<ImovelResumo, 'entrega' | 'situacao' | '
   return `Cód. ${imovel.codigo}`
 }
 
+/** Nome de bairro como vem do cadastro, com os numerais romanos em maiúsculas ("Merepe Ii" vira "Merepe II"). */
+export function nomeDoLocal(nome: string) {
+  return nome.replace(/\b(Ii|Iii|Iv|Vi|Vii|Viii|Ix)\b/g, (numeral) => numeral.toUpperCase())
+}
+
 export function pluralImoveis(n: number) {
   return `${n} ${n === 1 ? 'imóvel' : 'imóveis'}`
+}
+
+/** Texto alternativo das fotos do anúncio: nome, tipo e lugar, que é o que o Google Imagens e os leitores de tela usam. */
+export function altDaFoto(im: { nome: string; tipo: TipoImovel; bairro: string; cidade: string }, posicao: number) {
+  return `${im.nome}, ${rotuloTipo[im.tipo].toLowerCase()} em ${im.bairro}, ${im.cidade} – foto ${posicao + 1}`
 }
 
 export function slugificar(texto: string) {

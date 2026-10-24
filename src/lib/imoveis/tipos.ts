@@ -98,5 +98,6 @@ export interface ImovelResumo {
 export interface Cidade {
   nome: string
   slug: string
+  uf: string
   bairros: { nome: string; slug: string }[]
 }

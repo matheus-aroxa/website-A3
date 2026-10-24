@@ -7,10 +7,12 @@ import { AreaResultados } from '@/components/busca/Resultados'
 import { BotaoWhatsApp } from '@/components/layout/BotaoWhatsApp'
 import { Cabecalho } from '@/components/layout/Cabecalho'
 import { Rodape } from '@/components/layout/Rodape'
+import { JsonLd } from '@/components/seo/JsonLd'
 import { Migalhas } from '@/components/ui/Migalhas'
-import { interpretarSegmentos, segmentosDaRota } from '@/lib/imoveis/filtros'
-import { listarCidades, listarIndice } from '@/lib/imoveis/repositorio'
+import { caminhoDaRota, interpretarSegmentos, segmentosDaRota } from '@/lib/imoveis/filtros'
+import { listarCidades, listarIndice, listarPaginasDeBusca } from '@/lib/imoveis/repositorio'
 import { combinacoesDeRota, migalhasDaBusca, textosDaBusca } from '@/lib/imoveis/rotas'
+import { schemaColecao } from '@/lib/seo'
 import s from '@/components/busca/Busca.module.css'
 
 // Pré-gera todas as páginas de busca que têm imóveis (categoria × tipo × cidade × bairro).
@@ -21,10 +23,12 @@ export async function generateStaticParams() {
 }
 
 export default async function LayoutBusca({ params, children }: LayoutProps<'/imoveis/[[...filtros]]'>) {
-  const [{ filtros: segmentos }, cidades] = await Promise.all([params, listarCidades()])
+  const [{ filtros: segmentos }, cidades, paginas] = await Promise.all([params, listarCidades(), listarPaginasDeBusca()])
   const rota = interpretarSegmentos(segmentos, cidades)
   if (!rota) notFound()
-  const { h1, subtitulo } = textosDaBusca(rota, cidades)
+  const caminho = caminhoDaRota(rota)
+  const pagina = paginas.find((p) => p.caminho === caminho)
+  const { h1, subtitulo, descricao } = textosDaBusca(rota, cidades, pagina)
 
   return (
     <>
@@ -55,6 +59,7 @@ export default async function LayoutBusca({ params, children }: LayoutProps<'/im
           </ProvedorBusca>
         </Suspense>
       </main>
+      <JsonLd dados={schemaColecao({ nome: h1, descricao, caminho: pagina?.canonico ?? caminho })} />
       <Rodape />
       <BotaoWhatsApp />
     </>

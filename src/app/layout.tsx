@@ -1,10 +1,11 @@
 import type { Metadata, Viewport } from 'next'
 import { Archivo } from 'next/font/google'
 import { Suspense } from 'react'
+import { preconnect } from 'react-dom'
 import { TopoAoMudarDePagina } from '@/components/layout/TopoAoMudarDePagina'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { schemaImobiliaria } from '@/lib/seo'
-import { site } from '@/lib/site'
+import { URL_IMAGENS, openGraphBase, site } from '@/lib/site'
 import './globals.css'
 
 // Auto-hospedada pelo Next (sem requisição ao Google no navegador), com o eixo de
@@ -19,8 +20,9 @@ const archivo = Archivo({
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.nome} | Imóveis à venda, para alugar e lançamentos`,
-    template: `%s | ${site.nome}`,
+    default: site.titulo,
+    // Marca curta no sufixo: sobra espaço para a palavra-chave dentro dos ~60 caracteres que o Google mostra.
+    template: `%s | ${site.nomeCurto}`,
   },
   description: site.descricao,
   applicationName: site.nome,
@@ -33,11 +35,7 @@ export const metadata: Metadata = {
     'imobiliária Jaguaribe',
   ],
   formatDetection: { telephone: false },
-  openGraph: {
-    type: 'website',
-    locale: 'pt_BR',
-    siteName: site.nome,
-  },
+  openGraph: openGraphBase,
   twitter: { card: 'summary_large_image' },
   robots: {
     index: true,
@@ -56,6 +54,8 @@ export const viewport: Viewport = {
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  // As fotos vêm de outra origem (S3): abre a conexão enquanto o HTML ainda é lido, antes de a primeira foto ser pedida.
+  preconnect(URL_IMAGENS)
   return (
     <html lang="pt-BR" className={archivo.variable} data-scroll-behavior="smooth">
       <body>

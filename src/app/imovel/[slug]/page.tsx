@@ -28,11 +28,25 @@ import {
   rotuloSituacao,
   rotuloTipo,
 } from '@/lib/imoveis/formato'
-import { listarIndice, listarSemelhantes, obterImovelPorSlug } from '@/lib/imoveis/repositorio'
-import { categoriaDoImovel, migalhasDoImovel, urlImovel } from '@/lib/imoveis/rotas'
+import { paginaPrincipal } from '@/lib/imoveis/paginas'
+import {
+  listarCidades,
+  listarIndice,
+  listarPaginasDeBusca,
+  listarSemelhantes,
+  obterImovelPorSlug,
+} from '@/lib/imoveis/repositorio'
+import {
+  categoriaDoImovel,
+  descricaoDoImovel,
+  migalhasDoImovel,
+  textosDaBusca,
+  tituloDoImovel,
+  urlImovel,
+} from '@/lib/imoveis/rotas'
 import type { Imovel } from '@/lib/imoveis/tipos'
 import { schemaAnuncio } from '@/lib/seo'
-import { linkWhatsApp } from '@/lib/site'
+import { linkWhatsApp, openGraphBase } from '@/lib/site'
 import s from '@/components/imovel/Imovel.module.css'
 
 // Página 100% estática. Imóveis cadastrados depois do build são gerados no primeiro acesso
@@ -44,29 +58,20 @@ export async function generateStaticParams() {
   return imoveis.map((im) => ({ slug: im.slug }))
 }
 
-// Ex.: "Apartamentos de 2 e 3 quartos com suíte em Jaguaribe, Paulista – PE. Investimento a partir de
-// R$ 265.000, entrega prevista para janeiro de 2028. Agende sua visita."
-function descricaoSeo(im: Imovel) {
-  const preco = `${rotuloPreco(im.finalidade)} ${formatarPreco(im.preco, im.finalidade)}`
-  const entrega =
-    im.entrega && im.situacao !== 'pronto' ? `, entrega prevista para ${formatarEntrega(im.entrega).toLowerCase()}` : ''
-  const chamada = im.finalidade === 'aluguel' ? 'Fale com um corretor.' : 'Agende sua visita.'
-  return `${im.chamada}. ${preco}${entrega}. ${chamada}`
-}
-
 export async function generateMetadata({ params }: PageProps<'/imovel/[slug]'>): Promise<Metadata> {
   const { slug } = await params
   const im = await obterImovelPorSlug(slug)
   if (!im) return { title: 'Imóvel não encontrado', robots: { index: false } }
-  const titulo = `${im.nome}, ${im.local.bairro} – ${im.local.cidade}/${im.local.uf}`
-  const descricao = descricaoSeo(im)
+  // Título absoluto: o nome, o tipo e o lugar cabem melhor nos ~60 caracteres do Google sem o sufixo da marca.
+  const titulo = tituloDoImovel(im)
+  const descricao = descricaoDoImovel(im)
   const url = urlImovel(im.slug)
   return {
-    title: titulo,
+    title: { absolute: titulo },
     description: descricao,
     alternates: { canonical: url },
     openGraph: {
-      type: 'website',
+      ...openGraphBase,
       title: titulo,
       description: descricao,
       url,
@@ -86,7 +91,7 @@ export default async function PaginaImovel({ params }: PageProps<'/imovel/[slug]
   const { slug } = await params
   const im = await obterImovelPorSlug(slug)
   if (!im) notFound()
-  const semelhantes = await listarSemelhantes(im)
+  const [semelhantes, paginas, cidades] = await Promise.all([listarSemelhantes(im), listarPaginasDeBusca(), listarCidades()])
 
   const aluguel = im.finalidade === 'aluguel'
   const mensagemWhats = `Olá! Tenho interesse no ${im.nome} (cód. ${im.codigo}).`
@@ -116,6 +121,13 @@ export default async function PaginaImovel({ params }: PageProps<'/imovel/[slug]
   const enderecoTexto = im.local.logradouro ?? `${im.local.bairro}, ${im.local.cidade} – ${im.local.uf}`
   const consultaMapa = `${im.nome}, ${im.local.logradouro ? `${im.local.logradouro}, ` : ''}${im.local.bairro}, ${im.local.cidade} - ${im.local.uf}`
   const categoria = categoriaDoImovel(im)
+  // Links para as buscas do bairro e da cidade: sempre a página principal de cada conjunto de imóveis.
+  const buscasDoLugar = [
+    paginaPrincipal(paginas, { ...ROTA_VAZIA, categoria, cidade: im.local.cidadeSlug, bairro: im.local.bairroSlug }),
+    paginaPrincipal(paginas, { ...ROTA_VAZIA, categoria, cidade: im.local.cidadeSlug }),
+  ]
+    .filter((p, i, todas) => p && todas.findIndex((o) => o?.caminho === p.caminho) === i)
+    .map((p) => ({ href: p!.caminho, rotulo: textosDaBusca(p!.rota, cidades).h1 }))
 
   return (
     <>
@@ -345,14 +357,22 @@ export default async function PaginaImovel({ params }: PageProps<'/imovel/[slug]
                 <h2 id="t-similares">
                   {aluguel ? 'Outros imóveis para alugar' : 'Empreendimentos parecidos'} em {im.local.cidade}
                 </h2>
-                <Link
-                  href={caminhoDaRota({ ...ROTA_VAZIA, categoria, cidade: im.local.cidadeSlug })}
-                  className="link-texto"
-                  style={{ fontSize: 16, gap: 8 }}
-                >
-                  Ver mais {categoria === 'lancamentos' ? 'lançamentos' : 'imóveis'}
-                  <Icone nome="seta" tamanho={18} espessura={2} />
-                </Link>
+                <div className={s.semelhantesLinks}>
+                  {(buscasDoLugar.length
+                    ? buscasDoLugar
+                    : [
+                        {
+                          href: caminhoDaRota({ ...ROTA_VAZIA, categoria, cidade: im.local.cidadeSlug }),
+                          rotulo: `Ver mais ${categoria === 'lancamentos' ? 'lançamentos' : 'imóveis'}`,
+                        },
+                      ]
+                  ).map((l) => (
+                    <Link key={l.href} href={l.href} className="link-texto" style={{ fontSize: 16, gap: 8 }}>
+                      {l.rotulo}
+                      <Icone nome="seta" tamanho={18} espessura={2} />
+                    </Link>
+                  ))}
+                </div>
               </div>
               <div className={`${s.gradeSemelhantes} carrossel-mobile`}>
                 {semelhantes.map((sim) => (

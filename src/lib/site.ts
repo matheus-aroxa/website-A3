@@ -4,8 +4,10 @@ export const site = {
   nome: 'A3 Soluções Imobiliárias',
   nomeCurto: 'A3 Imobiliária',
   url: (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.a3solucoesimobiliarias.com.br').replace(/\/$/, ''),
+  /** Título da home: a palavra-chave local primeiro, que é o que a pessoa digita ("imobiliária em Paulista"). */
+  titulo: 'Imobiliária em Paulista – PE | A3 Soluções Imobiliárias',
   descricao:
-    'Apartamentos, casas de condomínio e lançamentos para comprar ou alugar em Paulista, Recife e região, com um corretor da A3 do primeiro contato à entrega das chaves.',
+    'Apartamentos, casas de condomínio e lançamentos para comprar ou alugar em Paulista, Recife e região, com um corretor da A3 do primeiro contato às chaves.',
   creci: 'CRECI 18568PJ',
   telefone: '+55 81 99148-3731',
   telefoneExibicao: '(81) 99148-3731',
@@ -39,12 +41,19 @@ export const imagensSite = {
   },
 }
 
+/**
+ * Open Graph comum a todas as páginas. O Next não mescla `openGraph` entre layout e página: quem define o seu precisa
+ * repetir estes campos, senão `og:site_name`, `og:locale` e `og:type` somem do HTML.
+ */
+export const openGraphBase = { type: 'website', locale: 'pt_BR', siteName: site.nome } as const
+
 export const anoAtual = new Date().getFullYear()
 
 export const mensagensWhatsApp = {
   padrao: 'Olá! Vim pelo site da A3 Soluções Imobiliárias e gostaria de falar com um corretor.',
   financiamento: 'Olá! Vim pelo site da A3 e gostaria de simular um financiamento imobiliário.',
   anunciar: 'Olá! Vim pelo site da A3 e quero anunciar meu imóvel para venda ou aluguel.',
+  mcmv: 'Olá! Vi os imóveis do Minha Casa Minha Vida no site da A3 e gostaria de saber se me enquadro.',
 }
 
 /** Mensagem do formulário "Quero ser atendido", com o que a pessoa preencheu (campos vazios ficam de fora). */

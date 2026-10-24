@@ -595,6 +595,13 @@
   margin-bottom: 32px;
 }
 
+.semelhantesLinks {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
 .semelhantesTopo h2 {
   font-size: clamp(28px, 3vw, 40px);
   line-height: 1.05;

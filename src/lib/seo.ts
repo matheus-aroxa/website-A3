@@ -1,6 +1,6 @@
 // Dados estruturados (schema.org / JSON-LD) para o Google entender a imobiliária e os anúncios.
 import { fotosComCapaPrimeiro } from './imoveis/busca'
-import { formatarArea, rotuloTipo } from './imoveis/formato'
+import { formatarArea, precoPlausivel, rotuloTipo } from './imoveis/formato'
 import type { Migalha } from './imoveis/rotas'
 import { urlImovel } from './imoveis/rotas'
 import type { Imovel, ImovelResumo } from './imoveis/tipos'
@@ -16,12 +16,22 @@ export function schemaImobiliaria() {
         '@type': 'RealEstateAgent',
         '@id': ID_ORGANIZACAO,
         name: site.nome,
+        alternateName: site.nomeCurto,
         url: site.url,
         logo: urlAbsoluta('/icon.png'),
         image: urlAbsoluta('/opengraph-image.jpg'),
         description: site.descricao,
         telephone: site.telefone,
         email: site.email,
+        contactPoint: {
+          '@type': 'ContactPoint',
+          contactType: 'customer service',
+          telephone: site.telefone,
+          email: site.email,
+          areaServed: 'BR',
+          availableLanguage: 'pt-BR',
+        },
+        hasMap: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${site.nome}, ${site.endereco.exibicao}`)}`,
         address: {
           '@type': 'PostalAddress',
           streetAddress: site.endereco.logradouro,
@@ -39,6 +49,7 @@ export function schemaImobiliaria() {
         '@id': `${site.url}/#site`,
         url: site.url,
         name: site.nome,
+        alternateName: site.nomeCurto,
         inLanguage: 'pt-BR',
         publisher: { '@id': ID_ORGANIZACAO },
       },
@@ -56,6 +67,21 @@ export function schemaMigalhas(migalhas: Migalha[]) {
       name: m.nome,
       item: urlAbsoluta(m.href),
     })),
+  }
+}
+
+/** Página de listagem (busca por local, Minha Casa Minha Vida): a coleção de anúncios que ela reúne. */
+export function schemaColecao({ nome, descricao, caminho }: { nome: string; descricao: string; caminho: string }) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    '@id': `${urlAbsoluta(caminho)}#colecao`,
+    url: urlAbsoluta(caminho),
+    name: nome,
+    description: descricao,
+    inLanguage: 'pt-BR',
+    isPartOf: { '@id': `${site.url}/#site` },
+    publisher: { '@id': ID_ORGANIZACAO },
   }
 }
 
@@ -109,16 +135,20 @@ export function schemaAnuncio(im: Imovel) {
     identifier: im.codigo,
     provider: { '@id': ID_ORGANIZACAO },
     about: residencia,
-    offers: {
-      '@type': 'Offer',
-      price: im.preco,
-      priceCurrency: 'BRL',
-      businessFunction: im.finalidade === 'aluguel' ? 'http://purl.org/goodrelations/v1#LeaseOut' : 'http://purl.org/goodrelations/v1#Sell',
-      availability: 'https://schema.org/InStock',
-      seller: { '@id': ID_ORGANIZACAO },
-      ...(im.finalidade === 'aluguel' && {
-        priceSpecification: { '@type': 'UnitPriceSpecification', price: im.preco, priceCurrency: 'BRL', unitCode: 'MON' },
-      }),
-    },
+    // Preço absurdo (erro de cadastro) fica de fora: um valor errado nos dados estruturados desacredita o anúncio.
+    ...(precoPlausivel(im.finalidade, im.preco) && {
+      offers: {
+        '@type': 'Offer',
+        url,
+        price: im.preco,
+        priceCurrency: 'BRL',
+        businessFunction: im.finalidade === 'aluguel' ? 'http://purl.org/goodrelations/v1#LeaseOut' : 'http://purl.org/goodrelations/v1#Sell',
+        availability: 'https://schema.org/InStock',
+        seller: { '@id': ID_ORGANIZACAO },
+        ...(im.finalidade === 'aluguel' && {
+          priceSpecification: { '@type': 'UnitPriceSpecification', price: im.preco, priceCurrency: 'BRL', unitCode: 'MON' },
+        }),
+      },
+    }),
   }
 }

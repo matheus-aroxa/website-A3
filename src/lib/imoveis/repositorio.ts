@@ -18,7 +18,8 @@ import {
   contarImoveis,
   type PaginaResumos,
 } from './consultas'
-import { lerFiltros, type Filtros, type FiltrosRota } from './filtros'
+import { FILTROS_PADRAO, lerFiltros, type Filtros, type FiltrosRota } from './filtros'
+import { paginasDeBusca, type PaginaBusca } from './paginas'
 import type { IndiceImovel } from './rotas'
 import type { Cidade, Imovel, ImovelResumo } from './tipos'
 
@@ -54,6 +55,25 @@ export async function listarIndiceComFotos(): Promise<IndiceImovel[]> {
   cacheLife('hours')
   cacheTag(TAG_IMOVEIS)
   return buscarIndice(true)
+}
+
+/** Todas as páginas de busca com imóveis, já com a principal de cada conjunto de resultados (ver paginas.ts). */
+export async function listarPaginasDeBusca(): Promise<PaginaBusca[]> {
+  'use cache'
+  cacheLife('hours')
+  cacheTag(TAG_IMOVEIS)
+  return paginasDeBusca(await buscarIndice())
+}
+
+/** Quantos imóveis as páginas do Minha Casa Minha Vida mostram de uma vez. */
+export const MCMV_POR_PAGINA = 24
+
+/** Imóveis do Minha Casa Minha Vida, de uma cidade ou de todas. */
+export async function listarMcmv(cidade: string | null): Promise<ResultadoBusca> {
+  'use cache'
+  cacheLife('hours')
+  cacheTag(TAG_IMOVEIS)
+  return buscarPagina({ ...FILTROS_PADRAO, categoria: 'venda', mcmv: true, cidade }, 1, MCMV_POR_PAGINA)
 }
 
 export async function listarDestaques(): Promise<ImovelResumo[]> {
