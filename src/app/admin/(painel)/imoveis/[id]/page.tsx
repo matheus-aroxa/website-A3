@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
-import { FormularioImovel, Publicacao } from '@/components/admin/FormularioImovel'
-import { CorpoPagina, Secao, TopoPagina } from '@/components/admin/TopoPagina'
+import { FormularioImovel } from '@/components/admin/FormularioImovel'
+import { TopoPagina } from '@/components/admin/TopoPagina'
 import { Icone } from '@/components/ui/Icone'
 import { obterImovelAdmin } from '@/lib/admin/catalogo'
 import { etiquetaImovel } from '@/lib/imoveis/formato'
@@ -16,14 +16,13 @@ const VOLTAR = { href: '/admin', rotulo: 'Todos os imóveis' }
 const STATUS = {
   ativo: 'Publicado',
   inativo: 'Desativado',
-  excluido: 'Excluído',
 }
 
 async function Edicao({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const dados = await obterImovelAdmin(id)
   if (!dados) notFound()
-  const { imovel: im, status, editado, criado } = dados
+  const { imovel: im, status, criado } = dados
   const classe = im.finalidade === 'aluguel' ? 'aluguel' : im.situacao
 
   return (
@@ -50,15 +49,7 @@ async function Edicao({ params }: { params: Promise<{ id: string }> }) {
         )}
       </TopoPagina>
 
-      {status === 'excluido' ? (
-        <CorpoPagina estreito>
-          <Secao icone={<Icone nome="lixeira" />} titulo="Imóvel excluído" descricao="Ele não aparece no site, na busca nem na vitrine. Restaure para voltar a editá-lo.">
-            <Publicacao imovel={im} status={status} editado={editado} criado={criado} />
-          </Secao>
-        </CorpoPagina>
-      ) : (
-        <FormularioImovel imovel={im} status={status} editado={editado} criado={criado} />
-      )}
+      <FormularioImovel imovel={im} status={status} criado={criado} />
     </>
   )
 }

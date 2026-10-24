@@ -19,9 +19,7 @@ import carregadorImagem from '@/lib/imoveis/carregador-imagem'
 const ABAS = [
   { valor: 'ativo', rotulo: 'No site', resumo: 'publicados no site' },
   { valor: 'inativo', rotulo: 'Desativados', resumo: 'desativados' },
-  { valor: 'excluido', rotulo: 'Excluídos', resumo: 'excluídos' },
   { valor: 'vitrine', rotulo: 'Na vitrine', resumo: 'na vitrine da home' },
-  { valor: 'editado', rotulo: 'Editados no painel', resumo: 'editados no painel' },
 ] as const
 
 type Aba = (typeof ABAS)[number]['valor']
@@ -29,9 +27,7 @@ type Aba = (typeof ABAS)[number]['valor']
 const VAZIOS: Record<Aba, [string, string]> = {
   ativo: ['Nenhum imóvel no site', 'Imóveis novos chegam do CRM quando o catálogo é atualizado.'],
   inativo: ['Nenhum imóvel desativado', 'Imóveis desativados saem do site, mas continuam aqui para você reativar quando quiser.'],
-  excluido: ['Nenhum imóvel excluído', 'Imóveis excluídos ficam aqui e podem ser restaurados a qualquer momento.'],
   vitrine: ['A vitrine está vazia', 'Escolha o topo e os destaques da página inicial em Vitrine da home.'],
-  editado: ['Nenhum imóvel editado', 'Quando você muda algo que veio do CRM, o imóvel aparece aqui.'],
 }
 
 const OPCOES_SITUACAO = [
@@ -64,10 +60,8 @@ function Etiquetas({ item }: { item: ItemAdmin }) {
           <Icone nome="estrela" tamanho={11} espessura={2} /> Vitrine
         </span>
       )}
-      {item.criado && <span className={`${s.marcador} ${s.marcadorEditado}`}>Cadastrado no painel</span>}
-      {item.editado && <span className={`${s.marcador} ${s.marcadorEditado}`}>Editado</span>}
+      {item.criado && <span className={`${s.marcador} ${s.marcadorCriado}`}>Cadastrado no painel</span>}
       {item.status === 'inativo' && <span className={`${s.marcador} ${s.marcadorDesativado}`}>Desativado</span>}
-      {item.status === 'excluido' && <span className={`${s.marcador} ${s.marcadorExcluido}`}>Excluído</span>}
     </div>
   )
 }
@@ -77,20 +71,19 @@ export function ListaImoveis({
   filtro,
   titulo,
   descricao,
-  alteracao,
 }: {
   catalogo: CatalogoAdmin
   filtro: FiltroAdmin
   titulo: string
   descricao: string
-  alteracao: string
 }) {
   const { itens, total, pagina, totalPaginas, contagens } = catalogo
   const aba = filtro.aba
-  const [lista, aplicarStatus] = useOptimistic(itens, (atual, { id, status }: { id: string; status: StatusImovel }) =>
-    atual.map((i) => (i.id === id ? { ...i, status } : i)),
+  // `status: null` é imóvel excluído: some da lista na hora.
+  const [lista, aplicarStatus] = useOptimistic(itens, (atual, { id, status }: { id: string; status: StatusImovel | null }) =>
+    status ? atual.map((i) => (i.id === id ? { ...i, status } : i)) : atual.filter((i) => i.id !== id),
   )
-  const { executar } = useMudarStatus((id, status) => aplicarStatus({ id, status }))
+  const { executar, excluir: excluirImovel } = useMudarStatus((id, status) => aplicarStatus({ id, status }))
   const [pedido, setPedido] = useState<PedidoConfirmacao | null>(null)
 
   // Aba, busca, filtros e página moram na URL: o servidor devolve só a página pedida.
@@ -123,20 +116,26 @@ export function ListaImoveis({
   const filtrando = Boolean(filtro.q.trim() || filtro.situacao || filtro.finalidade)
   const abaAtual = ABAS.find((a) => a.valor === aba)!
   // Até o servidor responder, o imóvel que mudou de status já sai da aba onde estava e as contagens acompanham.
-  const visiveis = lista.filter((i) => aba === 'vitrine' ? i.status === 'ativo' : aba === 'editado' ? i.status !== 'excluido' : i.status === aba)
+  const visiveis = lista.filter((i) => (aba === 'vitrine' ? i.status === 'ativo' : i.status === aba))
   const statusNoServidor = new Map(itens.map((i) => [i.id, i.status]))
   const movidos = lista.filter((i) => statusNoServidor.get(i.id) !== i.status)
-  const contagem = (a: Aba) =>
-    a === 'ativo' || a === 'inativo' || a === 'excluido'
-      ? contagens[a] - movidos.filter((i) => statusNoServidor.get(i.id) === a).length + movidos.filter((i) => i.status === a).length
-      : contagens[a]
+  const excluidos = itens.filter((i) => !lista.some((l) => l.id === i.id))
+  const contagem = (a: Aba) => {
+    if (a === 'vitrine') return contagens[a]
+    return (
+      contagens[a] -
+      movidos.filter((i) => statusNoServidor.get(i.id) === a).length +
+      movidos.filter((i) => i.status === a).length -
+      excluidos.filter((i) => i.status === a).length
+    )
+  }
 
   const excluir = (item: ItemAdmin) =>
     setPedido({
       titulo: `Excluir ${item.nome}?`,
       texto: TEXTO_EXCLUSAO,
       rotulo: 'Excluir imóvel',
-      aoConfirmar: () => executar(item.id, item.nome, 'excluir'),
+      aoConfirmar: () => excluirImovel(item.id, item.nome),
     })
 
   return (
@@ -159,12 +158,6 @@ export function ListaImoveis({
         <Link href="/admin/imoveis/novo" className={`${s.botao} ${s.botaoSol} ${s.botaoG}`}>
           <Icone nome="mais" tamanho={17} espessura={2.4} /> Novo imóvel
         </Link>
-        {alteracao && (
-          <p className={s.topoStatus}>
-            <span className={s.ponto} aria-hidden="true" />
-            {alteracao}
-          </p>
-        )}
       </TopoPagina>
 
       <CorpoPagina>
@@ -233,50 +226,41 @@ export function ListaImoveis({
                         <span>Cód. {item.codigo}</span>
                       </div>
 
-                      {item.status === 'excluido' ? (
-                        <div className={s.itemExcluido}>
-                          <span>Fora do site e da busca.</span>
-                          <button type="button" className={`${s.botao} ${s.botaoLinha}`} onClick={() => executar(item.id, item.nome, 'restaurar')}>
-                            <Icone nome="restaurar" tamanho={16} /> Restaurar
-                          </button>
-                        </div>
-                      ) : (
-                        <div className={s.itemAcoes} data-status={item.status}>
-                          <Link href={editar} className={`${s.botao} ${s.botaoMar}`}>
-                            <Icone nome="editar" tamanho={16} /> Editar
-                          </Link>
-                          {item.status === 'ativo' ? (
-                            <>
-                              <button type="button" className={`${s.botao} ${s.botaoLinha}`} onClick={() => executar(item.id, item.nome, 'desativar')}>
-                                <Icone nome="olho-fechado" tamanho={16} /> Desativar
-                              </button>
-                              <a
-                                href={urlImovel(item.slug)}
-                                target="_blank"
-                                rel="noopener"
-                                className={`${s.botao} ${s.botaoLinha} ${s.botaoIcone}`}
-                                aria-label={`Ver ${item.nome} no site`}
-                                title="Ver no site"
-                              >
-                                <Icone nome="externo" tamanho={17} />
-                              </a>
-                            </>
-                          ) : (
-                            <button type="button" className={`${s.botao} ${s.botaoSol}`} onClick={() => executar(item.id, item.nome, 'ativar')}>
-                              <Icone nome="olho" tamanho={16} /> Reativar
+                      <div className={s.itemAcoes} data-status={item.status}>
+                        <Link href={editar} className={`${s.botao} ${s.botaoMar}`}>
+                          <Icone nome="editar" tamanho={16} /> Editar
+                        </Link>
+                        {item.status === 'ativo' ? (
+                          <>
+                            <button type="button" className={`${s.botao} ${s.botaoLinha}`} onClick={() => executar(item.id, item.nome, 'desativar')}>
+                              <Icone nome="olho-fechado" tamanho={16} /> Desativar
                             </button>
-                          )}
-                          <button
-                            type="button"
-                            className={`${s.botao} ${s.botaoPerigo} ${s.botaoIcone}`}
-                            onClick={() => excluir(item)}
-                            aria-label={`Excluir ${item.nome}`}
-                            title="Excluir"
-                          >
-                            <Icone nome="lixeira" tamanho={17} />
+                            <a
+                              href={urlImovel(item.slug)}
+                              target="_blank"
+                              rel="noopener"
+                              className={`${s.botao} ${s.botaoLinha} ${s.botaoIcone}`}
+                              aria-label={`Ver ${item.nome} no site`}
+                              title="Ver no site"
+                            >
+                              <Icone nome="externo" tamanho={17} />
+                            </a>
+                          </>
+                        ) : (
+                          <button type="button" className={`${s.botao} ${s.botaoSol}`} onClick={() => executar(item.id, item.nome, 'ativar')}>
+                            <Icone nome="olho" tamanho={16} /> Reativar
                           </button>
-                        </div>
-                      )}
+                        )}
+                        <button
+                          type="button"
+                          className={`${s.botao} ${s.botaoPerigo} ${s.botaoIcone}`}
+                          onClick={() => excluir(item)}
+                          aria-label={`Excluir ${item.nome}`}
+                          title="Excluir"
+                        >
+                          <Icone nome="lixeira" tamanho={17} />
+                        </button>
+                      </div>
                     </article>
                   </li>
                 )

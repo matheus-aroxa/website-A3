@@ -2,14 +2,13 @@
 
 import Image from 'next/image'
 import { useState, useTransition } from 'react'
-import { salvarVitrine, usarVitrineDoCrm } from '@/app/admin/acoes'
+import { salvarVitrine } from '@/app/admin/acoes'
 import { Icone } from '@/components/ui/Icone'
 import { Seletor } from '@/components/ui/Seletor'
 import type { OpcaoVitrine } from '@/lib/admin/catalogo'
 import { ESTADO_INICIAL } from '@/lib/formularios'
 import type { Vitrine } from '@/lib/imoveis/painel'
 import { useAvisar } from './Avisos'
-import { Confirmacao, type PedidoConfirmacao } from './Confirmacao'
 import { Secao } from './TopoPagina'
 import s from './Admin.module.css'
 import carregadorImagem from '@/lib/imoveis/carregador-imagem'
@@ -52,20 +51,20 @@ export function EditorVitrine({
   inicial,
   opcoes,
   limite,
-  personalizada,
+  porVez,
 }: {
   inicial: Vitrine
   opcoes: OpcaoVitrine[]
   limite: number
-  personalizada: boolean
+  /** Quantos destaques a home mostra de uma vez; acima disso eles viram um carrossel. */
+  porVez: number
 }) {
   const avisar = useAvisar()
   const [salvando, iniciar] = useTransition()
-  const [pedido, setPedido] = useState<PedidoConfirmacao | null>(null)
   const [heroi, setHeroi] = useState(inicial.heroi ?? '')
   const [destaques, setDestaques] = useState(inicial.destaques)
   const [novo, setNovo] = useState('')
-  // Se a vitrine mudar no servidor (salvou ou voltou a usar o CRM), a tela acompanha.
+  // Se a vitrine mudar no servidor (salvou), a tela acompanha.
   const [anterior, setAnterior] = useState(inicial)
   if (JSON.stringify(anterior) !== JSON.stringify(inicial)) {
     setAnterior(inicial)
@@ -98,42 +97,6 @@ export function EditorVitrine({
 
   return (
     <>
-      <div className={s.nota}>
-        <Icone nome="historico" tamanho={20} />
-        <div>
-          {personalizada ? (
-            <>
-              <p>
-                <strong>A vitrine está sendo definida aqui no painel.</strong> As marcações de destaque do CRM são ignoradas.
-              </p>
-              <button
-                type="button"
-                className={s.limpar}
-                onClick={() =>
-                  setPedido({
-                    titulo: 'Voltar a usar o CRM?',
-                    texto: 'A escolha feita aqui é apagada e a home volta a mostrar os imóveis marcados como destaque no CRM.',
-                    rotulo: 'Usar os destaques do CRM',
-                    icone: 'restaurar',
-                    aoConfirmar: () =>
-                      iniciar(async () => {
-                        await usarVitrineDoCrm()
-                        avisar('A home voltou a usar os destaques do CRM.')
-                      }),
-                  })
-                }
-              >
-                Voltar a usar os destaques do CRM
-              </button>
-            </>
-          ) : (
-            <p>
-              <strong>A vitrine atual vem do CRM.</strong> Ao salvar aqui, ela passa a ser definida pelo painel.
-            </p>
-          )}
-        </div>
-      </div>
-
       <Secao icone={<Icone nome="casa" />} titulo="Topo da home" descricao="O imóvel com foto grande ao lado de “Seu lar está aqui.”">
         <div className={s.vitrineBloco}>
           <div className={s.rotulo}>
@@ -146,7 +109,7 @@ export function EditorVitrine({
             />
           </div>
           <div className={s.previa}>
-            <span className={s.legenda}>Como aparece no celular</span>
+            <span className={s.legenda}>Como será exibido</span>
             <PreviaTopo imovel={porId.get(heroi)} />
           </div>
         </div>
@@ -155,7 +118,7 @@ export function EditorVitrine({
       <Secao
         icone={<Icone nome="estrela" />}
         titulo="Imóveis em destaque"
-        descricao="Aparecem na home, nesta ordem."
+        descricao={`Aparecem na home, nesta ordem. Com mais de ${porVez}, a home mostra ${porVez} por vez em um carrossel que passa sozinho e tem botões para avançar e voltar.`}
         extra={
           <span className={s.contador} data-cheio={cheio || undefined}>
             {destaques.length} de {limite}
@@ -234,13 +197,13 @@ export function EditorVitrine({
         <div className={s.previa}>
           <span className={s.legenda}>Como aparece na home</span>
           {destaques.length ? (
-            <div className={s.previaDestaques}>
-              {Array.from({ length: limite }, (_, i) => {
+            <div className={s.previaDestaques} data-carrossel={destaques.length > porVez || undefined}>
+              {Array.from({ length: Math.max(porVez, destaques.length) }, (_, i) => {
                 const o = porId.get(destaques[i] ?? '')
                 return o ? (
                   <div key={o.id} className={s.miniCard}>
                     <div className={s.miniCardFoto}>
-                      {o.capa && <Image loader={carregadorImagem} src={o.capa} alt="" fill sizes="210px" />}
+                      {o.capa && <Image loader={carregadorImagem} src={o.capa} alt="" fill sizes="(max-width: 767px) 210px, 300px" />}
                       <span className={`etiqueta etiqueta-${o.classeEtiqueta} ${s.etiquetaP}`}>{o.etiqueta}</span>
                     </div>
                     <div className={s.miniCardTexto}>
@@ -292,7 +255,6 @@ export function EditorVitrine({
         </div>
       )}
 
-      <Confirmacao pedido={pedido} aoFechar={() => setPedido(null)} />
     </>
   )
 }

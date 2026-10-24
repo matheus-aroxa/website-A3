@@ -3,6 +3,8 @@
 export interface EstadoFormulario {
   status: 'inicial' | 'sucesso' | 'erro'
   mensagem?: string
+  /** Para onde levar a pessoa depois de um sucesso (o formulário navega; a ação não redireciona). */
+  destino?: string
   erros?: Partial<Record<string, string>>
   /** Valores enviados, devolvidos em caso de erro para não apagar o que a pessoa digitou. */
   valores?: Record<string, string>

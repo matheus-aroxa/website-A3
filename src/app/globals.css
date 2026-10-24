@@ -336,6 +336,11 @@ dd {
   -webkit-appearance: none;
 }
 
+.campo:disabled {
+  background: #f1f4f3;
+  cursor: not-allowed;
+}
+
 .campo:focus {
   border-color: var(--mar);
   outline: none;

@@ -35,10 +35,7 @@ function Formulario({ aoRefazer }: { aoRefazer: () => void }) {
       <form action={acao} className={s.form} noValidate>
         <Armadilha />
         <Campo rotulo="Nome" name="nome" estado={estado} autoComplete="name" placeholder="Como podemos te chamar?" required />
-        <div className={s.linha}>
-          <CampoTelefone estado={estado} />
-          <Campo rotulo="E-mail" name="email" type="email" estado={estado} autoComplete="email" placeholder="voce@email.com" />
-        </div>
+        <CampoTelefone estado={estado} />
         <label className="rotulo">
           Tenho interesse em
           <Seletor

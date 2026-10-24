@@ -8,19 +8,23 @@ import { redirect } from 'next/navigation'
 import { encerrarSessao, exigirAdmin, iniciarSessao } from '@/lib/admin/acesso'
 import { autenticar, limparFalhas, loginBloqueado, painelConfigurado, registrarFalha } from '@/lib/admin/sessao'
 import { texto, type EstadoFormulario } from '@/lib/formularios'
+import { apagarDoImovel, apagarFotos } from '@/lib/admin/fotos'
 import {
+  excluirImovelNoBanco,
   gravarImovel,
   gravarVitrine,
   inserirImovel,
   mudarStatusNoBanco,
   obterRegistro,
+  slugDaCidade,
   slugsEmUso,
-  usarVitrineDoCrmNoBanco,
 } from '@/lib/imoveis/banco'
 import { idsAtivos } from '@/lib/imoveis/consultas-admin'
-import { CAMPOS_EDITAVEIS, PREFIXO_CRIADO, capaDe, diferencas } from '@/lib/imoveis/painel'
+import { CAMPOS_EDITAVEIS, ID_CRIADO, PREFIXO_CRIADO, capaDe, diferencas } from '@/lib/imoveis/painel'
 import { SITUACOES, TIPOS, lerNumeroBr, slugificar } from '@/lib/imoveis/formato'
 import { fotoPermitida } from '@/lib/imoveis/hosts-fotos'
+import { cidadeDoEstado, locaisDoEstado, type LocaisDoEstado } from '@/lib/imoveis/locais'
+import { UFS, validarImovel, type EntradaImovel } from '@/lib/imoveis/validacao'
 import { LIMITE_DESTAQUES, TAG_IMOVEIS } from '@/lib/imoveis/repositorio'
 import type { Faixa, Finalidade, Foto, Imovel } from '@/lib/imoveis/tipos'
 
@@ -69,12 +73,12 @@ export async function sair() {
   redirect('/admin/entrar')
 }
 
-// ---------- Status (ativar, desativar, excluir, restaurar) ----------
+// ---------- Status (desativar e ativar) e exclusão ----------
 
-const ACOES_STATUS = ['desativar', 'ativar', 'excluir', 'restaurar'] as const
+const ACOES_STATUS = ['desativar', 'ativar'] as const
 export type AcaoStatus = (typeof ACOES_STATUS)[number]
 
-/** Chamada direto pelos botões do painel (e pelo "Desfazer" dos avisos). */
+/** Desativar tira o imóvel do site sem apagar nada; reativar o devolve. Chamada pelos botões do painel e pelo "Desfazer". */
 export async function mudarStatus(id: string, acao: AcaoStatus) {
   const admin = await exigirAdmin()
   // Os argumentos chegam da rede: confere tipo e valor antes de usar.
@@ -83,28 +87,38 @@ export async function mudarStatus(id: string, acao: AcaoStatus) {
   publicar()
 }
 
+/**
+ * Exclui o imóvel de vez: some do banco (com fotos, plantas e vitrine) e as imagens são apagadas do S3. Não tem volta.
+ * O banco vai primeiro: se o S3 falhar, o imóvel já está fora do site e `falhas` avisa que sobraram arquivos.
+ * Quem chama atualiza a tela (`router.refresh()` ou navega), porque a página do imóvel deixa de existir.
+ */
+export async function excluirImovel(id: string): Promise<{ ok: boolean; arquivos?: number; falhas?: number }> {
+  const admin = await exigirAdmin()
+  if (typeof id !== 'string' || !(await obterRegistro(id))) return { ok: false }
+  const imagens = await excluirImovelNoBanco(id, admin.email)
+  updateTag(TAG_IMOVEIS)
+  const { apagados, falhas } = await apagarDoImovel(id, imagens)
+  return { ok: true, arquivos: apagados, falhas }
+}
+
 // ---------- Edição ----------
 
 function numero(fd: FormData, campo: string) {
   return lerNumeroBr(texto(fd, campo, 30))
 }
 
-function faixa(fd: FormData, campo: string, erros: Erros, obrigatoria = true): Faixa | null {
+/** O campo `entrega` chega como "ano-mês"; meio preenchido ("2026-" ou "-05") fica de fora e é recusado na conferência. */
+function entregaDe(valor: string) {
+  const [entregaAno = '', entregaMes = ''] = valor.split('-')
+  return { entregaAno, entregaMes }
+}
+
+/** Faixa já conferida por `validarImovel`: o máximo vazio repete o mínimo (e, na área, o máximo 0 também). */
+function faixa(fd: FormData, campo: string): Faixa | null {
   const min = numero(fd, `${campo}Min`)
-  const max = numero(fd, `${campo}Max`) ?? min
-  if (min === undefined) {
-    if (obrigatoria) erros[campo] = 'Informe pelo menos o valor mínimo.'
-    return null
-  }
-  if (Number.isNaN(min) || max === undefined || Number.isNaN(max)) {
-    erros[campo] = 'Use apenas números.'
-    return null
-  }
-  if (max < min) {
-    erros[campo] = 'O máximo não pode ser menor que o mínimo.'
-    return null
-  }
-  return { min, max }
+  if (min === undefined) return null
+  const max = numero(fd, `${campo}Max`)
+  return { min, max: max === undefined || (campo === 'area' && max === 0) ? min : max }
 }
 
 const linhas = (fd: FormData, campo: string, limite = 20000) =>
@@ -121,40 +135,60 @@ type CamposImovel = Pick<Imovel, (typeof CAMPOS_EDITAVEIS)[number] | 'capa'>
  * Lê e valida o formulário do imóvel. `base` é o imóvel já existente (edição); no cadastro é `null`.
  * Quando a lista de fotos não muda, mantém as do original (com legendas e dimensões).
  */
-function lerFormulario(fd: FormData, base: Imovel | null): { erros: Erros } | { erros: null; campos: CamposImovel } {
-  const erros: Erros = {}
-  const nome = texto(fd, 'nome', 120)
-  const chamada = texto(fd, 'chamada', 200)
-  const tipo = TIPOS.find((t) => t === texto(fd, 'tipo'))
-  const finalidade = (['venda', 'aluguel'] as Finalidade[]).find((f) => f === texto(fd, 'finalidade'))
-  const situacao = SITUACOES.find((s) => s === texto(fd, 'situacao'))
+async function lerFormulario(fd: FormData, base: Imovel | null): Promise<{ erros: Erros } | { erros: null; campos: CamposImovel }> {
+  const entrada: EntradaImovel = {
+    nome: texto(fd, 'nome', 200),
+    chamada: texto(fd, 'chamada', 300),
+    tipo: texto(fd, 'tipo'),
+    finalidade: texto(fd, 'finalidade'),
+    situacao: texto(fd, 'situacao'),
+    preco: texto(fd, 'preco', 30),
+    areaMin: texto(fd, 'areaMin', 30),
+    areaMax: texto(fd, 'areaMax', 30),
+    quartosMin: texto(fd, 'quartosMin', 30),
+    quartosMax: texto(fd, 'quartosMax', 30),
+    suitesMin: texto(fd, 'suitesMin', 30),
+    suitesMax: texto(fd, 'suitesMax', 30),
+    banheirosMin: texto(fd, 'banheirosMin', 30),
+    banheirosMax: texto(fd, 'banheirosMax', 30),
+    vagasMin: texto(fd, 'vagasMin', 30),
+    vagasMax: texto(fd, 'vagasMax', 30),
+    ...entregaDe(texto(fd, 'entrega', 10)),
+    bairro: texto(fd, 'bairro', 120),
+    cidade: texto(fd, 'cidade', 120),
+    uf: texto(fd, 'uf', 4),
+  }
+  // As mesmas regras que o formulário aplica no navegador; aqui valem de verdade.
+  const erros: Erros = { ...validarImovel(entrada) }
+
+  const nome = entrada.nome
+  const chamada = entrada.chamada
+  const tipo = TIPOS.find((t) => t === entrada.tipo)
+  const finalidade = (['venda', 'aluguel'] as Finalidade[]).find((f) => f === entrada.finalidade)
+  const situacao = SITUACOES.find((s) => s === entrada.situacao)
   const preco = numero(fd, 'preco')
-  const suites = numero(fd, 'suites')
+  const suitesFaixa = faixa(fd, 'suites')
+  // Sem suíte (vazio ou 0 a 0) não se grava nada.
+  const suites = suitesFaixa && suitesFaixa.max > 0 ? suitesFaixa : undefined
   const entrega = texto(fd, 'entrega', 10)
-  const bairro = texto(fd, 'bairro', 80)
-  const cidade = texto(fd, 'cidade', 80)
-  const uf = texto(fd, 'uf', 2).toUpperCase()
+  const bairro = entrada.bairro
+  const cidade = entrada.cidade
+  const uf = entrada.uf.toUpperCase()
   const srcCapa = texto(fd, 'capa', 500)
   const srcFotos = fd.getAll('fotos').filter((f): f is string => typeof f === 'string').map((f) => f.trim()).slice(0, 100)
 
-  if (nome.length < 2) erros.nome = 'Informe o nome.'
-  if (chamada.length < 5) erros.chamada = 'Escreva uma frase curta sobre o imóvel.'
-  if (!tipo) erros.tipo = 'Escolha o tipo.'
-  if (!finalidade) erros.finalidade = 'Escolha a finalidade.'
-  if (!situacao) erros.situacao = 'Escolha a situação.'
-  if (!preco || Number.isNaN(preco)) erros.preco = 'Informe um valor maior que zero.'
-  if (suites !== undefined && (Number.isNaN(suites) || !Number.isInteger(suites))) erros.suites = 'Use um número inteiro.'
-  if (entrega && !/^\d{4}-(0[1-9]|1[0-2])$/.test(entrega)) erros.entrega = 'Escolha o mês e o ano.'
-  if (bairro.length < 2) erros.bairro = 'Informe o bairro.'
-  if (cidade.length < 2) erros.cidade = 'Informe a cidade.'
-  if (!/^[A-Z]{2}$/.test(uf)) erros.uf = 'Use a sigla do estado.'
   if (!srcFotos.length) erros.fotos = base ? 'Mantenha pelo menos uma foto.' : 'Envie pelo menos uma foto.'
   else if (!srcFotos.every(fotoPermitida)) erros.fotos = 'Há fotos de um endereço não permitido.'
 
-  const area = faixa(fd, 'area', erros)
-  const quartos = faixa(fd, 'quartos', erros)
-  const banheiros = faixa(fd, 'banheiros', erros)
-  const vagas = faixa(fd, 'vagas', erros, false)
+  const area = faixa(fd, 'area')
+  const quartos = faixa(fd, 'quartos')
+  const banheiros = faixa(fd, 'banheiros')
+  const vagas = faixa(fd, 'vagas')
+
+  // A cidade precisa estar na lista do estado (a do próprio imóvel vale, mesmo que a lista não a tenha).
+  if (!erros.cidade && !erros.uf && !(base && cidade === base.local.cidade && uf === base.local.uf) && !(await cidadeDoEstado(uf, cidade))) {
+    erros.cidade = 'Escolha uma cidade da lista do estado.'
+  }
 
   if (Object.keys(erros).length) return { erros }
 
@@ -174,7 +208,7 @@ function lerFormulario(fd: FormData, base: Imovel | null): { erros: Erros } | { 
     bairro,
     bairroSlug: base && bairro === base.local.bairro ? base.local.bairroSlug : slugificar(bairro),
     cidade,
-    cidadeSlug: base && cidade === base.local.cidade ? base.local.cidadeSlug : slugificar(cidade),
+    cidadeSlug: base && cidade === base.local.cidade && uf === base.local.uf ? base.local.cidadeSlug : await slugDaCidade(cidade, uf),
     uf,
     logradouro: opcional(texto(fd, 'logradouro', 200)),
   }
@@ -187,11 +221,11 @@ function lerFormulario(fd: FormData, base: Imovel | null): { erros: Erros } | { 
       tipo: tipo!,
       finalidade: finalidade!,
       situacao: situacao!,
-      mcmv: fd.get('mcmv') === 'on',
+      mcmv: finalidade === 'venda' && fd.get('mcmv') === 'on', // aluguel não entra no programa
       preco: preco!,
       area: area!,
       quartos: quartos!,
-      suites: suites || undefined,
+      suites,
       banheiros: banheiros!,
       vagas,
       entrega: opcional(entrega),
@@ -214,17 +248,18 @@ export async function salvarImovel(id: string, _: EstadoFormulario, fd: FormData
   const admin = await exigirAdmin()
   const registro = await obterRegistro(id)
   if (!registro) return { status: 'erro', mensagem: 'Imóvel não encontrado no catálogo.' }
-  const { imovel: atual, original, criado } = registro
+  const { imovel: atual } = registro
 
-  const lido = lerFormulario(fd, atual)
+  const lido = await lerFormulario(fd, atual)
   if (lido.erros) return { status: 'erro', mensagem: 'Confira os campos destacados.', erros: lido.erros }
 
   const novo: Imovel = { ...atual, ...lido.campos, atualizadoEm: hoje() }
-  // Imóvel cadastrado no painel não tem CRM para comparar; os do CRM ficam "editados" enquanto divergirem dele.
-  const editado = !criado && (diferencas(original, novo).length > 0 || capaDe(original) !== capaDe(novo))
   const campos: string[] = diferencas(atual, novo)
   if (capaDe(atual) !== capaDe(novo)) campos.push('capa')
-  await gravarImovel(novo, editado, { autor: admin.email, acao: 'editar', campos })
+  await gravarImovel(novo, { autor: admin.email, acao: 'editar', campos })
+  // Fotos tiradas da galeria: agora que o imóvel foi salvo sem elas, saem também do S3.
+  const mantidas = new Set(novo.fotos.map((f) => f.src))
+  await apagarFotos(atual.fotos.map((f) => f.src).filter((src) => !mantidas.has(src))).catch(() => undefined)
   publicar()
   return { status: 'sucesso', mensagem: 'Alterações salvas e publicadas.' }
 }
@@ -232,17 +267,19 @@ export async function salvarImovel(id: string, _: EstadoFormulario, fd: FormData
 /** Cadastra um imóvel novo. Já nasce publicado; depois segue o mesmo fluxo de edição dos demais. */
 export async function criarImovel(_: EstadoFormulario, fd: FormData): Promise<EstadoFormulario> {
   const admin = await exigirAdmin()
-  const lido = lerFormulario(fd, null)
+  const lido = await lerFormulario(fd, null)
   if (lido.erros) return { status: 'erro', mensagem: 'Confira os campos destacados.', erros: lido.erros }
 
-  // Slugs de excluídos também contam: restaurar um deles não pode colidir com este.
+  // Slugs de imóveis desativados também contam: reativar um deles não pode colidir com este.
   const usados = await slugsEmUso()
   const { nome, local } = lido.campos
   const raiz = slugificar(`${nome} ${local.bairro} ${local.cidade}`)
   let slug = raiz
   for (let n = 2; usados.has(slug); n++) slug = `${raiz}-${n}`
 
-  const id = `${PREFIXO_CRIADO}${Date.now().toString(36)}`
+  // As fotos já foram para o S3 na pasta do id que o formulário gerou; vale esse id, se estiver livre.
+  const pedido = texto(fd, 'id', 40)
+  const id = ID_CRIADO.test(pedido) && !(await obterRegistro(pedido)) ? pedido : `${PREFIXO_CRIADO}${Date.now().toString(36)}`
   const imovel: Imovel = {
     ...lido.campos,
     id,
@@ -255,18 +292,8 @@ export async function criarImovel(_: EstadoFormulario, fd: FormData): Promise<Es
   }
   await inserirImovel(imovel, { autor: admin.email, acao: 'criar' })
   publicar()
-  redirect(`/admin/imoveis/${id}`)
-}
-
-/** Descarta as edições do painel: o imóvel volta a seguir 100% o CRM. */
-export async function descartarEdicoes(id: string) {
-  const admin = await exigirAdmin()
-  if (typeof id !== 'string') return
-  const registro = await obterRegistro(id)
-  // Imóvel cadastrado no painel não tem versão do CRM para voltar.
-  if (!registro || registro.criado) return
-  await gravarImovel(registro.original, false, { autor: admin.email, acao: 'descartar-edicoes', campos: diferencas(registro.original, registro.imovel) })
-  publicar()
+  // Não usa redirect(): chamado do navegador ele faz a ação "falhar" e o formulário mostraria erro com o imóvel já salvo.
+  return { status: 'sucesso', mensagem: 'Imóvel cadastrado e publicado no site.', destino: `/admin/imoveis/${id}` }
 }
 
 // ---------- Vitrine da home ----------
@@ -287,9 +314,11 @@ export async function salvarVitrine(_: EstadoFormulario, fd: FormData): Promise<
   return { status: 'sucesso', mensagem: 'Vitrine atualizada. A home já mostra a nova seleção.' }
 }
 
-/** Volta a usar as marcações de destaque e "super destaque" do CRM. */
-export async function usarVitrineDoCrm() {
-  const admin = await exigirAdmin()
-  await usarVitrineDoCrmNoBanco(admin.email)
-  publicar()
+// ---------- Listas do formulário ----------
+
+/** Cidades de um estado (IBGE + catálogo) e os bairros já cadastrados em cada uma, para os seletores do formulário. */
+export async function listarLocais(uf: string): Promise<LocaisDoEstado> {
+  await exigirAdmin()
+  if (typeof uf !== 'string' || !UFS.includes(uf)) return { cidades: [], bairros: {} }
+  return locaisDoEstado(uf)
 }

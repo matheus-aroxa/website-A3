@@ -1,7 +1,9 @@
 // Origens de onde o site aceita fotos (next/image só otimiza imagens desses hosts).
-// Usado no next.config.ts e na validação das fotos editadas no painel administrativo.
+// Usado no next.config.ts e na validação das fotos do painel administrativo.
+export const HOST_S3_FOTOS = 'a3-imoveis-fotos.s3.sa-east-1.amazonaws.com'
+
 export const HOSTS_FOTOS = [
-  'a3-imoveis-fotos.s3.sa-east-1.amazonaws.com',
+  HOST_S3_FOTOS,
   'cdn.sistemasupremo.com.br',
   'ss.cloudadmin.com.br',
   'arquivos.sistemasupremo.com.br',

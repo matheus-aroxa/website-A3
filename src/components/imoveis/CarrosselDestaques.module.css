@@ -1,0 +1,158 @@
+/* Carrossel dos destaques da home (mais de 3 imóveis). Três por vez no computador, dois em tablet, um e meio no celular. */
+.carrossel {
+  --espaco: 24px;
+  --seta: 46px;
+  --vao: 20px;
+  /* Respiro em volta dos cards: cabe a sombra deles (36px abaixo, 44px no hover, ~20px dos lados) sem ser cortada. */
+  --sombra-lado: 20px;
+  --sombra-baixo: 48px;
+}
+
+/* [seta] [cards] [seta], com os pontos de página embaixo, no meio. */
+.palco {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: 'pista';
+  align-items: center;
+}
+
+.palco[data-controles] {
+  grid-template-columns: var(--seta) minmax(0, 1fr) var(--seta);
+  grid-template-areas:
+    'anterior pista proximo'
+    '. pontos .';
+  column-gap: var(--vao);
+}
+
+/* Em tela larga a margem da página comporta as setas: os cards seguem alinhados com o resto do conteúdo. */
+@media (min-width: 1420px) {
+  .palco[data-controles] {
+    margin-inline: calc((var(--seta) + var(--vao)) * -1);
+  }
+}
+
+.pista {
+  grid-area: pista;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: calc((100% - 2 * var(--espaco)) / 3);
+  gap: var(--espaco);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  /* O overflow corta o que passa da caixa. O respiro (padding) deixa a sombra e o "levantar" dos cards inteiros, e a
+     margem negativa devolve o espaço: os cards continuam exatamente onde estariam. */
+  padding: 14px var(--sombra-lado) var(--sombra-baixo);
+  margin: -14px calc(var(--sombra-lado) * -1) calc(var(--sombra-baixo) * -1);
+  scroll-padding-inline: var(--sombra-lado);
+  /* O que é cortado pela borda (resto da sombra, card entrando ou saindo) esmaece em vez de acabar numa linha reta.
+     Os cards em repouso ficam dentro da área opaca, então não são afetados. */
+  --esmaecer: var(--sombra-lado);
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 var(--esmaecer), #000 calc(100% - var(--esmaecer)), transparent 100%),
+    linear-gradient(to bottom, #000 calc(100% - 14px), transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 var(--esmaecer), #000 calc(100% - var(--esmaecer)), transparent 100%),
+    linear-gradient(to bottom, #000 calc(100% - 14px), transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+.pista::-webkit-scrollbar {
+  display: none;
+}
+
+.pista > * {
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+.seta {
+  /* Acima do respiro dos cards (que se estende por baixo da pista): sem isso ele capturaria os cliques. */
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: var(--seta);
+  height: var(--seta);
+  padding: 0;
+  border: 1px solid var(--borda-2);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--mar);
+  box-shadow: 0 10px 24px -12px rgba(14, 31, 29, 0.45);
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.seta:hover {
+  background: var(--mar-claro);
+}
+
+.seta:active {
+  transform: scale(0.94);
+}
+
+.anterior {
+  grid-area: anterior;
+}
+
+.proximo {
+  grid-area: proximo;
+}
+
+/* Indicador de página: a atual vira uma pílula. */
+.pontos {
+  position: relative;
+  z-index: 1;
+  grid-area: pontos;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 22px;
+}
+
+.ponto {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #b9cac5;
+  transition: width 0.25s ease, background-color 0.25s ease;
+}
+
+.ponto[data-ativo] {
+  width: 26px;
+  background: var(--mar);
+}
+
+@media (max-width: 1007px) {
+  .pista {
+    grid-auto-columns: calc((100% - var(--espaco)) / 2);
+  }
+}
+
+/* Celular: não há espaço ao lado dos cards, então as setas ficam embaixo, uma de cada lado dos pontos. */
+@media (max-width: 767px) {
+  .carrossel {
+    --espaco: 12px;
+  }
+  .palco[data-controles] {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      'pista pista pista'
+      'anterior pontos proximo';
+    margin-inline: 0;
+  }
+  .pista {
+    grid-auto-columns: min(300px, 82vw);
+    margin-inline: calc(var(--margem) * -1);
+    padding-inline: var(--margem);
+    scroll-padding-inline: var(--margem);
+    --esmaecer: 12px; /* o primeiro card começa a 16px da borda: o esmaecimento não o alcança */
+  }
+  .pontos {
+    margin-top: 0;
+  }
+  .palco[data-controles] .seta {
+    margin-top: 18px;
+  }
+}

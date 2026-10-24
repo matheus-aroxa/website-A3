@@ -90,7 +90,7 @@ export default async function PaginaImovel({ params }: PageProps<'/imovel/[slug]
 
   const aluguel = im.finalidade === 'aluguel'
   const mensagemWhats = `Olá! Tenho interesse no ${im.nome} (cód. ${im.codigo}).`
-  const quartos = im.suites ? `${formatarFaixa(im.quartos)}, com suíte` : formatarFaixa(im.quartos)
+  const quartos = im.suites?.max ? `${formatarFaixa(im.quartos)}, com suíte` : formatarFaixa(im.quartos)
   const ficha: { icone: NomeIcone; rotulo: string; rotuloCurto?: string; valor: string; valorCurto?: string }[] = [
     { icone: 'area', rotulo: 'Área privativa', valor: formatarArea(im.area) },
     ...(im.tipo !== 'terreno'

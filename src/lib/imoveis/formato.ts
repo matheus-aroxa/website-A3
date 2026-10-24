@@ -29,12 +29,14 @@ const MESES_EXTENSO = [
 ]
 
 const reais = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })
+const reaisComCentavos = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
 const decimal = (casas: number) =>
   new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: casas })
 
 export function formatarPreco(valor: number, finalidade: Finalidade) {
   // Intl usa espaço não separável entre "R$" e o número; mantém a quebra de linha correta.
-  const texto = reais.format(valor)
+  // Centavos só aparecem quando existem: "R$ 265.000" e "R$ 265.000,50".
+  const texto = (Number.isInteger(valor) ? reais : reaisComCentavos).format(valor)
   return finalidade === 'aluguel' ? `${texto}/mês` : texto
 }
 
@@ -62,12 +64,19 @@ export function formatarQuartos(q: Faixa) {
   return `${faixaTexto(q)} ${q.max === 1 ? 'quarto' : 'quartos'}`
 }
 
+/** "1 suíte", "1 a 2 suítes" ou "sem suíte". */
+export function formatarSuites(s: Faixa | undefined) {
+  if (!s || s.max === 0) return 'sem suíte'
+  return `${faixaTexto(s)} ${s.max === 1 ? 'suíte' : 'suítes'}`
+}
+
 export function formatarBanheiros(b: Faixa) {
   return b.min === b.max ? `${b.min} banh.` : `${b.min} a ${b.max} banh.`
 }
 
 export function formatarVagas(v: Faixa | null) {
   if (!v) return 'Vaga a consultar'
+  if (v.max === 0) return 'Sem vaga'
   return `${faixaTexto(v)} ${v.max === 1 ? 'vaga' : 'vagas'}`
 }
 

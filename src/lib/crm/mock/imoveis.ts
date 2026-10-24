@@ -99,7 +99,7 @@ export const imoveisMock: Imovel[] = [
     preco: 265000,
     area: { min: 50.84, max: 91.12 },
     quartos: { min: 2, max: 3 },
-    suites: 1,
+    suites: { min: 1, max: 1 },
     banheiros: { min: 2, max: 2 },
     vagas: { min: 1, max: 1 },
     entrega: '2028-01',

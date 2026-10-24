@@ -6,7 +6,6 @@ import {
   type EstadoFormulario,
   texto,
   validarConsentimento,
-  validarEmail,
   validarNome,
   validarWhatsapp,
 } from '@/lib/formularios'
@@ -64,20 +63,18 @@ export async function enviarContato(_: EstadoFormulario, fd: FormData): Promise<
   const dados = {
     nome: texto(fd, 'nome', 100),
     whatsapp: texto(fd, 'whatsapp', 30),
-    email: texto(fd, 'email', 150),
     interesse: texto(fd, 'interesse', 80),
     mensagem: texto(fd, 'mensagem', 2000),
   }
   const erros: Erros = {
     nome: validarNome(dados.nome),
     whatsapp: validarWhatsapp(dados.whatsapp),
-    email: validarEmail(dados.email),
     consentimento: validarConsentimento(fd),
   }
   if (!semErros(erros)) return { status: 'erro', erros, valores: valoresDe(fd) }
 
   const resultado = await registrar(
-    { origem: 'contato-home', ...dados, email: dados.email || undefined },
+    { origem: 'contato-home', ...dados },
     'Mensagem enviada para o WhatsApp da A3.'
   )
   // A conversa é aberta no WhatsApp da A3, já com os dados preenchidos no formulário.

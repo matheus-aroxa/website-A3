@@ -10,7 +10,8 @@ export const CAMPOS_EDITAVEIS = [
 
 export type CampoEditavel = (typeof CAMPOS_EDITAVEIS)[number]
 
-export type StatusImovel = 'ativo' | 'inativo' | 'excluido'
+/** Excluir apaga o imóvel de vez (banco e S3), então não existe status "excluído". */
+export type StatusImovel = 'ativo' | 'inativo'
 
 export interface Vitrine {
   /** Imóvel do topo da home. `null`: nenhum escolhido (vale o destaque mais recente). */
@@ -21,6 +22,10 @@ export interface Vitrine {
 
 /** Prefixo do id e do código dos imóveis cadastrados no painel. */
 export const PREFIXO_CRIADO = 'A3-'
+/** Forma do id de um imóvel cadastrado no painel. */
+export const ID_CRIADO = new RegExp(`^${PREFIXO_CRIADO}[0-9a-z]{6,16}$`)
+/** Id de um imóvel novo. Nasce no navegador, no primeiro envio de foto, para as fotos já irem para a pasta definitiva no S3. */
+export const novoIdCriado = () => `${PREFIXO_CRIADO}${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`
 
 /** JSON com as chaves em ordem fixa: o jsonb do banco não preserva a ordem em que o objeto foi escrito. */
 function estavel(valor: unknown): string {
@@ -34,7 +39,7 @@ function estavel(valor: unknown): string {
 /** Src da foto dos cards: a capa escolhida ou, sem escolha, a primeira da galeria. */
 export const capaDe = (im: Pick<Imovel, 'fotos' | 'capa'>) => (im.capa ?? im.fotos[0])?.src
 
-/** Nomes dos campos de `novo` que diferem de `original`. */
-export function diferencas(original: Imovel, novo: Pick<Imovel, CampoEditavel>): CampoEditavel[] {
-  return CAMPOS_EDITAVEIS.filter((campo) => estavel(original[campo]) !== estavel(novo[campo]))
+/** Nomes dos campos de `novo` que diferem de `antes` (para o registro de auditoria). */
+export function diferencas(antes: Imovel, novo: Pick<Imovel, CampoEditavel>): CampoEditavel[] {
+  return CAMPOS_EDITAVEIS.filter((campo) => estavel(antes[campo]) !== estavel(novo[campo]))
 }

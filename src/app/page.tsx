@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { BuscaInicial } from '@/components/home/BuscaInicial'
 import { CardImovel } from '@/components/imoveis/CardImovel'
+import { CarrosselDestaques } from '@/components/imoveis/CarrosselDestaques'
 import { FormularioContato } from '@/components/formularios/FormularioContato'
 import { BotaoWhatsApp } from '@/components/layout/BotaoWhatsApp'
 import { Cabecalho } from '@/components/layout/Cabecalho'
@@ -11,7 +12,7 @@ import { RevelarAoRolar } from '@/components/ui/RevelarAoRolar'
 import { Icone, type NomeIcone } from '@/components/ui/Icone'
 import { MapaEstatico } from '@/components/ui/MapaEstatico'
 import { etiquetaImovel, formatarPreco, rotuloPreco } from '@/lib/imoveis/formato'
-import { listarCidades, listarDestaques, obterImovelHeroi } from '@/lib/imoveis/repositorio'
+import { DESTAQUES_POR_VEZ, listarCidades, listarDestaques, obterImovelHeroi } from '@/lib/imoveis/repositorio'
 import { urlImovel } from '@/lib/imoveis/rotas'
 import { imagensSite, linkWhatsApp, mensagensWhatsApp, site } from '@/lib/site'
 import s from './page.module.css'
@@ -161,11 +162,11 @@ export default async function Home() {
                   Ver todos os imóveis <Icone nome="seta" tamanho={18} espessura={2} />
                 </Link>
               </div>
-              <div className={`${s.gradeDestaques} carrossel-mobile`} data-revelar-filhos>
+              <CarrosselDestaques porVez={DESTAQUES_POR_VEZ} classeGrade={s.gradeDestaques}>
                 {destaques.map((im) => (
                   <CardImovel key={im.id} imovel={im} variante="destaque" />
                 ))}
-              </div>
+              </CarrosselDestaques>
               <Link href="/imoveis" className={`btn btn-sol btn-g btn-bloco ${s.verTodosMobile}`}>
                 Ver todos os imóveis <Icone nome="seta" tamanho={18} espessura={2} />
               </Link>

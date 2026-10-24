@@ -13,8 +13,6 @@ export const metadata: Metadata = { title: 'Entrar' }
 
 const RODAPE = `© ${anoAtual} ${site.nome} · ${site.creci}`
 
-const VANTAGENS = ['Imóveis sincronizados com o CRM', 'Fotos, textos e valores editáveis', 'Vitrine da home em poucos cliques']
-
 // Celular: faixa verde no alto e cartão por cima (protótipo "Painel · entrar · mobile").
 // Computador: faixa verde à esquerda e cartão à direita (protótipo "Painel · entrar").
 // As partes que só existem num dos dois levam .soCelular / .soComputador.
@@ -36,18 +34,8 @@ export default function PaginaEntrar() {
             </h1>
             <p className={s.soCelular}>Edite imóveis e escolha os destaques da home direto do celular.</p>
             <p className={s.soComputador}>
-              Edite imóveis, escolha os destaques da home e acompanhe o que veio do CRM. Tudo aparece no site na hora.
+              Edite imóveis, escolha os destaques da home e acompanhe os contatos recebidos. Tudo aparece no site na hora.
             </p>
-            <ul className={`${s.loginVantagens} ${s.soComputador}`}>
-              {VANTAGENS.map((v) => (
-                <li key={v}>
-                  <span>
-                    <Icone nome="check" tamanho={16} espessura={2.4} />
-                  </span>
-                  {v}
-                </li>
-              ))}
-            </ul>
           </div>
           <span className={`${s.loginRodapeTopo} ${s.soComputador}`}>{RODAPE}</span>
         </div>

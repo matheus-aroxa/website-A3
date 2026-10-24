@@ -51,7 +51,8 @@ export interface Imovel {
   /** Área privativa em m². */
   area: Faixa
   quartos: Faixa
-  suites?: number
+  /** Faixa de suítes entre as plantas; ausente quando não há suíte. */
+  suites?: Faixa
   banheiros: Faixa
   /** `null` quando a vaga é "a consultar". */
   vagas: Faixa | null

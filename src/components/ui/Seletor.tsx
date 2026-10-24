@@ -28,7 +28,10 @@ export function Seletor({
   aoMudar,
   name,
   className,
+  desativado,
   'aria-label': ariaLabel,
+  'aria-invalid': ariaInvalid,
+  'aria-describedby': ariaDescribedby,
 }: {
   opcoes: Item[]
   valor?: string
@@ -36,7 +39,10 @@ export function Seletor({
   aoMudar?: (valor: string) => void
   name?: string
   className?: string
+  desativado?: boolean
   'aria-label'?: string
+  'aria-invalid'?: boolean
+  'aria-describedby'?: string
 }) {
   const planas = opcoes.flatMap((item) => (ehGrupo(item) ? item.opcoes : [item]))
   const [valorInterno, setValorInterno] = useState(valorInicial ?? planas[0]?.valor ?? '')
@@ -155,6 +161,9 @@ export function Seletor({
         role="combobox"
         className="campo seletor-botao"
         aria-label={ariaLabel}
+        aria-invalid={ariaInvalid}
+        aria-describedby={ariaDescribedby}
+        disabled={desativado}
         aria-haspopup="listbox"
         aria-expanded={aberto}
         aria-controls={`${id}-lista`}

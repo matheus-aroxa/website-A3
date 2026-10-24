@@ -24,10 +24,12 @@ import type { Cidade, Imovel, ImovelResumo } from './tipos'
 
 export const TAG_IMOVEIS = 'imoveis'
 
-/** Quantos destaques a home exibe. */
-export const LIMITE_DESTAQUES = 3
+/** Quantos imóveis o painel pode pôr em destaque na home. */
+export const LIMITE_DESTAQUES = 12
+/** Quantos aparecem de uma vez na home (no computador). Com mais que isso, viram um carrossel. */
+export const DESTAQUES_POR_VEZ = 3
 
-/** Imóvel publicado (sem desativados e excluídos), com galeria e textos completos. */
+/** Imóvel publicado (sem desativados), com galeria e textos completos. */
 export async function obterImovelPorSlug(slug: string): Promise<Imovel | null> {
   'use cache'
   cacheLife('hours')

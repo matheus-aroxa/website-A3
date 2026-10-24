@@ -139,10 +139,6 @@
   background: #a9b6b2;
 }
 
-.ponto[data-status='excluido'] {
-  background: #e0705f;
-}
-
 .verNoSite {
   align-self: flex-start;
   display: flex;
@@ -162,20 +158,12 @@
   background: rgba(255, 255, 255, 0.08);
 }
 
-.topoStatus {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.topo .topoStatus {
-  font-size: 13px;
-}
-
 /* Cartões de contagem (No site, Desativados…) */
+/* Uma coluna por card, todas da mesma largura: distribui igualmente seja qual for a quantidade de abas. */
 .abas {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
   gap: 10px;
   margin: 4px 0 0;
 }
@@ -240,7 +228,6 @@
     font-size: 17px;
   }
   .abas {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
     margin: 8px 0 0;
   }
 }
@@ -538,7 +525,7 @@
   color: var(--mar);
 }
 
-.marcadorEditado {
+.marcadorCriado {
   background: #fff4dc;
   color: #6e4608;
 }
@@ -546,11 +533,6 @@
 .marcadorDesativado {
   background: #eef1f0;
   color: var(--texto-3);
-}
-
-.marcadorExcluido {
-  background: #fce9e6;
-  color: #b23a2e;
 }
 
 .itemNome {
@@ -611,18 +593,6 @@
 
 .itemAcoes[data-status='ativo'] {
   grid-template-columns: 1fr 1fr 44px 44px;
-}
-
-.itemExcluido {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.itemExcluido span {
-  font-size: 13px;
-  color: #5b6b68;
 }
 
 .paginar {
@@ -804,23 +774,16 @@
   gap: 18px;
 }
 
-@media (min-width: 960px) {
-  .apresentacao {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 300px;
-    align-items: start;
-    gap: 28px;
-  }
-  .apresentacao .previa {
-    position: sticky;
-    top: calc(var(--altura-cabecalho) + 80px);
-  }
+.chips {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
 }
 
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+@media (min-width: 640px) {
+  .chips {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 .mcmv {
@@ -919,6 +882,199 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+/* Tipo e finalidade lado a lado. */
+.grade2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 12px;
+}
+
+/* Preço e área em metades iguais, na mesma divisão dos cartões abaixo (no celular, um sobre o outro). */
+.valoresTopo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px 12px;
+  align-items: start;
+}
+
+@media (min-width: 640px) {
+  .valoresTopo {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* "De [mín.] m²  até  [máx.] m²" */
+.areaPar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+}
+
+.areaPar > span:not(.prefixo) {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--texto-3);
+}
+
+/* Cartões com contadores (quartos, suítes, banheiros, vagas) */
+.cartoesNumeros {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .cartoesNumeros {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.cartaoNumeros {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--borda-2);
+  border-radius: 16px;
+  background: #f8faf9;
+}
+
+.cartaoNumeros header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.cartaoNumeros h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--tinta);
+}
+
+.cartaoNumeros header span {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #e1ece8;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--mar);
+  white-space: nowrap;
+}
+
+/* Um contador por coluna, do mesmo tamanho (um só ocupa o cartão todo). */
+.contadores {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 10px;
+}
+
+.contadorRotulado {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.contadorRotulado > span {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--texto-3);
+}
+
+.passo {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  height: 50px;
+  border: 1px solid var(--borda-campo);
+  border-radius: 12px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.passo:focus-within {
+  border-color: var(--mar);
+  box-shadow: 0 0 0 3px rgba(11, 74, 68, 0.18);
+}
+
+.passo[data-invalido] {
+  border-color: #b3261e;
+}
+
+.passo button {
+  border: 0;
+  background: var(--fundo-3);
+  font-size: 22px;
+  line-height: 1;
+  color: var(--tinta);
+  cursor: pointer;
+}
+
+.passo button:first-of-type {
+  border-right: 1px solid var(--borda-2);
+}
+
+.passo button:last-of-type {
+  border-left: 1px solid var(--borda-2);
+}
+
+.passo button:hover:not(:disabled) {
+  background: #e6eeeb;
+}
+
+.passo button:disabled {
+  color: #b4c0bc;
+  cursor: not-allowed;
+}
+
+.passo input {
+  min-width: 0;
+  border: 0;
+  background: none;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--tinta);
+  outline: none;
+}
+
+/* Barra "No site:" com o resumo dos números */
+.resumoSite {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: #e6eeeb;
+  font-size: 13.5px;
+  line-height: 1.4;
+  color: var(--texto-4);
+}
+
+.resumoSite svg {
+  flex: none;
+  color: var(--texto-3);
+}
+
+.grade3 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px 12px;
+}
+
+@media (min-width: 768px) {
+  .grade3 {
+    grid-template-columns: minmax(0, 1.2fr) repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (min-width: 768px) {
   .grade4 {
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -931,22 +1087,22 @@
   gap: 18px 12px;
 }
 
+/* UF, cidade e bairro numa linha; no celular o bairro ocupa a linha de baixo. */
 .gradeLocal > :last-child {
-  width: calc(50% - 6px);
+  grid-column: 1 / -1;
 }
 
 @media (min-width: 768px) {
   .gradeLocal {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 110px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 2fr);
   }
   .gradeLocal > :last-child {
-    width: auto;
+    grid-column: auto;
   }
 }
 
-/* Campo com prefixo (R$) e faixa (mín. a máx.) */
-.prefixo,
-.faixa {
+/* Campo com prefixo (R$) */
+.prefixo {
   display: flex;
   align-items: center;
   height: 52px;
@@ -956,14 +1112,12 @@
   overflow: hidden;
 }
 
-.prefixo:focus-within,
-.faixa:focus-within {
+.prefixo:focus-within {
   border-color: var(--mar);
   box-shadow: 0 0 0 3px rgba(11, 74, 68, 0.18);
 }
 
-.prefixo:has([aria-invalid='true']),
-.faixa:has([aria-invalid='true']) {
+.prefixo:has([aria-invalid='true']) {
   border-color: #b3261e;
 }
 
@@ -979,8 +1133,16 @@
   color: var(--texto-3);
 }
 
-.prefixo input,
-.faixa input {
+.prefixo b:not(:first-child) {
+  border-right: 0;
+  border-left: 1px solid var(--borda-2);
+}
+
+.prefixo b {
+  font-weight: 700;
+}
+
+.prefixo input {
   flex: 1;
   min-width: 0;
   height: 100%;
@@ -988,23 +1150,15 @@
   border: 0;
   background: none;
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
   color: var(--tinta);
   outline: none;
 }
 
-.faixa > span {
-  flex: none;
-  padding: 0 4px;
-  font-size: 13px;
-  font-weight: 400;
-  color: #5b6b68;
-}
-
 .entrega {
   display: grid;
-  grid-template-columns: 1.4fr 1fr;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
   gap: 8px;
 }
 
@@ -1180,10 +1334,6 @@
   background: #a9b6b2;
 }
 
-.dados .ponto[data-status='excluido'] {
-  background: #b23a2e;
-}
-
 .dados > .dadosBloco {
   flex-direction: column;
   gap: 6px;
@@ -1292,36 +1442,6 @@
 }
 
 /* ---------- Vitrine ---------- */
-
-.nota {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 14px 16px;
-  background: #fff;
-  border: 1px solid var(--borda-2);
-  border-left: 6px solid var(--sol);
-  border-radius: 16px;
-}
-
-.nota > svg {
-  flex: none;
-  margin-top: 1px;
-  color: var(--mar);
-}
-
-.nota > div {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-}
-
-.nota p {
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--texto-4);
-}
 
 .vitrineBloco {
   display: flex;
@@ -1577,8 +1697,11 @@
   }
 }
 
+/* Uma coluna por imóvel, repartindo a largura toda; em tela estreita cada card mantém 210px e a faixa rola. */
 .previaDestaques {
-  display: flex;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(210px, 1fr);
   gap: 10px;
   padding: 14px;
   border-radius: 18px;
@@ -1587,11 +1710,17 @@
   scrollbar-width: thin;
 }
 
+/* Mais que o "por vez": a home vira carrossel, e a prévia mostra todos em linhas de até 3 (menos no celular). */
+.previaDestaques[data-carrossel] {
+  grid-auto-flow: row;
+  grid-auto-columns: auto;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  overflow-x: visible;
+}
+
 .miniCard {
   display: flex;
   flex-direction: column;
-  flex: none;
-  width: 210px;
   min-height: 200px;
   border-radius: 14px;
   overflow: hidden;
@@ -2099,7 +2228,6 @@
   }
 }
 
-
 /* Computador: faixa verde à esquerda e cartão à direita (protótipo "Painel · entrar", 1440 × 900). */
 @media (min-width: 1024px) {
   .soComputador {
@@ -2109,23 +2237,44 @@
   .login {
     display: grid;
     grid-template-columns: 1.05fr 1fr;
+    /* Linhas compartilhadas: o texto do topo e o cartão começam na mesma linha (a do meio). */
+    grid-template-rows: 1fr auto 1fr;
     min-height: 100vh;
     padding-bottom: 0;
   }
 
+  .loginTopo,
+  .loginTopo .loginColuna,
+  .loginCorpo {
+    display: grid;
+    grid-template-rows: subgrid;
+    grid-row: 1 / -1;
+  }
+
   .loginTopo {
-    display: flex;
-    flex-direction: column;
     min-height: 900px;
     padding: 48px 64px;
   }
 
   .loginTopo .loginColuna {
-    flex: 1;
-    justify-content: space-between;
     gap: 0;
     max-width: none;
     margin: 0;
+  }
+
+  .loginLogo {
+    grid-row: 1;
+  }
+
+  .loginChamada,
+  .loginCartao {
+    grid-row: 2;
+    align-self: start;
+  }
+
+  .loginRodapeTopo {
+    grid-row: 3;
+    align-self: end;
   }
 
   .loginAnel {
@@ -2210,9 +2359,7 @@
   }
 
   .loginCorpo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    justify-items: center;
     max-width: none;
     margin: 0;
     padding: 48px;
@@ -2270,4 +2417,13 @@
   .soCelular {
     display: none;
   }
+}
+
+/* Botões logo abaixo do formulário (não ficam fixos na tela). */
+.acoesFormulario {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-bottom: 12px;
 }

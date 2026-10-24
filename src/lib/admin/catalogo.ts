@@ -1,7 +1,7 @@
-// Leituras do catálogo para o painel: inclui inativos e excluídos, sem cache
+// Leituras do catálogo para o painel: inclui os desativados, sem cache
 // (o painel sempre vê o estado atual do banco). A listagem é paginada no SQL (consultas-admin.ts).
 import 'server-only'
-import { obterRegistro, obterUltimaAlteracao, type UltimaAlteracao } from '@/lib/imoveis/banco'
+import { obterRegistro } from '@/lib/imoveis/banco'
 import {
   listarOpcoesVitrine,
   listarPaginaAdmin,
@@ -13,7 +13,7 @@ import {
 import { etiquetaImovel, formatarPreco, rotuloPreco } from '@/lib/imoveis/formato'
 import { exigirAdmin } from './acesso'
 
-export type { AbaAdmin, FiltroAdmin, UltimaAlteracao }
+export type { AbaAdmin, FiltroAdmin }
 
 export interface ItemAdmin extends Omit<LinhaAdmin, 'capa'> {
   capa?: string
@@ -44,15 +44,13 @@ export interface CatalogoAdmin {
   totalPaginas: number
   /** Quantos imóveis há em cada aba (sem considerar a busca). */
   contagens: Record<AbaAdmin, number>
-  alteracao: UltimaAlteracao | null
 }
 
 /** Uma página do catálogo, já filtrada e contada pelo banco. */
 export async function listarCatalogoAdmin(filtro: FiltroAdmin): Promise<CatalogoAdmin> {
   await exigirAdmin()
-  const [pagina, alteracao] = await Promise.all([listarPaginaAdmin(filtro), obterUltimaAlteracao()])
-  const { itens, ...resto } = pagina
-  return { ...resto, itens: itens.map(({ capa, ...item }) => ({ ...item, ...(capa ? { capa } : {}) })), alteracao }
+  const { itens, ...resto } = await listarPaginaAdmin(filtro)
+  return { ...resto, itens: itens.map(({ capa, ...item }) => ({ ...item, ...(capa ? { capa } : {}) })) }
 }
 
 export async function obterImovelAdmin(id: string) {
@@ -62,10 +60,9 @@ export async function obterImovelAdmin(id: string) {
 
 export async function obterVitrineAdmin() {
   await exigirAdmin()
-  const [{ personalizada, vitrine }, linhas] = await Promise.all([obterVitrineEfetiva(), listarOpcoesVitrine()])
+  const [vitrine, linhas] = await Promise.all([obterVitrineEfetiva(), listarOpcoesVitrine()])
   return {
     vitrine,
-    personalizada,
     opcoes: linhas.map(
       (l): OpcaoVitrine => ({
         id: l.id,
