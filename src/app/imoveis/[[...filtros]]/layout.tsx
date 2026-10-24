@@ -14,7 +14,7 @@ import { combinacoesDeRota, migalhasDaBusca, textosDaBusca } from '@/lib/imoveis
 import s from '@/components/busca/Busca.module.css'
 
 // Pré-gera todas as páginas de busca que têm imóveis (categoria × tipo × cidade × bairro).
-// Combinações novas que surgirem no CRM são geradas no primeiro acesso e ficam em cache.
+// Combinações novas que surgirem no catálogo são geradas no primeiro acesso e ficam em cache.
 export async function generateStaticParams() {
   const imoveis = await listarIndice()
   return combinacoesDeRota(imoveis).map((rota) => ({ filtros: segmentosDaRota(rota) }))

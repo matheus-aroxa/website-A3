@@ -123,6 +123,17 @@ export function MensagemErroGeral({ estado }: { estado: EstadoFormulario }) {
   )
 }
 
+/** Plano B de quem não foi levado ao WhatsApp automaticamente (app não instalado, bloqueio do navegador). */
+export function AbrirWhatsApp({ href }: { href?: string }) {
+  if (!href) return null
+  return (
+    <a href={href} target="_blank" rel="noopener" className="btn btn-sol btn-quadrado">
+      <Icone nome="whatsapp" tamanho={18} espessura={2} />
+      Abrir o WhatsApp
+    </a>
+  )
+}
+
 export function Sucesso({
   titulo,
   children,

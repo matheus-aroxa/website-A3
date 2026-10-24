@@ -1,6 +1,7 @@
 'use server'
 
-import { crm, type Lead } from '@/lib/crm'
+// Os formulários não guardam nada: conferem os dados no servidor e devolvem o link do WhatsApp da A3 com a mensagem
+// pronta. O contato só chega à A3 quando a pessoa envia a mensagem no WhatsApp.
 import {
   CAMPO_ARMADILHA,
   type EstadoFormulario,
@@ -36,19 +37,6 @@ function valoresDe(fd: FormData) {
   return valores
 }
 
-async function registrar(lead: Omit<Lead, 'criadoEm' | 'consentimento'>, sucesso: string): Promise<EstadoFormulario> {
-  try {
-    await crm.enviarLead({ ...lead, consentimento: true, criadoEm: new Date().toISOString() })
-    return { status: 'sucesso', mensagem: sucesso }
-  } catch (erro) {
-    console.error('[leads] falha ao enviar para o CRM', erro)
-    return {
-      status: 'erro',
-      mensagem: 'Não conseguimos enviar agora. Tente de novo ou chame a gente no WhatsApp.',
-    }
-  }
-}
-
 async function imovelDoFormulario(fd: FormData) {
   const id = texto(fd, 'imovel', 100)
   const imovel = await obterImovelPorId(id)
@@ -73,12 +61,12 @@ export async function enviarContato(_: EstadoFormulario, fd: FormData): Promise<
   }
   if (!semErros(erros)) return { status: 'erro', erros, valores: valoresDe(fd) }
 
-  const resultado = await registrar(
-    { origem: 'contato-home', ...dados },
-    'Mensagem enviada para o WhatsApp da A3.'
-  )
   // A conversa é aberta no WhatsApp da A3, já com os dados preenchidos no formulário.
-  return resultado.status === 'sucesso' ? { ...resultado, whatsapp: linkWhatsApp(mensagemAtendimento(dados)) } : resultado
+  return {
+    status: 'sucesso',
+    mensagem: 'Abrindo o WhatsApp da A3 com a sua mensagem.',
+    whatsapp: linkWhatsApp(mensagemAtendimento(dados)),
+  }
 }
 
 export async function solicitarVisita(_: EstadoFormulario, fd: FormData): Promise<EstadoFormulario> {
@@ -100,18 +88,16 @@ export async function solicitarVisita(_: EstadoFormulario, fd: FormData): Promis
   }
   if (!semErros(erros)) return { status: 'erro', erros, valores: valoresDe(fd) }
 
-  const resultado = await registrar(
-    { origem: 'visita-imovel', ...dados, imovel, visita: { dias, horarios } },
-    `Abrindo o WhatsApp da A3 para confirmar a visita ao ${imovel!.nome}.`
-  )
   // A conversa é aberta no WhatsApp da A3, já com a disponibilidade escolhida.
   const agenda = `${DIAS_DA_SEMANA.filter(([d]) => dias.includes(d)).map(([, nome]) => nome).join(', ')}, às ${[...horarios]
     .sort()
     .map((h) => `${parseInt(h, 10)}h`)
     .join(', ')}`
-  return resultado.status === 'sucesso'
-    ? { ...resultado, whatsapp: linkWhatsApp(mensagemVisita({ ...dados, agenda }, imovel!)) }
-    : resultado
+  return {
+    status: 'sucesso',
+    mensagem: `Abrindo o WhatsApp da A3 para confirmar a visita ao ${imovel!.nome}.`,
+    whatsapp: linkWhatsApp(mensagemVisita({ ...dados, agenda }, imovel!)),
+  }
 }
 
 export async function falarComCorretor(_: EstadoFormulario, fd: FormData): Promise<EstadoFormulario> {
@@ -132,13 +118,11 @@ export async function falarComCorretor(_: EstadoFormulario, fd: FormData): Promi
   }
   if (!semErros(erros)) return { status: 'erro', erros, valores: valoresDe(fd) }
 
-  const resultado = await registrar(
-    { origem: 'corretor-imovel', ...dados, imovel },
-    `Abrindo o WhatsApp da A3 com sua mensagem sobre o ${imovel!.nome}.`
-  )
   // A conversa é aberta no WhatsApp da A3, já com os dados preenchidos no formulário.
   const rotuloCanal = dados.canalPreferido === 'ligacao' ? 'Ligação' : 'WhatsApp'
-  return resultado.status === 'sucesso'
-    ? { ...resultado, whatsapp: linkWhatsApp(mensagemImovel({ ...dados, canal: rotuloCanal }, imovel!)) }
-    : resultado
+  return {
+    status: 'sucesso',
+    mensagem: `Abrindo o WhatsApp da A3 com sua mensagem sobre o ${imovel!.nome}.`,
+    whatsapp: linkWhatsApp(mensagemImovel({ ...dados, canal: rotuloCanal }, imovel!)),
+  }
 }

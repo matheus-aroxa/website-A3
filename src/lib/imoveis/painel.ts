@@ -1,7 +1,7 @@
 // Tipos e regras do painel administrativo sobre o catálogo (que fica no banco, src/lib/imoveis/banco.ts).
 import type { Imovel } from './tipos'
 
-/** Campos que o painel pode alterar. Id, código e slug (URL) seguem sempre o CRM. */
+/** Campos que o painel pode alterar. Id, código e slug (URL) não mudam depois de cadastrados. */
 export const CAMPOS_EDITAVEIS = [
   'nome', 'chamada', 'tipo', 'finalidade', 'situacao', 'mcmv', 'preco', 'area', 'quartos', 'suites',
   'banheiros', 'vagas', 'entrega', 'unidades', 'construtora', 'local', 'descricao', 'lazer',

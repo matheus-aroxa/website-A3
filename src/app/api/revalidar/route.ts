@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server'
 import { TAG_IMOVEIS } from '@/lib/imoveis/repositorio'
 
 /**
- * Webhook para o CRM avisar que o catálogo mudou (imóvel novo, preço, foto...).
+ * Invalida o cache do catálogo à mão, por exemplo depois de mexer direto no banco (o painel já faz isso sozinho).
  *   POST /api/revalidar   Authorization: Bearer <REVALIDATE_SECRET>
  * As páginas são regeneradas em segundo plano; visitantes nunca esperam.
  */

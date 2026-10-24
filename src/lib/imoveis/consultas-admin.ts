@@ -40,19 +40,19 @@ export interface LinhaAdmin {
 }
 
 // Quem está no topo e na vitrine da home: as tabelas vitrine_* depois que o painel mexeu, e antes disso
-// as marcações do CRM (o "herói" mais recente e os destaques mais recentes, até o limite).
+// as marcações originais do catálogo (o "herói" mais recente e os destaques mais recentes, até o limite).
 const BASE = `
   WITH vc AS (SELECT personalizada, heroi_id FROM vitrine_config),
-  crm_heroi AS (SELECT id FROM imoveis WHERE status = 'ativo' AND heroi ORDER BY publicado_em DESC, id LIMIT 1),
-  crm_destaques AS (SELECT id FROM imoveis WHERE status = 'ativo' AND destaque ORDER BY publicado_em DESC, id LIMIT ${LIMITE_DESTAQUES}),
+  heroi_original AS (SELECT id FROM imoveis WHERE status = 'ativo' AND heroi ORDER BY publicado_em DESC, id LIMIT 1),
+  destaques_originais AS (SELECT id FROM imoveis WHERE status = 'ativo' AND destaque ORDER BY publicado_em DESC, id LIMIT ${LIMITE_DESTAQUES}),
   base AS (
     SELECT i.id, i.codigo, i.slug, i.nome, i.tipo, i.finalidade, i.situacao, i.preco::float8 AS preco, i.publicado_em,
            b.nome AS bairro, c.nome AS cidade, i.status, (i.origem = 'painel') AS criado,
            cp.src AS capa,
            (i.status = 'ativo' AND CASE WHEN vc.personalizada THEN vc.heroi_id = i.id
-                                        ELSE i.id IN (SELECT id FROM crm_heroi) END) AS heroi,
+                                        ELSE i.id IN (SELECT id FROM heroi_original) END) AS heroi,
            (i.status = 'ativo' AND CASE WHEN vc.personalizada THEN EXISTS (SELECT 1 FROM vitrine_destaques vd WHERE vd.imovel_id = i.id)
-                                        ELSE i.id IN (SELECT id FROM crm_destaques) END) AS destaque,
+                                        ELSE i.id IN (SELECT id FROM destaques_originais) END) AS destaque,
            ${SEM_ACENTO("i.nome || ' ' || i.codigo")} AS alvo
       FROM imoveis i
       JOIN bairros b ON b.id = i.bairro_id
@@ -105,7 +105,7 @@ export async function listarPaginaAdmin(f: FiltroAdmin): Promise<PaginaAdmin> {
 
 // ---------- Vitrine ----------
 
-/** Vitrine em vigor, só com imóveis publicados (as escolhas do painel ou, antes de qualquer escolha, as marcações do CRM). */
+/** Vitrine em vigor, só com imóveis publicados (as escolhas do painel ou, antes de qualquer escolha, as marcações originais do catálogo). */
 export async function obterVitrineEfetiva(): Promise<Vitrine> {
   const { rows } = await banco().query<{ heroi: string | null; destaques: string[] }>(
     `${BASE}

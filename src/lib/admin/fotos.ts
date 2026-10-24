@@ -44,7 +44,7 @@ function detectarFormato(b: Uint8Array): Extensao | null {
 }
 
 /**
- * Pasta do imóvel no bucket. Imóvel do CRM segue a pasta onde as fotos dele já estão (`imoveis/` ou
+ * Pasta do imóvel no bucket. Imóvel importado segue a pasta onde as fotos dele já estão (`imoveis/` ou
  * `empreendimentos/`, porque os ids podem coincidir); imóvel novo usa `imoveis/<id>`. `null`: id desconhecido.
  */
 export async function pastaDoImovel(id: string): Promise<string | null> {

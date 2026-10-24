@@ -4,7 +4,7 @@ import { useActionState, useEffect, useState } from 'react'
 import { enviarContato } from '@/app/acoes'
 import { Seletor } from '@/components/ui/Seletor'
 import { ESTADO_INICIAL } from '@/lib/formularios'
-import { Armadilha, BotaoEnviar, Campo, CampoTelefone, Consentimento, MensagemErroGeral, Sucesso } from './partes'
+import { AbrirWhatsApp, Armadilha, BotaoEnviar, Campo, CampoTelefone, Consentimento, MensagemErroGeral, Sucesso } from './partes'
 import s from './formularios.module.css'
 
 const INTERESSES = [
@@ -26,7 +26,10 @@ function Formulario({ aoRefazer }: { aoRefazer: () => void }) {
 
   if (estado.status === 'sucesso')
     return (
-      <Sucesso titulo="Recebemos seus dados!" acao="Enviar outra mensagem" aoRefazer={aoRefazer} />
+      <Sucesso titulo="Abrindo o WhatsApp…" acao="Enviar outra mensagem" aoRefazer={aoRefazer}>
+        <p>Sua mensagem já está pronta. É só enviá-la no WhatsApp para falar com um corretor da A3.</p>
+        <AbrirWhatsApp href={whatsapp} />
+      </Sucesso>
     )
 
   return (

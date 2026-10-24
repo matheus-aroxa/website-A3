@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useState } from 'react'
 import { falarComCorretor, solicitarVisita } from '@/app/acoes'
 import {
+  AbrirWhatsApp,
   Armadilha,
   BotaoEnviar,
   Campo,
@@ -68,6 +69,7 @@ function FormVisita({ imovelId, aoRefazer }: { imovelId: string; aoRefazer: () =
       <Sucesso titulo="Quase lá!" acao="Alterar dias e horários" aoRefazer={aoRefazer}>
         <p>{resumo}</p>
         <p>{estado.mensagem}</p>
+        <AbrirWhatsApp href={whatsapp} />
       </Sucesso>
     )
 
@@ -160,6 +162,7 @@ function FormCorretor({
     return (
       <Sucesso titulo="Quase lá!" acao="Enviar outra mensagem" aoRefazer={aoRefazer}>
         <p>{estado.mensagem}</p>
+        <AbrirWhatsApp href={whatsapp} />
       </Sucesso>
     )
 

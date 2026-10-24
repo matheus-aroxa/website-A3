@@ -202,7 +202,7 @@ async function lerFormulario(fd: FormData, base: Imovel | null): Promise<{ erros
         alt: `${nome} – foto ${i + 1}`,
       }))
 
-  // Mantém os slugs do CRM quando o nome não mudou, para não alterar URLs à toa.
+  // Mantém os slugs quando o nome não mudou, para não alterar URLs à toa.
   const local = {
     ...base?.local,
     bairro,

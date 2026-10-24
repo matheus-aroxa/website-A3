@@ -35,7 +35,7 @@ import { schemaAnuncio } from '@/lib/seo'
 import { linkWhatsApp } from '@/lib/site'
 import s from '@/components/imovel/Imovel.module.css'
 
-// Página 100% estática. Imóveis novos no CRM são gerados no primeiro acesso
+// Página 100% estática. Imóveis cadastrados depois do build são gerados no primeiro acesso
 // (o visitante recebe a página completa, nunca um esqueleto) e ficam em cache.
 export const ensureStatic = 'navigation'
 

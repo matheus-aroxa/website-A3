@@ -25,7 +25,7 @@ const ABAS = [
 type Aba = (typeof ABAS)[number]['valor']
 
 const VAZIOS: Record<Aba, [string, string]> = {
-  ativo: ['Nenhum imóvel no site', 'Imóveis novos chegam do CRM quando o catálogo é atualizado.'],
+  ativo: ['Nenhum imóvel no site', 'Cadastre um imóvel novo e ele aparece aqui e no site.'],
   inativo: ['Nenhum imóvel desativado', 'Imóveis desativados saem do site, mas continuam aqui para você reativar quando quiser.'],
   vitrine: ['A vitrine está vazia', 'Escolha o topo e os destaques da página inicial em Vitrine da home.'],
 }

@@ -143,7 +143,7 @@ export async function buscarPagina(f: Filtros, pagina: number): Promise<PaginaRe
 
 // ---------- Vitrine e semelhantes ----------
 
-// Enquanto a vitrine não é personalizada valem as marcações do CRM; depois, as tabelas vitrine_*.
+// Enquanto a vitrine não é personalizada valem as marcações originais do catálogo; depois, as tabelas vitrine_*.
 const VITRINE = `
   CROSS JOIN vitrine_config vc
   LEFT JOIN vitrine_destaques vd ON vd.imovel_id = i.id`

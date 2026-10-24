@@ -1,5 +1,4 @@
-// Modelo de dados dos imóveis. É o contrato entre o site e o CRM: o adaptador do CRM
-// (src/lib/crm) deve converter a resposta da API para estes tipos.
+// Modelo de dados dos imóveis: o contrato entre o banco (src/lib/imoveis/banco.ts) e as páginas do site.
 
 export type Finalidade = 'venda' | 'aluguel'
 export type Situacao = 'breve-lancamento' | 'lancamento' | 'em-construcao' | 'pronto'
@@ -60,7 +59,7 @@ export interface Imovel {
   entrega?: string
   mcmv: boolean
   destaque: boolean
-  /** Imóvel exibido no topo da home (ex.: "super destaque" no CRM). */
+  /** Imóvel exibido no topo da home. */
   heroi?: boolean
   publicadoEm: string
   atualizadoEm: string

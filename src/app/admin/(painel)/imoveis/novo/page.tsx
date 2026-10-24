@@ -10,7 +10,7 @@ export default function PaginaNovoImovel() {
       <TopoPagina
         voltar={{ href: '/admin', rotulo: 'Todos os imóveis' }}
         titulo="Novo imóvel"
-        descricao="Cadastre um imóvel que não está no CRM. Ao cadastrar, ele já aparece no site."
+        descricao="Cadastre um imóvel novo. Ao cadastrar, ele já aparece no site."
       />
       <FormularioImovel />
     </>

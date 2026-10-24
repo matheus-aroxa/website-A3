@@ -9,7 +9,7 @@ import type { Finalidade, Foto, Imovel, Planta, Situacao, TipoImovel } from './t
 export interface RegistroImovel {
   imovel: Imovel
   status: StatusImovel
-  /** Cadastrado no painel (não vem do CRM). */
+  /** Cadastrado no painel (não veio da importação do sistema anterior). */
   criado: boolean
 }
 
@@ -178,7 +178,7 @@ export async function obterRegistro(id: string): Promise<RegistroImovel | null> 
 }
 
 export interface EstadoVitrine {
-  /** Falso enquanto ninguém mexeu na vitrine: valem as marcações do CRM (`heroi` e `destaque` dos imóveis). */
+  /** Falso enquanto ninguém mexeu na vitrine: valem as marcações originais do catálogo (`heroi` e `destaque` dos imóveis). */
   personalizada: boolean
   vitrine: Vitrine
 }

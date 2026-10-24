@@ -590,10 +590,10 @@ export function Publicacao({ imovel: im, status, criado = false }: { imovel: Imo
         </div>
         <div>
           <dt>Origem</dt>
-          <dd>{criado ? 'Cadastrado no painel' : 'CRM'}</dd>
+          <dd>{criado ? 'Cadastrado no painel' : 'Importado do sistema anterior'}</dd>
         </div>
         <div>
-          <dt>{criado ? 'Código' : 'Código no CRM'}</dt>
+          <dt>Código</dt>
           <dd>{im.codigo}</dd>
         </div>
         <div className={s.dadosBloco}>
@@ -660,7 +660,7 @@ export function FormularioImovel({
 
   const [inicial, setInicial] = useState(() => valoresDe(im, novo))
   const [v, setV] = useState(inicial)
-  // Quando os dados mudam no servidor (salvou ou voltou ao CRM), os campos acompanham.
+  // Quando os dados mudam no servidor (por exemplo, ao salvar), os campos acompanham.
   const [anterior, setAnterior] = useState(im)
   if (anterior !== im && JSON.stringify(anterior) !== JSON.stringify(im)) {
     const novos = valoresDe(im)
