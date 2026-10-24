@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Archivo } from 'next/font/google'
+import { Suspense } from 'react'
 import { TopoAoMudarDePagina } from '@/components/layout/TopoAoMudarDePagina'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { schemaImobiliaria } from '@/lib/seo'
@@ -61,7 +62,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <a href="#conteudo" className="pular-conteudo">
           Pular para o conteúdo
         </a>
-        <TopoAoMudarDePagina />
+        {/* usePathname() só existe na requisição: sem o Suspense, as rotas de segmento dinâmico (/admin/imoveis/[id]) não prerenderizam. */}
+        <Suspense fallback={null}>
+          <TopoAoMudarDePagina />
+        </Suspense>
         {children}
         <JsonLd dados={schemaImobiliaria()} />
       </body>
