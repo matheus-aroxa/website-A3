@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Archivo } from 'next/font/google'
+import { TopoAoMudarDePagina } from '@/components/layout/TopoAoMudarDePagina'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { schemaImobiliaria } from '@/lib/seo'
 import { site } from '@/lib/site'
@@ -55,11 +56,12 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={archivo.variable}>
+    <html lang="pt-BR" className={archivo.variable} data-scroll-behavior="smooth">
       <body>
         <a href="#conteudo" className="pular-conteudo">
           Pular para o conteúdo
         </a>
+        <TopoAoMudarDePagina />
         {children}
         <JsonLd dados={schemaImobiliaria()} />
       </body>

@@ -61,6 +61,35 @@ export function mensagemAtendimento(d: { nome: string; whatsapp: string; email?:
   return `Olá! Vim pelo site da A3 e quero ser atendido.\n\n${linhas.join('\n')}`
 }
 
+/** Mensagem do formulário "Falar com corretor" de um imóvel, com o que a pessoa preencheu. */
+export function mensagemImovel(d: { nome: string; whatsapp: string; mensagem?: string; canal?: string }, imovel: { nome: string; codigo: string }) {
+  const linhas = [
+    ['Nome', d.nome],
+    ['WhatsApp', d.whatsapp],
+    ['Contato preferido', d.canal],
+    ['Mensagem', d.mensagem],
+  ]
+    .filter(([, valor]) => valor)
+    .map(([rotulo, valor]) => `${rotulo}: ${valor}`)
+  return `Olá! Vim pelo site da A3 e tenho interesse no ${imovel.nome} (cód. ${imovel.codigo}).\n\n${linhas.join('\n')}`
+}
+
+/** Mensagem do pedido de visita, com o resumo dos dias e horários e o que a pessoa preencheu. */
+export function mensagemVisita(
+  d: { nome: string; whatsapp: string; mensagem?: string; agenda: string },
+  imovel: { nome: string; codigo: string },
+) {
+  const linhas = [
+    ['Nome', d.nome],
+    ['WhatsApp', d.whatsapp],
+    ['Disponibilidade', d.agenda],
+    ['Observações', d.mensagem],
+  ]
+    .filter(([, valor]) => valor)
+    .map(([rotulo, valor]) => `${rotulo}: ${valor}`)
+  return `Olá! Vim pelo site da A3 e quero agendar uma visita ao ${imovel.nome} (cód. ${imovel.codigo}).\n\n${linhas.join('\n')}`
+}
+
 export function linkWhatsApp(mensagem: string = mensagensWhatsApp.padrao) {
   return `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(mensagem)}`
 }

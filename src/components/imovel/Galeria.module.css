@@ -71,26 +71,37 @@
   padding: 6px 12px;
 }
 
-.verTodas {
+.maisFotos {
   position: absolute;
-  bottom: 18px;
-  left: calc(50% - 18px);
-  transform: translateX(-100%);
-  height: 44px;
-  padding: 0 16px;
-  border-radius: 12px;
-  background: #fff;
-  color: var(--tinta);
-  font-size: 14px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.14);
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: linear-gradient(160deg, rgba(14, 31, 29, 0.55), rgba(14, 31, 29, 0.82));
+  backdrop-filter: blur(3px);
+  color: #fff;
+  transition: background 0.2s ease;
 }
 
-.galeria[data-quantidade='1'] .verTodas,
-.galeria[data-quantidade='2'] .verTodas,
-.galeria[data-quantidade='3'] .verTodas {
-  left: auto;
-  right: 18px;
-  transform: none;
+.maisFotos strong {
+  font-size: 30px;
+  font-weight: 800;
+  font-stretch: 112%;
+  line-height: 1.1;
+}
+
+.maisFotos span {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.item:hover .maisFotos {
+  background: linear-gradient(160deg, rgba(14, 31, 29, 0.4), rgba(14, 31, 29, 0.7));
 }
 
 .controlesMobile {
@@ -207,7 +218,8 @@
     padding: 5px 10px;
   }
 
-  .verTodas {
+  /* No celular o contador "1 / N", as setas e os pontos já mostram que há mais fotos. */
+  .maisFotos {
     display: none;
   }
 

@@ -8,7 +8,7 @@ banco só o que mostra; filtros, ordenação, contagem e paginação rodam no SQ
   e o total. Também há destaques, herói da home, semelhantes, um imóvel por slug/id, cidades e um índice mínimo
   (rotas e sitemap).
 - `src/lib/imoveis/repositorio.ts`: só envolve essas consultas com `"use cache"` (tag `imoveis`).
-- A busca de texto (`?q=`) ignora acentos e maiúsculas sem a extensão `unaccent` (função `SEM_ACENTO`).
+- A busca de texto (`?q=`) filtra pelo nome e pelo código do imóvel e ignora acentos e maiúsculas sem a extensão `unaccent` (função `SEM_ACENTO`).
 - `listarIndice()` (slug, tipo, cidade, bairro) alimenta `generateStaticParams`; o sitemap usa o mesmo índice com as fotos.
 
 ## Painel (`/admin`)

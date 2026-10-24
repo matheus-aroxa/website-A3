@@ -7,7 +7,6 @@ import { AreaResultados } from '@/components/busca/Resultados'
 import { BotaoWhatsApp } from '@/components/layout/BotaoWhatsApp'
 import { Cabecalho } from '@/components/layout/Cabecalho'
 import { Rodape } from '@/components/layout/Rodape'
-import { TopoAoEntrar } from '@/components/layout/TopoAoEntrar'
 import { Migalhas } from '@/components/ui/Migalhas'
 import { interpretarSegmentos, segmentosDaRota } from '@/lib/imoveis/filtros'
 import { listarCidades, listarIndice } from '@/lib/imoveis/repositorio'
@@ -29,7 +28,6 @@ export default async function LayoutBusca({ params, children }: LayoutProps<'/im
 
   return (
     <>
-      <TopoAoEntrar />
       <Cabecalho ativo="imoveis" />
       <main id="conteudo">
         <section className={s.topo}>

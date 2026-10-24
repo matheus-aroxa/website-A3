@@ -26,6 +26,7 @@
   line-height: 1.5;
   color: var(--texto-2);
   max-width: 820px;
+  min-height: 3em; /* reserva 2 linhas: o texto de "todos" quebra e os demais não, o que fazia a página pular */
 }
 
 .topoBarra {
@@ -252,18 +253,10 @@
   height: 22px;
 }
 
-.tipos label {
+.chipsColuna {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  min-height: 40px;
-  font-size: 15px;
-  cursor: pointer;
-}
-
-.chipsSituacao {
-  display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: stretch;
   gap: 8px;
 }
 
@@ -431,16 +424,19 @@
   padding: 0 18px;
 }
 
+.desativada {
+  background: var(--fundo-2, #f3f4f6);
+  color: var(--texto-2);
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .pagina[aria-current='page'] {
   border-color: var(--mar);
   background: var(--mar);
   color: #fff;
   font-weight: 700;
-}
-
-.reticencias {
-  padding: 0 6px;
-  color: var(--texto-2);
 }
 
 .carregarMais {
@@ -606,13 +602,6 @@
     border-bottom: 0;
   }
 
-  .tipos label {
-    justify-content: space-between;
-    flex-direction: row-reverse;
-    min-height: 48px;
-    font-size: 16px;
-  }
-
   .pilulas :global(.alternancia) {
     height: 48px;
     font-size: 15px;
@@ -654,6 +643,7 @@
   .titulos p {
     margin-top: -4px;
     font-size: 15px;
+    min-height: 6em; /* reserva 4 linhas, o máximo que o texto mais longo ocupa no celular */
   }
 
   .topoBarra {

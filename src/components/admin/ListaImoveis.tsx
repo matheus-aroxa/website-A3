@@ -175,7 +175,7 @@ export function ListaImoveis({
             <input
               className="campo"
               type="search"
-              placeholder="Nome, código ou bairro"
+              placeholder="Nome ou código do imóvel"
               value={busca}
               onChange={(e) => buscar(e.target.value)}
             />

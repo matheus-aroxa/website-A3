@@ -1,7 +1,7 @@
 # A3 Soluções Imobiliárias — site
 
 Site em **Next.js 16 (App Router)** implementado a partir dos protótipos em `propotype/`
-(desktop e mobile). Os dados ainda são **mocks**, isolados atrás de um adaptador de CRM.
+(desktop e mobile). O catálogo fica no **PostgreSQL**; não há integração com nenhum CRM.
 
 ## Rodando
 
@@ -27,7 +27,7 @@ Copie `.env.example` para `.env.local` e ajuste `NEXT_PUBLIC_SITE_URL` para o do
 | `/politica-de-privacidade` | Texto-base LGPD (**revisar com o jurídico**) | Estática |
 | `/sitemap.xml`, `/robots.txt`, `/manifest.webmanifest` | SEO técnico | Gerados |
 | `/api/imoveis` | JSON do "Carregar mais" (celular) | Dinâmica |
-| `/api/revalidar` | Webhook do CRM para atualizar o cache | Dinâmica |
+| `/api/revalidar` | Webhook (protegido por `REVALIDATE_SECRET`) para invalidar o cache | Dinâmica |
 | `/admin` | Painel administrativo (login, imóveis, vitrine da home) | Dinâmica, `noindex` |
 
 Filtros que não viram página (quartos, vagas, área, ordem, página…) vão na query string
@@ -41,7 +41,7 @@ Filtros que não viram página (quartos, vagas, área, ordem, página…) vão n
 - **404 real** para URLs inexistentes (`src/proxy.ts`), em vez de "soft 404".
 - **Dados estruturados (JSON-LD)**: `RealEstateAgent` + `WebSite` (todas as páginas),
   `BreadcrumbList`, `ItemList` (busca) e `RealEstateListing` com `Offer` (imóvel).
-- **Sitemap com imagens**, `lastModified` vindo do CRM, `robots.txt`, canonical em tudo.
+- **Sitemap com imagens**, `lastModified` vindo do banco, `robots.txt`, canonical em tudo.
 - Open Graph/Twitter com a foto do imóvel; imagem padrão gerada para as demais páginas.
 - HTML semântico, `lang="pt-BR"`, trilha de navegação, links internos para cidades/bairros
   e "buscas frequentes" no rodapé, nome/endereço/telefone (SEO local) no rodapé.
@@ -60,33 +60,23 @@ Filtros que não viram página (quartos, vagas, área, ordem, página…) vão n
   ~500 KB de JS por visita).
 - JavaScript no navegador só onde há interação: menu, filtros, galeria, plantas, formulários.
 
-## Integração com o CRM
+## Dados e cache
 
-Todo acesso a dados passa por `src/lib/crm/` (contrato em `src/lib/crm/tipos.ts`):
+O site **não se integra a nenhum CRM**: o catálogo vive só no banco de dados (PostgreSQL/Supabase). Os imóveis foram
+importados uma vez de um export do painel Supremo (veja `docs/migracao-banco.md`) e, daí em diante, são mantidos
+pelo painel `/admin`. Todas as leituras passam por `src/lib/imoveis/consultas.ts` (SQL), envolvidas com `"use cache"`
+em `src/lib/imoveis/repositorio.ts`.
 
-```ts
-interface AdaptadorCrm {
-  listarImoveis(): Promise<Imovel[]>          // catálogo publicado
-  enviarLead(lead: Lead): Promise<{ protocolo: string }>
-}
-```
+- Cada gravação feita pelo painel invalida o cache, e o site se atualiza na hora.
+- `POST /api/revalidar` com `Authorization: Bearer <REVALIDATE_SECRET>` invalida o cache à mão (por exemplo, depois
+  de mexer direto no banco).
+- Sem isso, o cache do catálogo expira sozinho a cada hora.
+- Fotos de fora do site precisam ter o host liberado em `src/lib/imoveis/hosts-fotos.ts` (usado por `next.config.ts`).
 
-Para conectar o CRM real:
-
-1. Crie `src/lib/crm/<nome-do-crm>/index.ts` implementando `AdaptadorCrm`, convertendo a
-   resposta da API para o tipo `Imovel` (`src/lib/imoveis/tipos.ts`).
-2. Selecione-o em `src/lib/crm/index.ts`.
-3. Se as fotos vierem de outro domínio, libere-o em `images.remotePatterns` no `next.config.ts`.
-4. Configure o CRM para chamar `POST /api/revalidar` com `Authorization: Bearer <REVALIDATE_SECRET>`
-   sempre que um imóvel mudar — o site se atualiza em segundo plano, sem rebuild.
-
-Sem webhook, o cache do catálogo expira sozinho a cada hora (`src/lib/imoveis/repositorio.ts`).
-Se o catálogo crescer muito (milhares de imóveis), troque a filtragem em memória de
-`buscarImoveis()` por uma consulta filtrada na API do CRM — a assinatura da função continua a mesma.
-
-Os formulários (contato, agendar visita, falar com corretor) usam Server Actions
-(`src/app/acoes.ts`): validam no servidor, têm campo-armadilha anti-robô e funcionam até
-sem JavaScript. Hoje o adaptador mock só registra o lead no log do servidor.
+Os formulários (contato, agendar visita, falar com corretor) usam Server Actions (`src/app/acoes.ts`): validam no
+servidor, têm campo-armadilha anti-robô e funcionam até sem JavaScript. Os formulários de contato e de falar com
+corretor abrem o WhatsApp da A3 com a mensagem pronta. **Ainda não há onde guardar os contatos:** hoje cada envio só é
+registrado no log do servidor (`src/lib/crm/`, um simulador que será trocado por uma tabela no banco).
 
 ## Painel administrativo (`/admin`)
 
@@ -104,7 +94,7 @@ administrador com o `INSERT` documentado no começo desse arquivo (veja também 
   sessão derruba o acesso na hora. O limite de tentativas (8 por IP, 20 por e-mail, a cada 15 min) fica na tabela
   `tentativas_login`. Detalhes em `docs/login-admin.md`.
 - **Alterações**: gravadas direto nas tabelas do catálogo (`db/schema.sql`), com registro em `auditoria`.
-  O imóvel guarda em `original` a versão do CRM, para o painel marcar o que foi editado e descartar edições.
+  O imóvel guarda em `original` a versão importada do catálogo, para o painel marcar o que foi editado e descartar edições.
   Cada gravação invalida o cache e o site se atualiza na hora.
 - **Fotos enviadas pelo painel**: ficam em `ADMIN_DADOS_DIR/fotos/` (JPG, PNG ou WebP, até 15 MB, formato
   conferido pelo conteúdo do arquivo) e são servidas pelo próprio site em `/fotos/<id>`. O envio usa a rota
@@ -138,7 +128,7 @@ src/
     formularios/          formulário da home e partes compartilhadas
     ui/, seo/             ícones, migalhas, mapa, JSON-LD
   lib/
-    crm/                  contrato + adaptador mock (trocar pelo CRM real)
+    crm/                  registro provisório dos contatos dos formulários (a trocar por uma tabela no banco)
     imoveis/              tipos, filtros ⇄ URL, busca, textos de SEO, cache
     site.ts               dados da imobiliária (telefone, endereço, CRECI…)
   proxy.ts                404 para URLs de busca inexistentes

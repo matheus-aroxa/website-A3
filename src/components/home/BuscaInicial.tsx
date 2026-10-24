@@ -173,7 +173,7 @@ export function BuscaInicial({ cidades }: { cidades: Cidade[] }) {
         </div>
 
         <label className={`${s.campo} ${s.extra}`}>
-          Empreendimento ou código
+          Nome ou código do imóvel
           <input
             className={s.codigo}
             type="search"

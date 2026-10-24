@@ -62,7 +62,7 @@ Rodar o de banco: `node --env-file=.env.local scripts/migrar-fotos-banco.mjs`.
 ## Banco
 
 - `fotos.src`: links usados pelo site.
-- `imoveis.original` (jsonb): cópia do imóvel como veio do CRM, usada em "descartar edições". Foi atualizada também, senão descartar edições traria de volta os links do Supremo.
+- `imoveis.original` (jsonb): cópia do imóvel como foi importado do catálogo, usada em "descartar edições". Foi atualizada também, senão descartar edições traria de volta os links do Supremo.
 - Backups criados pela migração, uma só vez: `fotos_backup_supremo` e `imoveis_original_backup`. Para desfazer: `scripts/migrar-fotos-banco.mjs --reverter`.
 
 ## Cuidados
@@ -71,4 +71,4 @@ Rodar o de banco: `node --env-file=.env.local scripts/migrar-fotos-banco.mjs`.
 - `dados/fotos-s3.json` é o mapa URL antiga → S3. Está em `dados/`, que é ignorado pelo git; guarde uma cópia se for apagar a pasta.
 - Páginas já em cache no Next só mostram as novas fotos depois de `POST /api/revalidar` (ver `src/app/api/revalidar/route.ts`) ou de um novo deploy.
 - Se o bucket for apagado ou ficar privado de novo, todas as fotos do site quebram.
-- A capa é independente da ordem: trocá-la no painel não reordena a galeria. Se a foto da capa for removida, vale a primeira. "Descartar edições" volta ao CRM, que não tem capa: vale a primeira foto do original.
+- A capa é independente da ordem: trocá-la no painel não reordena a galeria. Se a foto da capa for removida, vale a primeira. "Descartar edições" volta ao catálogo importado, que não tem capa: vale a primeira foto do original.

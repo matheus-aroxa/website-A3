@@ -54,7 +54,7 @@ const BASE = `
                                         ELSE i.id IN (SELECT id FROM crm_heroi) END) AS heroi,
            (i.status = 'ativo' AND CASE WHEN vc.personalizada THEN EXISTS (SELECT 1 FROM vitrine_destaques vd WHERE vd.imovel_id = i.id)
                                         ELSE i.id IN (SELECT id FROM crm_destaques) END) AS destaque,
-           ${SEM_ACENTO("i.nome || ' ' || i.codigo || ' ' || b.nome || ' ' || c.nome")} AS alvo
+           ${SEM_ACENTO("i.nome || ' ' || i.codigo")} AS alvo
       FROM imoveis i
       JOIN bairros b ON b.id = i.bairro_id
       JOIN cidades c ON c.id = b.cidade_id

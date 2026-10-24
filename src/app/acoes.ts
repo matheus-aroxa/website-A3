@@ -11,7 +11,17 @@ import {
   validarWhatsapp,
 } from '@/lib/formularios'
 import { obterImovelPorId } from '@/lib/imoveis/repositorio'
-import { linkWhatsApp, mensagemAtendimento } from '@/lib/site'
+import { linkWhatsApp, mensagemAtendimento, mensagemImovel, mensagemVisita } from '@/lib/site'
+
+const DIAS_DA_SEMANA = [
+  ['seg', 'segundas'],
+  ['ter', 'terças'],
+  ['qua', 'quartas'],
+  ['qui', 'quintas'],
+  ['sex', 'sextas'],
+  ['sáb', 'sábados'],
+  ['dom', 'domingos'],
+] as const
 
 type Erros = NonNullable<EstadoFormulario['erros']>
 
@@ -93,10 +103,18 @@ export async function solicitarVisita(_: EstadoFormulario, fd: FormData): Promis
   }
   if (!semErros(erros)) return { status: 'erro', erros, valores: valoresDe(fd) }
 
-  return registrar(
+  const resultado = await registrar(
     { origem: 'visita-imovel', ...dados, imovel, visita: { dias, horarios } },
-    'Um corretor da A3 vai confirmar a visita com você pelo WhatsApp.'
+    `Abrindo o WhatsApp da A3 para confirmar a visita ao ${imovel!.nome}.`
   )
+  // A conversa é aberta no WhatsApp da A3, já com a disponibilidade escolhida.
+  const agenda = `${DIAS_DA_SEMANA.filter(([d]) => dias.includes(d)).map(([, nome]) => nome).join(', ')}, às ${[...horarios]
+    .sort()
+    .map((h) => `${parseInt(h, 10)}h`)
+    .join(', ')}`
+  return resultado.status === 'sucesso'
+    ? { ...resultado, whatsapp: linkWhatsApp(mensagemVisita({ ...dados, agenda }, imovel!)) }
+    : resultado
 }
 
 export async function falarComCorretor(_: EstadoFormulario, fd: FormData): Promise<EstadoFormulario> {
@@ -106,21 +124,24 @@ export async function falarComCorretor(_: EstadoFormulario, fd: FormData): Promi
   const dados = {
     nome: texto(fd, 'nome', 100),
     whatsapp: texto(fd, 'whatsapp', 30),
-    email: texto(fd, 'email', 150),
     mensagem: texto(fd, 'mensagem', 2000),
-    canalPreferido: (['whatsapp', 'ligacao', 'email'] as const).find((c) => c === canal) ?? 'whatsapp',
+    canalPreferido: (['whatsapp', 'ligacao'] as const).find((c) => c === canal) ?? 'whatsapp',
   }
   const erros: Erros = {
     nome: validarNome(dados.nome),
     whatsapp: validarWhatsapp(dados.whatsapp),
-    email: validarEmail(dados.email, dados.canalPreferido === 'email'),
     consentimento: validarConsentimento(fd),
     imovel: imovel ? undefined : 'Imóvel não encontrado. Recarregue a página.',
   }
   if (!semErros(erros)) return { status: 'erro', erros, valores: valoresDe(fd) }
 
-  return registrar(
-    { origem: 'corretor-imovel', ...dados, email: dados.email || undefined, imovel },
-    `Um corretor da A3 vai responder sobre o ${imovel!.nome} pelo canal que você escolheu.`
+  const resultado = await registrar(
+    { origem: 'corretor-imovel', ...dados, imovel },
+    `Abrindo o WhatsApp da A3 com sua mensagem sobre o ${imovel!.nome}.`
   )
+  // A conversa é aberta no WhatsApp da A3, já com os dados preenchidos no formulário.
+  const rotuloCanal = dados.canalPreferido === 'ligacao' ? 'Ligação' : 'WhatsApp'
+  return resultado.status === 'sucesso'
+    ? { ...resultado, whatsapp: linkWhatsApp(mensagemImovel({ ...dados, canal: rotuloCanal }, imovel!)) }
+    : resultado
 }

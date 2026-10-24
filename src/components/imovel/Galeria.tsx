@@ -8,20 +8,20 @@ import s from './Galeria.module.css'
 import carregadorImagem from '@/lib/imoveis/carregador-imagem'
 
 /**
- * Desktop: mosaico (foto principal + 4 miniaturas; clicar numa miniatura a promove).
+ * Desktop: mosaico (foto principal + 4 miniaturas). Clicar em qualquer foto a abre ampliada.
  * Celular: carrossel com swipe, setas, pontos e contador.
  * As mesmas <img> servem aos dois layouts (via CSS), então nada é baixado em dobro.
  */
 export function Galeria({ fotos }: { fotos: Foto[] }) {
-  const [principal, setPrincipal] = useState(0)
   const [visivel, setVisivel] = useState(0)
   const [ampliada, setAmpliada] = useState<number | null>(null)
   const trilho = useRef<HTMLDivElement>(null)
   const dialogo = useRef<HTMLDialogElement>(null)
   const total = fotos.length
 
-  // Miniaturas do mosaico: as 4 primeiras fotos que não são a principal.
-  const miniaturas = fotos.map((_, i) => i).filter((i) => i !== principal).slice(0, 4)
+  // O mosaico mostra a primeira foto e as 4 seguintes; as demais só aparecem ampliadas ou no carrossel do celular.
+  const MINIATURAS = 4
+  const restantes = total - (MINIATURAS + 1)
 
   useEffect(() => {
     const d = dialogo.current
@@ -34,12 +34,6 @@ export function Galeria({ fotos }: { fotos: Foto[] }) {
     const el = trilho.current
     if (!el) return
     el.scrollTo({ left: el.clientWidth * ((i + total) % total), behavior: 'smooth' })
-  }
-
-  function aoClicar(i: number) {
-    const celular = window.matchMedia('(max-width: 767px)').matches
-    if (celular || i === principal) setAmpliada(i)
-    else setPrincipal(i)
   }
 
   function navegarAmpliada(delta: number) {
@@ -57,8 +51,8 @@ export function Galeria({ fotos }: { fotos: Foto[] }) {
         }}
       >
         {fotos.map((foto, i) => {
-          const ehPrincipal = i === principal
-          const posicao = ehPrincipal ? 0 : miniaturas.indexOf(i) + 1
+          const ehPrincipal = i === 0
+          const posicao = i <= MINIATURAS ? i : 0
           return (
             <button
               key={foto.src}
@@ -67,8 +61,8 @@ export function Galeria({ fotos }: { fotos: Foto[] }) {
               data-principal={ehPrincipal || undefined}
               data-fora-do-mosaico={posicao === 0 && !ehPrincipal ? true : undefined}
               style={{ ['--ordem' as string]: posicao }}
-              onClick={() => aoClicar(i)}
-              aria-label={ehPrincipal ? `Ampliar foto: ${foto.legenda ?? foto.alt}` : `Mostrar foto: ${foto.legenda ?? foto.alt}`}
+              onClick={() => setAmpliada(i)}
+              aria-label={`Ampliar foto: ${foto.legenda ?? foto.alt}`}
             >
               <Image
                 loader={carregadorImagem}
@@ -84,17 +78,17 @@ export function Galeria({ fotos }: { fotos: Foto[] }) {
               {foto.legenda && (
                 <span className={s.legenda}>{foto.legenda}</span>
               )}
+              {i === MINIATURAS && restantes > 0 && (
+                <span className={s.maisFotos}>
+                  <Icone nome="grade" tamanho={26} espessura={1.8} />
+                  <strong>+{restantes}</strong>
+                  <span>{restantes === 1 ? 'foto' : 'fotos'}</span>
+                </span>
+              )}
             </button>
           )
         })}
       </div>
-
-      {total > 1 && (
-        <button type="button" className={`btn ${s.verTodas}`} onClick={() => setAmpliada(principal)}>
-          <Icone nome="grade" tamanho={18} />
-          Ver todas as fotos ({total})
-        </button>
-      )}
 
       {total > 1 && (
         <div className={s.controlesMobile}>

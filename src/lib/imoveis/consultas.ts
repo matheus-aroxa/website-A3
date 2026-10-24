@@ -48,7 +48,7 @@ function onde(f: Filtros) {
   if (f.entrega === 'pronto') c.push("i.situacao = 'pronto'")
   else if (f.entrega) c.push(`(i.situacao = 'pronto' OR (i.entrega IS NOT NULL AND i.entrega <= ${p(FIM_DO_ANO[f.entrega])}))`)
   if (f.q.trim()) {
-    const alvo = SEM_ACENTO("i.nome || ' ' || b.nome || ' ' || c.nome || ' ' || i.codigo")
+    const alvo = SEM_ACENTO("i.nome || ' ' || i.codigo")
     for (const termo of normalizarBusca(f.q).split(/\s+/)) c.push(`strpos(${alvo}, ${p(termo)}) > 0`)
   }
   return { where: c.join(' AND '), params }

@@ -39,7 +39,7 @@ export function BarraFerramentas() {
       }}
     >
       <label className={s.campoBusca}>
-        <span className="sr-only">Buscar por bairro, empreendimento ou código</span>
+        <span className="sr-only">Buscar por nome ou código do imóvel</span>
         <Icone nome="busca" espessura={2} />
         <input
           className="campo"
@@ -48,7 +48,7 @@ export function BarraFerramentas() {
           enterKeyHint="search"
           value={texto}
           onChange={(e) => digitar(e.target.value)}
-          placeholder="Bairro, empreendimento ou código (ex.: VEM_37819)"
+          placeholder="Nome ou código (ex.: VEM_37819)"
         />
       </label>
       <div className={s.barraAcoes}>

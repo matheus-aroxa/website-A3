@@ -56,10 +56,16 @@ function FormVisita({ imovelId, aoRefazer }: { imovelId: string; aoRefazer: () =
   const [horarios, setHorarios] = useState<string[]>([])
   const todas = HORAS.every((h) => horarios.includes(h))
   const resumo = resumoAgenda(dias, horarios)
+  const whatsapp = estado.status === 'sucesso' ? estado.whatsapp : undefined
+
+  // Abre o WhatsApp da A3 com a mensagem pronta. Na mesma aba: não depende de permitir pop-ups.
+  useEffect(() => {
+    if (whatsapp) window.location.assign(whatsapp)
+  }, [whatsapp])
 
   if (estado.status === 'sucesso')
     return (
-      <Sucesso titulo="Pedido de visita enviado!" acao="Alterar dias e horários" aoRefazer={aoRefazer}>
+      <Sucesso titulo="Quase lá!" acao="Alterar dias e horários" aoRefazer={aoRefazer}>
         <p>{resumo}</p>
         <p>{estado.mensagem}</p>
       </Sucesso>
@@ -81,6 +87,9 @@ function FormVisita({ imovelId, aoRefazer }: { imovelId: string; aoRefazer: () =
       {horarios.map((h) => (
         <input key={h} type="hidden" name="horarios" value={h} />
       ))}
+
+      <Campo rotulo="Nome" name="nome" estado={estado} autoComplete="name" placeholder="Seu nome completo" required />
+      <CampoTelefone estado={estado} />
 
       <fieldset className={s.agendaGrupo}>
         <legend>Quais dias você pode?</legend>
@@ -111,8 +120,6 @@ function FormVisita({ imovelId, aoRefazer }: { imovelId: string; aoRefazer: () =
       </div>
       <Erro estado={estado} campo="agenda" />
 
-      <Campo rotulo="Nome" name="nome" estado={estado} autoComplete="name" placeholder="Seu nome completo" required />
-      <CampoTelefone estado={estado} />
       <Campo
         rotulo="Observações"
         opcional
@@ -124,7 +131,7 @@ function FormVisita({ imovelId, aoRefazer }: { imovelId: string; aoRefazer: () =
       <Consentimento estado={estado} />
       <Erro estado={estado} campo="imovel" />
       <MensagemErroGeral estado={estado} />
-      <BotaoEnviar>Solicitar visita</BotaoEnviar>
+      <BotaoEnviar>Solicitar visita pelo WhatsApp</BotaoEnviar>
     </form>
   )
 }
@@ -142,10 +149,16 @@ function FormCorretor({
 }) {
   const [estado, acao] = useActionState(falarComCorretor, ESTADO_INICIAL)
   const canal = estado.valores?.canal ?? 'whatsapp'
+  const whatsapp = estado.status === 'sucesso' ? estado.whatsapp : undefined
+
+  // Abre o WhatsApp da A3 com a mensagem pronta. Na mesma aba: não depende de permitir pop-ups.
+  useEffect(() => {
+    if (whatsapp) window.location.assign(whatsapp)
+  }, [whatsapp])
 
   if (estado.status === 'sucesso')
     return (
-      <Sucesso titulo="Mensagem enviada!" acao="Enviar outra mensagem" aoRefazer={aoRefazer}>
+      <Sucesso titulo="Quase lá!" acao="Enviar outra mensagem" aoRefazer={aoRefazer}>
         <p>{estado.mensagem}</p>
       </Sucesso>
     )
@@ -156,7 +169,6 @@ function FormCorretor({
       <input type="hidden" name="imovel" value={imovelId} />
       <Campo rotulo="Nome" name="nome" estado={estado} autoComplete="name" placeholder="Seu nome completo" required />
       <CampoTelefone estado={estado} />
-      <Campo rotulo="E-mail" name="email" type="email" estado={estado} autoComplete="email" placeholder="voce@email.com" />
       <label className="rotulo">
         Mensagem
         <textarea
@@ -175,7 +187,6 @@ function FormCorretor({
             [
               ['whatsapp', 'WhatsApp'],
               ['ligacao', 'Ligação'],
-              ['email', 'E-mail'],
             ] as const
           ).map(([valor, rotulo]) => (
             <label key={valor}>
@@ -188,7 +199,7 @@ function FormCorretor({
       <Consentimento estado={estado} />
       <Erro estado={estado} campo="imovel" />
       <MensagemErroGeral estado={estado} />
-      <BotaoEnviar>Enviar mensagem</BotaoEnviar>
+      <BotaoEnviar>Enviar pelo WhatsApp</BotaoEnviar>
     </form>
   )
 }

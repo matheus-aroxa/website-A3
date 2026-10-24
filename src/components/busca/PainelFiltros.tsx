@@ -222,20 +222,27 @@ export function PainelFiltros() {
           </label>
         </fieldset>
 
-        <fieldset className={`${s.grupo} ${s.tipos}`}>
+        <fieldset className={s.grupo}>
           <legend>Tipo de imóvel</legend>
-          {TIPOS.map((t) => (
-            <label key={t}>
-              <input type="checkbox" className="caixa" checked={f.tipos.includes(t)} onChange={() => aplicar({ tipos: alternar(f.tipos, t) })} />
-              {rotuloTipo[t]}
-            </label>
-          ))}
+          <div className={s.chipsColuna}>
+            {TIPOS.map((t) => (
+              <button
+                key={t}
+                type="button"
+                className="alternancia alternancia-pilula"
+                aria-pressed={f.tipos.includes(t)}
+                onClick={() => aplicar({ tipos: alternar(f.tipos, t) })}
+              >
+                {rotuloTipo[t]}
+              </button>
+            ))}
+          </div>
         </fieldset>
 
         {!aluguel && (
           <fieldset className={s.grupo}>
             <legend>Situação</legend>
-            <div className={s.chipsSituacao}>
+            <div className={s.chipsColuna}>
               {SITUACOES.map((sit) => (
                 <button
                   key={sit}

@@ -62,12 +62,12 @@ export function Rodape({ comBarraInferior = false }: { comBarraInferior?: boolea
           <span>
             © {anoAtual} {site.nome} · {site.creci}
           </span>
-          {/* scroll={false}: a própria página anima a rolagem até o topo (RolarAoTopo). */}
+          {/* scroll={false}: quem anima a rolagem até o topo é o TopoAoMudarDePagina. */}
           <div className={s.linksBase}>
             <Link href="/politica-de-privacidade" scroll={false} className={s.link}>
               Política de privacidade
             </Link>
-            <Link href="/admin" className={s.link}>
+            <Link href="/admin" scroll={false} className={s.link}>
               Área administrativa
             </Link>
           </div>
