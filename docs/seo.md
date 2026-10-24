@@ -79,7 +79,7 @@ com `Offer` nos anúncios (sem `Offer` quando o preço é absurdo). Nada de aval
 ## Depois do deploy (o que não está no código)
 
 1. **Domínio e `NEXT_PUBLIC_SITE_URL`.** O endereço oficial de cada página sai dessa variável. O domínio do código
-   (`www.a3solucoesimobiliarias.com.br`) não existia no DNS em 24/10/2026. Registre o domínio, aponte para a Vercel, e
+   (`a3imobiliaria.com.br`) não existia no DNS em 24/10/2026. Registre o domínio, aponte para a Vercel, e
    confira a variável (docs/deploy-vercel.md). Redirecione o domínio sem `www` para o com `www` (ou o contrário).
 2. **Google Search Console:** adicionar o domínio, colocar o código em `GOOGLE_SITE_VERIFICATION` (ou verificar por DNS) e enviar
    `/sitemap.xml`. Fazer o mesmo no Bing Webmaster Tools.

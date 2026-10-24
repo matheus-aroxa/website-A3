@@ -4,7 +4,7 @@
 
 1. **Domínio.** Registre o domínio (para `.com.br`, no registro.br) e adicione na Vercel em Settings > Domains: o `www` e o
    endereço sem `www`, um redirecionando para o outro. Configure no DNS os registros que a Vercel mostrar. Em 24/10/2026 o
-   endereço padrão do código, `www.a3solucoesimobiliarias.com.br`, **não existia no DNS** (NXDOMAIN): se for esse o nome
+   endereço padrão do código, `a3imobiliaria.com.br`, **não existia no DNS** (NXDOMAIN): se for esse o nome
    escolhido, falta registrá-lo e apontá-lo.
 2. **`NEXT_PUBLIC_SITE_URL`** com o endereço final (veja abaixo). Faça este passo depois do 1.
 3. **Banco:** rode `db/seguranca-rls.sql` no SQL Editor do Supabase (fecha o acesso pela API pública do Supabase; o site não é

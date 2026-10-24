@@ -3,7 +3,7 @@
 export const site = {
   nome: 'A3 Soluções Imobiliárias',
   nomeCurto: 'A3 Imobiliária',
-  url: (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.a3solucoesimobiliarias.com.br').replace(/\/$/, ''),
+  url: (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://a3imobiliaria.com.br').replace(/\/$/, ''),
   /** Título da home: a palavra-chave local primeiro, que é o que a pessoa digita ("imobiliária em Paulista"). */
   titulo: 'Imobiliária em Paulista – PE | A3 Soluções Imobiliárias',
   descricao:
