@@ -26,7 +26,6 @@ ser o endereço real do site: ele alimenta canonical, Open Graph, sitemap e JSON
 | `/` | Home | Estática (regenera a cada 1h ou via webhook) |
 | `/imoveis/[categoria]/[tipo]/[cidade]/[bairro]` | Busca. Todos os segmentos são opcionais: `/imoveis`, `/imoveis/venda`, `/imoveis/lancamentos/paulista/jaguaribe`, `/imoveis/apartamentos/recife`… | Shell estático + resultados por streaming (PPR) |
 | `/imovel/[slug]` | Detalhe do imóvel/empreendimento | Estática |
-| `/minha-casa-minha-vida`, `/minha-casa-minha-vida/[cidade]` | Imóveis do programa, no geral e por cidade | Estática |
 | `/politica-de-privacidade` | Texto-base LGPD (**revisar com o jurídico**) | Estática |
 | `/sitemap.xml`, `/robots.txt`, `/manifest.webmanifest` | SEO técnico | Gerados |
 | `/api/imoveis` | JSON do "Carregar mais" (celular) | Dinâmica |
@@ -46,7 +45,6 @@ Detalhes, como conferir e o que depende de fora do código: **docs/seo.md**.
 - **404 real** para URLs inexistentes (`src/proxy.ts`), em vez de "soft 404".
 - **Dados estruturados (JSON-LD)**: `RealEstateAgent` + `WebSite` (todas as páginas), `BreadcrumbList`, `CollectionPage`,
   `ItemList` e `RealEstateListing` com `Offer`.
-- Texto e links internos em cada busca, seção de cidades na home, página do Minha Casa Minha Vida por cidade.
 - Open Graph/Twitter com a foto do imóvel; imagem padrão gerada para as demais páginas.
 - HTML semântico, `lang="pt-BR"`, trilha de navegação, texto alternativo descritivo nas fotos, nome/endereço/telefone (SEO
   local) no rodapé.
@@ -140,13 +138,12 @@ src/
   app/                    rotas, metadados, sitemap, robots, Server Actions
   components/
     admin/                painel: lista, formulário do imóvel, vitrine
-    busca/                filtros, barra de busca, resultados, paginação, texto e links de cada busca
-    home/                 busca do hero e seção de cidades
+    busca/                filtros, barra de busca, resultados, paginação
+    home/                 busca do hero
     imovel/               galeria, plantas, lazer, abas de contato
     imoveis/CardImovel    card usado em home, busca e semelhantes
     layout/               cabeçalho, menu mobile, rodapé, botão do WhatsApp
     formularios/          formulário da home e partes compartilhadas
-    mcmv/                 páginas do Minha Casa Minha Vida
     ui/, seo/             ícones, migalhas, mapa, JSON-LD
   lib/
     admin/                login, sessão, fotos (S3)

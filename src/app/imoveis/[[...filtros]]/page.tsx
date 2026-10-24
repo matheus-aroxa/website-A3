@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 import { Paginacao } from '@/components/busca/Paginacao'
 import { CarregarMais, ResumoResultados, SemResultados } from '@/components/busca/Resultados'
-import { TextoSeoBusca } from '@/components/busca/TextoSeoBusca'
 import { CardImovel } from '@/components/imoveis/CardImovel'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { POR_PAGINA, caminhoDaRota, interpretarSegmentos, lerFiltros, montarUrl, montarUrlApi } from '@/lib/imoveis/filtros'
@@ -46,7 +45,7 @@ export default function PaginaBusca(props: Props) {
 }
 
 async function Resultados({ params, searchParams }: Props) {
-  const [{ filtros: segmentos }, query, cidades, paginas] = await Promise.all([params, searchParams, listarCidades(), listarPaginasDeBusca()])
+  const [{ filtros: segmentos }, query, cidades] = await Promise.all([params, searchParams, listarCidades()])
   const rota = interpretarSegmentos(segmentos, cidades)
   if (!rota) notFound()
   const { filtros, pagina } = lerFiltros(rota, query)
@@ -73,8 +72,6 @@ async function Resultados({ params, searchParams }: Props) {
             total={total}
           />
           <Paginacao filtros={filtros} pagina={atual} totalPaginas={totalPaginas} />
-          {/* Junto dos resultados (e não no shell): fora da unidade de streaming, o texto seria empurrado para baixo quando eles chegam. */}
-          <TextoSeoBusca rota={rota} cidades={cidades} paginas={paginas} />
           <JsonLd dados={schemaListaImoveis(itens, (atual - 1) * POR_PAGINA + 1)} />
         </>
       )}

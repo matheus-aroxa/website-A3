@@ -28,11 +28,8 @@ import {
   rotuloSituacao,
   rotuloTipo,
 } from '@/lib/imoveis/formato'
-import { paginaPrincipal } from '@/lib/imoveis/paginas'
 import {
-  listarCidades,
   listarIndice,
-  listarPaginasDeBusca,
   listarSemelhantes,
   obterImovelPorSlug,
 } from '@/lib/imoveis/repositorio'
@@ -40,7 +37,6 @@ import {
   categoriaDoImovel,
   descricaoDoImovel,
   migalhasDoImovel,
-  textosDaBusca,
   tituloDoImovel,
   urlImovel,
 } from '@/lib/imoveis/rotas'
@@ -91,7 +87,7 @@ export default async function PaginaImovel({ params }: PageProps<'/imovel/[slug]
   const { slug } = await params
   const im = await obterImovelPorSlug(slug)
   if (!im) notFound()
-  const [semelhantes, paginas, cidades] = await Promise.all([listarSemelhantes(im), listarPaginasDeBusca(), listarCidades()])
+  const semelhantes = await listarSemelhantes(im)
 
   const aluguel = im.finalidade === 'aluguel'
   const mensagemWhats = `Olá! Tenho interesse no ${im.nome} (cód. ${im.codigo}).`
@@ -121,14 +117,6 @@ export default async function PaginaImovel({ params }: PageProps<'/imovel/[slug]
   const enderecoTexto = im.local.logradouro ?? `${im.local.bairro}, ${im.local.cidade} – ${im.local.uf}`
   const consultaMapa = `${im.nome}, ${im.local.logradouro ? `${im.local.logradouro}, ` : ''}${im.local.bairro}, ${im.local.cidade} - ${im.local.uf}`
   const categoria = categoriaDoImovel(im)
-  // Links para as buscas do bairro e da cidade: sempre a página principal de cada conjunto de imóveis.
-  const buscasDoLugar = [
-    paginaPrincipal(paginas, { ...ROTA_VAZIA, categoria, cidade: im.local.cidadeSlug, bairro: im.local.bairroSlug }),
-    paginaPrincipal(paginas, { ...ROTA_VAZIA, categoria, cidade: im.local.cidadeSlug }),
-  ]
-    .filter((p, i, todas) => p && todas.findIndex((o) => o?.caminho === p.caminho) === i)
-    .map((p) => ({ href: p!.caminho, rotulo: textosDaBusca(p!.rota, cidades).h1 }))
-
   return (
     <>
       <Cabecalho ativo="imoveis" variante="detalhe" />
@@ -357,22 +345,14 @@ export default async function PaginaImovel({ params }: PageProps<'/imovel/[slug]
                 <h2 id="t-similares">
                   {aluguel ? 'Outros imóveis para alugar' : 'Empreendimentos parecidos'} em {im.local.cidade}
                 </h2>
-                <div className={s.semelhantesLinks}>
-                  {(buscasDoLugar.length
-                    ? buscasDoLugar
-                    : [
-                        {
-                          href: caminhoDaRota({ ...ROTA_VAZIA, categoria, cidade: im.local.cidadeSlug }),
-                          rotulo: `Ver mais ${categoria === 'lancamentos' ? 'lançamentos' : 'imóveis'}`,
-                        },
-                      ]
-                  ).map((l) => (
-                    <Link key={l.href} href={l.href} className="link-texto" style={{ fontSize: 16, gap: 8 }}>
-                      {l.rotulo}
-                      <Icone nome="seta" tamanho={18} espessura={2} />
-                    </Link>
-                  ))}
-                </div>
+                <Link
+                  href={caminhoDaRota({ ...ROTA_VAZIA, categoria, cidade: im.local.cidadeSlug })}
+                  className="link-texto"
+                  style={{ fontSize: 16, gap: 8 }}
+                >
+                  Ver mais {categoria === 'lancamentos' ? 'lançamentos' : 'imóveis'}
+                  <Icone nome="seta" tamanho={18} espessura={2} />
+                </Link>
               </div>
               <div className={`${s.gradeSemelhantes} carrossel-mobile`}>
                 {semelhantes.map((sim) => (

@@ -9,7 +9,7 @@ import {
 } from './formato'
 import { caminhoDaRota, ROTA_VAZIA, type CategoriaRota, type FiltrosRota } from './filtros'
 import type { ResumoImoveis } from './paginas'
-import type { Cidade, Faixa, Imovel, TipoImovel } from './tipos'
+import type { Cidade, Imovel, TipoImovel } from './tipos'
 import { site } from '@/lib/site'
 
 export interface Migalha {
@@ -102,51 +102,6 @@ export function textosDaBusca(rota: FiltrosRota, cidades: Cidade[], resumo?: Res
   }
 
   return { h1, subtitulo, tituloSeo, descricao }
-}
-
-const faixaTexto = (f: Faixa, unidade: string) => (f.min === f.max ? `${f.min} ${unidade}` : `${f.min} a ${f.max} ${unidade}`)
-
-/** Parágrafos do texto descritivo no fim da busca: só fatos do próprio catálogo, sem promessa que o dado não sustente. */
-export function paragrafosDaBusca(rota: FiltrosRota, cidades: Cidade[], resumo: ResumoImoveis): string[] {
-  const { cidade, bairro } = nomesLocal(rota, cidades)
-  const local = bairro ? `${bairro}, ${cidade}` : (cidade ?? REGIAO_PADRAO)
-  const n = resumo.total
-  const preco =
-    resumo.menorPreco && resumo.finalidade && resumo.finalidade !== 'ambas' ? formatarPreco(resumo.menorPreco, resumo.finalidade) : null
-
-  const detalhes: string[] = []
-  if (resumo.quartos) detalhes.push(faixaTexto(resumo.quartos, resumo.quartos.max === 1 ? 'quarto' : 'quartos'))
-  if (resumo.area) {
-    // Só o mínimo: um único imóvel grande (casa de 400 m² entre apartamentos) distorceria a faixa.
-    const { min, max } = resumo.area
-    detalhes.push(max > min ? `áreas a partir de ${Math.floor(min)} m²` : `área de ${Math.floor(min)} m²`)
-  }
-
-  const situacoes: string[] = []
-  if (resumo.lancamentos) situacoes.push(plural(resumo.lancamentos, 'lançamento', 'lançamentos'))
-  if (resumo.emConstrucao) situacoes.push(`${resumo.emConstrucao} em construção`)
-  if (resumo.prontos) situacoes.push(plural(resumo.prontos, 'pronto para morar', 'prontos para morar'))
-
-  const frases = [`A A3 Soluções Imobiliárias reúne ${quantosImoveis(rota, n)} em ${local}.`]
-  if (preco) frases.push(`Os valores começam em ${preco}${detalhes.length ? `, com ${detalhes.join(' e ')}` : ''}.`)
-  else if (detalhes.length) frases.push(`Os imóveis têm ${detalhes.join(' e ')}.`)
-  if (n > 1 && resumo.finalidade !== 'aluguel' && situacoes.length > 1) {
-    frases.push(`Entre eles, ${situacoes.slice(0, -1).join(', ')} e ${situacoes.at(-1)}.`)
-  }
-  if (resumo.mcmv > 0 && n > 1) {
-    frases.push(
-      resumo.mcmv === n
-        ? 'Todos participam do Minha Casa Minha Vida.'
-        : resumo.mcmv === 1
-          ? 'Um deles participa do Minha Casa Minha Vida.'
-          : `${resumo.mcmv} deles participam do Minha Casa Minha Vida.`,
-    )
-  }
-
-  return [
-    frases.join(' '),
-    'Cada anúncio traz fotos, plantas, localização e ficha técnica. Para visitar ou tirar dúvidas sobre financiamento e documentação, fale com um corretor da A3 pelo WhatsApp ou pelo formulário de cada imóvel.',
-  ]
 }
 
 export function migalhasDaBusca(rota: FiltrosRota, cidades: Cidade[]): Migalha[] {

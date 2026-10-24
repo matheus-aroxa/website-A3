@@ -19,7 +19,7 @@ conteúdo duplicado e divide a força da página. Agora:
 - Conjunto com **um imóvel só** fica `noindex, follow`: não tem nada além do que o próprio anúncio já mostra. Busca sem
   resultado também (já era assim). O limite é `MIN_IMOVEIS_INDEXAVEL`.
 - O bairro provisório "A confirmar" nunca é a página principal nem recebe link.
-- O **sitemap** lista só as principais: 459 URLs (eram 955) = 337 anúncios + 112 buscas + 8 páginas do programa + home + política.
+- O **sitemap** lista só as principais: 451 URLs (eram 955) = 337 anúncios + 112 buscas + home + política.
 - A principal muda sozinha quando o catálogo muda (o painel invalida o cache).
 
 ### Títulos e descrições (`src/lib/imoveis/rotas.ts`)
@@ -35,21 +35,12 @@ conteúdo duplicado e divide a força da página. Agora:
 - `og:site_name`, `og:locale` e `og:type` saem em todas as páginas (o Next não mescla `openGraph` entre layout e página,
   então `openGraphBase` em `src/lib/site.ts` é repetido em cada uma).
 
-### Texto e links internos
+### Sem mudança visual
 
-- **Busca:** um cartão no fim dos resultados com o resumo do conjunto (quantos imóveis, a partir de quanto, quartos, situação das
-  obras, quantos do Minha Casa Minha Vida) e links para bairros, outras cidades e outras buscas, sempre para a página principal
-  de cada conjunto. Só dados do catálogo; nenhuma frase solta sobre o mercado. Fica junto dos resultados (e não no esqueleto da
-  página): fora dessa unidade o texto era empurrado para baixo quando os resultados chegavam (CLS 0,42).
-- **Home:** seção "Imóveis por cidade" com as cidades, os maiores bairros e a contagem; o rodapé de todas as páginas leva às três
-  maiores cidades e aos três maiores bairros (antes eram cinco links fixos).
-- **Anúncio:** links para a busca do bairro e da cidade.
-
-### Minha Casa Minha Vida (`/minha-casa-minha-vida` e `/minha-casa-minha-vida/[cidade]`)
-
-79 dos 337 imóveis são do programa (21 dos 47 de Paulista), e "Minha Casa Minha Vida + cidade" é uma busca de grande volume. Há
-uma página geral e uma por cidade com 2 ou mais imóveis do programa, com os imóveis, uma explicação genérica de como o programa
-funciona (sem faixa de renda nem valor, que mudam) e o convite para conferir o enquadramento no WhatsApp.
+O SEO feito no código não altera o conteúdo nem o design das páginas: só canonical, `noindex`, sitemap, títulos, descrições, dados
+estruturados, Open Graph e texto alternativo das fotos. Seções de texto e links por cidade, e páginas do Minha Casa Minha Vida
+(79 dos 337 imóveis são do programa), foram testadas e **retiradas a pedido do dono**; estão no histórico do git (commit `c0ef604`)
+se um dia quiser voltar a elas.
 
 ### Dados estruturados (`src/lib/seo.ts`)
 
@@ -79,7 +70,7 @@ com `Offer` nos anúncios (sem `Offer` quando o preço é absurdo). Nada de aval
 ## Depois do deploy (o que não está no código)
 
 1. **Domínio e `NEXT_PUBLIC_SITE_URL`.** O endereço oficial de cada página sai dessa variável. O domínio do código
-   (`a3imobiliaria.com.br`) não existia no DNS em 24/10/2026. Registre o domínio, aponte para a Vercel, e
+   (`www.a3solucoesimobiliarias.com.br`) não existia no DNS em 24/10/2026. Registre o domínio, aponte para a Vercel, e
    confira a variável (docs/deploy-vercel.md). Redirecione o domínio sem `www` para o com `www` (ou o contrário).
 2. **Google Search Console:** adicionar o domínio, colocar o código em `GOOGLE_SITE_VERIFICATION` (ou verificar por DNS) e enviar
    `/sitemap.xml`. Fazer o mesmo no Bing Webmaster Tools.

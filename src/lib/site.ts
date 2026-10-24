@@ -3,7 +3,7 @@
 export const site = {
   nome: 'A3 Soluções Imobiliárias',
   nomeCurto: 'A3 Imobiliária',
-  url: (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://a3imobiliaria.com.br').replace(/\/$/, ''),
+  url: (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.a3solucoesimobiliarias.com.br').replace(/\/$/, ''),
   /** Título da home: a palavra-chave local primeiro, que é o que a pessoa digita ("imobiliária em Paulista"). */
   titulo: 'Imobiliária em Paulista – PE | A3 Soluções Imobiliárias',
   descricao:
@@ -53,7 +53,6 @@ export const mensagensWhatsApp = {
   padrao: 'Olá! Vim pelo site da A3 Soluções Imobiliárias e gostaria de falar com um corretor.',
   financiamento: 'Olá! Vim pelo site da A3 e gostaria de simular um financiamento imobiliário.',
   anunciar: 'Olá! Vim pelo site da A3 e quero anunciar meu imóvel para venda ou aluguel.',
-  mcmv: 'Olá! Vi os imóveis do Minha Casa Minha Vida no site da A3 e gostaria de saber se me enquadro.',
 }
 
 /** Mensagem do formulário "Quero ser atendido", com o que a pessoa preencheu (campos vazios ficam de fora). */
