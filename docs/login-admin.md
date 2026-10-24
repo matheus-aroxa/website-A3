@@ -1,6 +1,6 @@
 # Login do painel administrativo
 
-Administradores, sessões e limite de tentativas ficam no banco (`db/administradores.sql`). Não há mais
+Administradores, sessões e limite de tentativas ficam no banco (tabelas em `db/schema.sql`). Não há mais
 `ADMIN_USUARIOS` nem `ADMIN_SESSAO_SEGREDO`, nem administrador padrão em desenvolvimento.
 
 ## Tabelas

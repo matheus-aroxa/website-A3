@@ -1,4 +1,4 @@
-// Autenticação do painel, no banco (db/administradores.sql).
+// Autenticação do painel, no banco (tabelas em db/schema.sql; como cadastrar administradores: docs/login-admin.md).
 //
 // - Administradores: tabela `administradores`, com a senha em bcrypt (pgcrypto). A conferência roda no próprio SQL.
 // - Sessão: o cookie leva um token aleatório; a tabela `sessoes_admin` guarda só o SHA-256 dele. Dá para

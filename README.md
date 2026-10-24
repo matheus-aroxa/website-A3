@@ -1,7 +1,8 @@
 # A3 Soluções Imobiliárias — site
 
-Site em **Next.js 16 (App Router)** implementado a partir dos protótipos em `propotype/`
-(desktop e mobile). O catálogo fica no **PostgreSQL**; não há integração com nenhum CRM.
+Site em **Next.js 16 (App Router)**. O catálogo fica no **PostgreSQL** (Supabase) e é mantido pelo painel `/admin`; as fotos
+ficam no **S3**. Não há integração com nenhum sistema externo: os contatos feitos pelos formulários viram uma mensagem pronta
+no WhatsApp da A3.
 
 ## Rodando
 
@@ -12,10 +13,11 @@ npm install
 npm run dev        # http://localhost:3000
 npm run build && npm start   # produção
 npm run lint
+npm run backup     # cópia do banco em ~/backups/website-A3 (docs/backup-banco.md)
 ```
 
-Copie `.env.example` para `.env.local` e ajuste `NEXT_PUBLIC_SITE_URL` para o domínio real
-**antes de publicar** — ele alimenta canonical, Open Graph, sitemap e JSON-LD.
+Copie `.env.example` para `.env.local` e preencha (principalmente `DATABASE_URL`). Em produção, `NEXT_PUBLIC_SITE_URL` precisa
+ser o endereço real do site: ele alimenta canonical, Open Graph, sitemap e JSON-LD (docs/deploy-vercel.md).
 
 ## Páginas
 
@@ -24,6 +26,7 @@ Copie `.env.example` para `.env.local` e ajuste `NEXT_PUBLIC_SITE_URL` para o do
 | `/` | Home | Estática (regenera a cada 1h ou via webhook) |
 | `/imoveis/[categoria]/[tipo]/[cidade]/[bairro]` | Busca. Todos os segmentos são opcionais: `/imoveis`, `/imoveis/venda`, `/imoveis/lancamentos/paulista/jaguaribe`, `/imoveis/apartamentos/recife`… | Shell estático + resultados por streaming (PPR) |
 | `/imovel/[slug]` | Detalhe do imóvel/empreendimento | Estática |
+| `/minha-casa-minha-vida`, `/minha-casa-minha-vida/[cidade]` | Imóveis do programa, no geral e por cidade | Estática |
 | `/politica-de-privacidade` | Texto-base LGPD (**revisar com o jurídico**) | Estática |
 | `/sitemap.xml`, `/robots.txt`, `/manifest.webmanifest` | SEO técnico | Gerados |
 | `/api/imoveis` | JSON do "Carregar mais" (celular) | Dinâmica |
@@ -35,37 +38,36 @@ Filtros que não viram página (quartos, vagas, área, ordem, página…) vão n
 
 ## SEO — o que já está feito
 
-- **Uma página indexável por intenção de busca**: categoria × tipo × cidade × bairro
-  (ex.: "apartamentos à venda no Janga"), com `<title>`, description e H1 próprios.
-  Só combinações com imóveis entram no sitemap; buscas vazias recebem `noindex`.
+Detalhes, como conferir e o que depende de fora do código: **docs/seo.md**.
+
+- **Uma página principal por conjunto de imóveis**: as URLs de busca que mostram exatamente os mesmos imóveis apontam o
+  `canonical` para a mais específica, e as que têm um imóvel só ficam fora do Google. O sitemap lista só as principais.
+- **Títulos e descrições** com palavra-chave + local + UF (a UF vem da cidade) e números do próprio catálogo.
 - **404 real** para URLs inexistentes (`src/proxy.ts`), em vez de "soft 404".
-- **Dados estruturados (JSON-LD)**: `RealEstateAgent` + `WebSite` (todas as páginas),
-  `BreadcrumbList`, `ItemList` (busca) e `RealEstateListing` com `Offer` (imóvel).
-- **Sitemap com imagens**, `lastModified` vindo do banco, `robots.txt`, canonical em tudo.
+- **Dados estruturados (JSON-LD)**: `RealEstateAgent` + `WebSite` (todas as páginas), `BreadcrumbList`, `CollectionPage`,
+  `ItemList` e `RealEstateListing` com `Offer`.
+- Texto e links internos em cada busca, seção de cidades na home, página do Minha Casa Minha Vida por cidade.
 - Open Graph/Twitter com a foto do imóvel; imagem padrão gerada para as demais páginas.
-- HTML semântico, `lang="pt-BR"`, trilha de navegação, links internos para cidades/bairros
-  e "buscas frequentes" no rodapé, nome/endereço/telefone (SEO local) no rodapé.
-- Imagens com nomes descritivos e `alt`.
+- HTML semântico, `lang="pt-BR"`, trilha de navegação, texto alternativo descritivo nas fotos, nome/endereço/telefone (SEO
+  local) no rodapé.
 
 ## Performance
 
 - Home e páginas de imóvel são **100% estáticas** (`ensureStatic = 'navigation'`).
-- Busca: shell estático entregue na hora + resultados por streaming; cada troca de filtro
-  atualiza a URL e o servidor responde só o trecho que mudou (UI otimista, sem recarregar).
-- `next/image` com AVIF/WebP e `sizes` por layout; a foto principal carrega com prioridade
-  alta, o resto sob demanda. Desktop e celular usam **o mesmo HTML** (só CSS muda), então
-  nada é baixado em dobro.
+- Busca: shell estático entregue na hora + resultados por streaming; cada troca de filtro atualiza a URL e o servidor responde
+  só o trecho que mudou (UI otimista, sem recarregar).
+- `next/image` com `sizes` por layout e o tamanho certo de foto (400/800/1600) escolhido por um loader próprio; a foto
+  principal carrega com prioridade alta e o endereço das fotos é pré-conectado.
+- Desktop e celular usam **o mesmo HTML** (só CSS muda), então nada é baixado em dobro.
 - Fonte Archivo auto-hospedada (`next/font`), só o subconjunto latino, com o eixo de largura.
-- Mapas são prévias estáticas com link para o Google Maps (o iframe do Google custaria
-  ~500 KB de JS por visita).
+- Mapas são prévias estáticas com link para o Google Maps (o iframe do Google custaria ~500 KB de JS por visita).
 - JavaScript no navegador só onde há interação: menu, filtros, galeria, plantas, formulários.
 
 ## Dados e cache
 
-O site **não se integra a nenhum CRM**: o catálogo vive só no banco de dados (PostgreSQL/Supabase). Os imóveis foram
-importados uma vez de um export do painel Supremo (veja `docs/migracao-banco.md`) e, daí em diante, são mantidos
-pelo painel `/admin`. Todas as leituras passam por `src/lib/imoveis/consultas.ts` (SQL), envolvidas com `"use cache"`
-em `src/lib/imoveis/repositorio.ts`.
+O catálogo vive só no banco de dados (PostgreSQL/Supabase). Os imóveis foram importados uma vez de um export do sistema
+anterior (Supremo) e, daí em diante, são mantidos pelo painel `/admin`. Todas as leituras passam por
+`src/lib/imoveis/consultas.ts` (SQL), envolvidas com `"use cache"` em `src/lib/imoveis/repositorio.ts`.
 
 - Cada gravação feita pelo painel invalida o cache, e o site se atualiza na hora.
 - `POST /api/revalidar` com `Authorization: Bearer <REVALIDATE_SECRET>` invalida o cache à mão (por exemplo, depois
@@ -73,18 +75,21 @@ em `src/lib/imoveis/repositorio.ts`.
 - Sem isso, o cache do catálogo expira sozinho a cada hora.
 - Fotos de fora do site precisam ter o host liberado em `src/lib/imoveis/hosts-fotos.ts` (usado por `next.config.ts`).
 
+## Formulários e contatos
+
 Os formulários (contato, agendar visita, falar com corretor) usam Server Actions (`src/app/acoes.ts`): validam no
-servidor, têm campo-armadilha anti-robô e funcionam até sem JavaScript. Os formulários de contato e de falar com
-corretor abrem o WhatsApp da A3 com a mensagem pronta. **Ainda não há onde guardar os contatos:** hoje cada envio só é
-registrado no log do servidor (`src/lib/crm/`, um simulador que será trocado por uma tabela no banco).
+servidor, têm campo-armadilha anti-robô e funcionam até sem JavaScript. **Nada é gravado nem registrado em log:** a ação
+devolve o link do WhatsApp da A3 com a mensagem pronta (nome, WhatsApp, interesse, dias e horários) e o navegador abre a
+conversa; a tela de sucesso traz um botão de reserva. O contato só chega à A3 quando a pessoa envia a mensagem no WhatsApp.
+A política de privacidade descreve isso; se um dia os contatos passarem a ser gravados, atualize o texto.
 
 ## Painel administrativo (`/admin`)
 
-Permite à equipe editar imóveis, desativá-los (somem do site, continuam no painel), excluí-los
-(com opção de restaurar) e escolher o imóvel do topo da home e os destaques.
+Permite à equipe cadastrar e editar imóveis, desativá-los (somem do site, continuam no painel), excluí-los (apaga de vez, com
+as fotos do S3) e escolher o imóvel do topo da home e os destaques.
 
-**Primeiro acesso:** não existe administrador padrão. Aplique `db/administradores.sql` e cadastre cada
-administrador com o `INSERT` documentado no começo desse arquivo (veja também `docs/login-admin.md`).
+**Primeiro acesso:** não existe administrador padrão. Cadastre cada administrador com o `INSERT` do
+`docs/login-admin.md`.
 
 **Catálogo no banco (PostgreSQL/Supabase, `DATABASE_URL`):**
 
@@ -94,43 +99,60 @@ administrador com o `INSERT` documentado no começo desse arquivo (veja também 
   sessão derruba o acesso na hora. O limite de tentativas (8 por IP, 20 por e-mail, a cada 15 min) fica na tabela
   `tentativas_login`. Detalhes em `docs/login-admin.md`.
 - **Alterações**: gravadas direto nas tabelas do catálogo (`db/schema.sql`), com registro em `auditoria`.
-  O imóvel guarda em `original` a versão importada do catálogo, para o painel marcar o que foi editado e descartar edições.
-  Cada gravação invalida o cache e o site se atualiza na hora.
-- **Fotos enviadas pelo painel**: ficam em `ADMIN_DADOS_DIR/fotos/` (JPG, PNG ou WebP, até 15 MB, formato
-  conferido pelo conteúdo do arquivo) e são servidas pelo próprio site em `/fotos/<id>`. O envio usa a rota
-  `POST /admin/enviar-foto`, que exige a sessão do painel.
+- **Fotos enviadas pelo painel**: vão para o S3 (JPG, PNG ou WebP, até 15 MB, formato conferido pelo conteúdo do arquivo;
+  na Vercel o limite é 4,5 MB), em quatro versões (original + 400/800/1600). O envio usa a rota `POST /admin/enviar-foto`,
+  que exige a sessão do painel. Detalhes em `docs/fotos-s3.md`.
 
-> As fotos enviadas ficam em disco, então a pasta de dados precisa ser **gravável e persistente** (VPS,
-> container com volume etc.). Em hospedagem serverless com disco efêmero (ex.: Vercel) elas se perderiam — aí seria
-> preciso trocar `src/lib/admin/fotos.ts` por um armazenamento externo (S3, Supabase Storage), mantendo a mesma interface.
+## Banco, backup e infraestrutura
+
+| Assunto | Onde |
+| --- | --- |
+| Estrutura do banco e segurança (RLS) | `db/schema.sql`, `db/seguranca-rls.sql` |
+| Backup e restauração do banco | `docs/backup-banco.md` (`npm run backup`) |
+| Mudar de banco ou de região | `docs/migracao-banco.md` |
+| Deploy na Vercel (variáveis, domínio, região) | `docs/deploy-vercel.md` |
+| Fotos no S3 e usuário IAM do site | `docs/fotos-s3.md` |
+| CloudFront na frente do bucket | `docs/cloudfront.md` |
+| Login do painel | `docs/login-admin.md` |
+| Busca paginada no banco | `docs/busca-paginada.md` |
+| SEO | `docs/seo.md` |
 
 ## Pendências antes de ir ao ar
 
-- Domínio real em `NEXT_PUBLIC_SITE_URL` e verificação no Google Search Console
-  (`GOOGLE_SITE_VERIFICATION`); enviar o sitemap pelo Search Console.
+- Registrar o domínio, apontá-lo para a Vercel e definir `NEXT_PUBLIC_SITE_URL`; depois, Search Console e Perfil da Empresa
+  no Google (docs/seo.md).
+- Na Vercel: `DATABASE_URL` do pooler, `REVALIDATE_SECRET` aleatório e a chave do usuário IAM mínimo (docs/deploy-vercel.md).
+- Rodar `db/seguranca-rls.sql` no Supabase e cadastrar o administrador.
 - Revisar a política de privacidade com o jurídico.
-- Endereço completo e coordenadas dos empreendimentos (o protótipo tinha placeholders) e
-  nome da construtora — os campos já existem no modelo (`local.logradouro`, `local.geo`, `construtora`).
-- Limite de envios por IP nos formulários (ex.: no provedor de hospedagem ou com Upstash)
-  quando houver tráfego real.
-- Analytics (ex.: Vercel Analytics ou GA4) e medição de Core Web Vitals em produção.
+- Corrigir os cadastros que prejudicam o site (preço, quartos e tipo errados, anúncios repetidos: lista em docs/seo.md).
+- Endereço completo e coordenadas dos empreendimentos e nome da construtora, onde faltarem (os campos já existem no
+  modelo: `local.logradouro`, `local.geo`, `construtora`).
+- Trocar o endereço das fotos pelo do CloudFront e fechar o bucket (docs/cloudfront.md).
+- Analytics (ex.: Vercel Analytics ou GA4), com atualização da política de privacidade, e medição de Core Web Vitals em produção.
 
 ## Estrutura
 
 ```
+db/                       estrutura do banco, segurança (RLS) e migrações
+docs/                     deploy, banco, fotos, CloudFront, login, SEO
+scripts/                  backup do banco
 src/
   app/                    rotas, metadados, sitemap, robots, Server Actions
   components/
-    busca/                filtros, barra de busca, resultados, paginação
+    admin/                painel: lista, formulário do imóvel, vitrine
+    busca/                filtros, barra de busca, resultados, paginação, texto e links de cada busca
+    home/                 busca do hero e seção de cidades
     imovel/               galeria, plantas, lazer, abas de contato
     imoveis/CardImovel    card usado em home, busca e semelhantes
     layout/               cabeçalho, menu mobile, rodapé, botão do WhatsApp
     formularios/          formulário da home e partes compartilhadas
+    mcmv/                 páginas do Minha Casa Minha Vida
     ui/, seo/             ícones, migalhas, mapa, JSON-LD
   lib/
-    crm/                  registro provisório dos contatos dos formulários (a trocar por uma tabela no banco)
-    imoveis/              tipos, filtros ⇄ URL, busca, textos de SEO, cache
-    site.ts               dados da imobiliária (telefone, endereço, CRECI…)
-  proxy.ts                404 para URLs de busca inexistentes
-propotype/                protótipos originais (referência de design)
+    admin/                login, sessão, fotos (S3)
+    db/                   conexão com o Postgres
+    imoveis/              tipos, filtros ⇄ URL, consultas SQL, páginas de busca e canonical, textos de SEO, cache
+    seo.ts, site.ts       dados estruturados; dados da imobiliária (telefone, endereço, CRECI…)
+  proxy.ts                404 para URLs de busca inexistentes e porta de entrada do painel
+vercel.json               região das funções (São Paulo)
 ```

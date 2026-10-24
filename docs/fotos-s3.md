@@ -14,7 +14,7 @@ Feito por etapas. Este arquivo registra o que foi decidido e o estado de cada et
 | Tamanhos | `400.webp` (cards, listas, miniaturas do painel), `800.webp` (hero, galeria em coluna) e `1600.webp` (foto ampliada). WebP, qualidade 78 (400) e 80 (800 e 1600), só limitando a largura, sem cortar |
 | Fotos pequenas | Nunca ampliadas. Só há 800/1600 se o original for maior que o tamanho anterior (~1.000 fotos têm menos de 1600px; 34 têm menos de 800px) |
 | Cache | `Cache-Control: public, max-age=31536000, immutable` em tudo; os arquivos nunca são sobrescritos |
-| Acesso | Público somente para leitura (`s3:GetObject`) nas pastas `imoveis/*` e `empreendimentos/*`. Listagem do bucket negada. CloudFront fica para depois |
+| Acesso | Público somente para leitura (`s3:GetObject`) nas pastas `imoveis/*`, `empreendimentos/*` e `site/*`. Listagem do bucket negada. O CloudFront já tem leitura liberada na policy; o site ainda usa o endereço direto do S3 (veja `docs/cloudfront.md`) |
 | Fotos quebradas | As 8 fotos do Villa das Laranjeiras (19191) que davam 404 no Supremo foram **removidas**. Ele ficou com 3 fotos |
 | Tamanho gravado no banco | `fotos.src` aponta para `1600.webp`; se não existir, `800.webp`, depois `400.webp`. O `next/image` reduz para cada tela |
 | Imagens institucionais | Ficam em `site/` no mesmo bucket (leitura pública liberada para `site/*`). Nome com hash do conteúdo e cache eterno: ao trocar uma imagem, suba outra e mude o endereço em `imagensSite` (`src/lib/site.ts`). Hoje: foto da equipe ("Quem somos" da home). Seguem pelo otimizador do Next (sem loader próprio) |
@@ -44,7 +44,8 @@ URL pública: `https://a3-imoveis-fotos.s3.sa-east-1.amazonaws.com/<caminho>`
 - [x] Capas marcadas em `fotos.capa`: a primeira foto de cada imóvel, igual ao que o site já mostrava
 - [x] Seleção/troca da capa no painel: selo "Capa" na foto escolhida e estrela para trocar, independente da ordem da galeria (`FormularioImovel.tsx`, `acoes.ts`)
 - [x] Tamanho certo por uso: loader do `next/image` (`src/lib/imoveis/carregador-imagem.ts`), passado como `loader={carregadorImagem}` em cada imagem do catálogo
-- [ ] CloudFront na frente do bucket (trocar só o domínio)
+- [x] Distribuição CloudFront criada (`E2DHJUYDMMVJN4`, `dbn76pzkb0t3o.cloudfront.net`) e liberada na policy do bucket
+- [ ] Site e banco passarem a usar o endereço do CloudFront e o bucket ficar privado (passos 3 e 4 de `docs/cloudfront.md`)
 - [x] Uploads do painel vão para o S3 (original + 400/800/1600), na mesma estrutura do catálogo (seção abaixo)
 
 ## Envio de fotos pelo painel
@@ -53,11 +54,50 @@ URL pública: `https://a3-imoveis-fotos.s3.sa-east-1.amazonaws.com/<caminho>`
 
 1. Confere o formato pelo conteúdo do arquivo (JPG, PNG ou WebP, até 15 MB). Outra coisa é recusada com 415.
 2. Grava o **original sem alteração** como `original.jpg|png|webp` e gera `400.webp` (qualidade 78), `800.webp` e `1600.webp` (80), limitando só a largura. A rotação do celular (EXIF) é aplicada nos tamanhos. Não amplia: o 800 só existe se o original for mais largo que 400, e o 1600 só se for mais largo que 800.
-3. Pasta: `imoveis/<id>/g_<AAAAMMDDHHMMSS>_<código>/`. Imóvel do CRM reaproveita a pasta onde as fotos dele já estão (`imoveis/` ou `empreendimentos/`). Imóvel novo usa `imoveis/A3-…`: o formulário gera o id no primeiro envio e o manda de volta ao cadastrar (`criarImovel`), então as fotos já nascem na pasta definitiva. A hora no nome da pasta é UTC.
+3. Pasta: `imoveis/<id>/g_<AAAAMMDDHHMMSS>_<código>/`. Imóvel importado reaproveita a pasta onde as fotos dele já estão (`imoveis/` ou `empreendimentos/`). Imóvel novo usa `imoveis/A3-…`: o formulário gera o id no primeiro envio e o manda de volta ao cadastrar (`criarImovel`), então as fotos já nascem na pasta definitiva. A hora no nome da pasta é UTC.
 4. Mesmos cabeçalhos do resto do bucket (`Cache-Control: public, max-age=31536000, immutable`, `Content-Type` certo).
 5. Devolve o endereço do maior tamanho gerado, que é o que o formulário guarda em `fotos.src` (o loader do `next/image` escolhe o tamanho por tela, como nas demais fotos).
 
-Credenciais: variáveis `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY`/`AWS_REGION` (na Vercel) ou `AWS_PROFILE=a3` (local). O usuário IAM do site precisa de `s3:PutObject` e `s3:DeleteObject` em `arn:aws:s3:::a3-imoveis-fotos/imoveis/*` e `arn:aws:s3:::a3-imoveis-fotos/empreendimentos/*`, e de `s3:ListBucket` em `arn:aws:s3:::a3-imoveis-fotos` (a exclusão lista a pasta para apagar tudo que há nela). `S3_FOTOS_BUCKET` troca o bucket (padrão `a3-imoveis-fotos`).
+Credenciais: variáveis `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY`/`AWS_REGION` (na Vercel) ou `AWS_PROFILE=a3` (local). `S3_FOTOS_BUCKET` troca o bucket (padrão `a3-imoveis-fotos`).
+
+### Usuário IAM do site (permissões mínimas)
+
+A chave que vai para a Vercel deve ser de um usuário só para isso, com **só** estas permissões. Não use a chave de administrador (`matheus`): quem alcançasse o site teria a conta AWS inteira. O site grava as fotos (`PutObject`), apaga as de um imóvel excluído ou tirado da galeria (`DeleteObject`) e lista a pasta antes de apagar (`ListBucket`). Ele não lê nada do S3 (as fotos são públicas) nem mexe em outras pastas (`site/`, `arquivo/`).
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "GravarEApagarFotos",
+      "Effect": "Allow",
+      "Action": ["s3:PutObject", "s3:DeleteObject"],
+      "Resource": [
+        "arn:aws:s3:::a3-imoveis-fotos/imoveis/*",
+        "arn:aws:s3:::a3-imoveis-fotos/empreendimentos/*"
+      ]
+    },
+    {
+      "Sid": "ListarPastasParaApagar",
+      "Effect": "Allow",
+      "Action": "s3:ListBucket",
+      "Resource": "arn:aws:s3:::a3-imoveis-fotos",
+      "Condition": { "StringLike": { "s3:prefix": ["imoveis/*", "empreendimentos/*"] } }
+    }
+  ]
+}
+```
+
+Criar o usuário (com o perfil `a3`, que tem permissão de IAM); salve o JSON acima como `politica-site.json`:
+
+```bash
+export AWS_PROFILE=a3
+aws iam create-user --user-name a3-site-vercel
+aws iam put-user-policy --user-name a3-site-vercel --policy-name fotos-do-site --policy-document file://politica-site.json
+aws iam create-access-key --user-name a3-site-vercel   # a chave secreta só aparece agora: copie direto para a Vercel
+```
+
+A política foi conferida no simulador da AWS (`aws iam simulate-custom-policy`): permite gravar e apagar em `imoveis/*` e `empreendimentos/*` e listar essas pastas, e nega todo o resto (`site/`, `arquivo/`, `GetObject`, listar o bucket inteiro, mexer na policy ou apagar o bucket). Se um dia as fotos passarem a ser lidas pelo site (não é o caso), acrescente `s3:GetObject`.
 
 ## Apagar fotos e imóveis
 
@@ -73,28 +113,20 @@ Cuidados:
 - Na Vercel, o corpo de uma requisição tem limite de 4,5 MB: fotos maiores que isso falham antes de chegar à rota (o formulário avisa que a foto é grande demais). Para aceitar os 15 MB seria preciso enviar direto do navegador ao S3 (URL pré-assinada).
 - As fotos gravadas em disco antes do S3 (`ADMIN_DADOS_DIR/fotos`, servidas por `/fotos/`) continuam sendo lidas, mas nenhum envio novo vai para lá.
 
-## Scripts
+## Scripts da migração
 
-Todos usam o AWS CLI com o perfil `a3` e podem ser rodados de novo sem duplicar nada.
-
-| Script | O que faz |
-|---|---|
-| `scripts/enviar-fotos-s3.mjs` | Baixa as fotos de `a3_painel_supremo.json` e envia os originais. Grava `dados/fotos-s3.json` (URL antiga → chave no S3). Opções: `--dry-run`, `--id N` |
-| `scripts/gerar-miniaturas-s3.mjs` | Gera 400/800/1600 a partir dos originais que estão no S3 (usa `sharp`). Opções: `--dry-run`, `--id N` |
-| `scripts/migrar-fotos-banco.mjs` | Troca os links no banco numa transação. Opções: `--dry-run` (mostra e desfaz), `--reverter` (restaura dos backups) |
-
-Rodar o de banco: `node --env-file=.env.local scripts/migrar-fotos-banco.mjs`.
+Os scripts usados na migração das fotos (`enviar-fotos-s3.mjs`, `gerar-miniaturas-s3.mjs`, `migrar-fotos-banco.mjs`) já cumpriram o papel e saíram do repositório; continuam no histórico do git (commit `ad80c28` e anteriores). Os arquivos de apoio (export do Supremo, mapa URL antiga → S3, SQLs antigos, protótipos) estão guardados em `s3://a3-imoveis-fotos/arquivo/2026-10-23/`.
 
 ## Banco
 
 - `fotos.src`: links usados pelo site.
 - `imoveis.original` (jsonb) e `imoveis.editado`: eram usados pelo "descartar edições" do painel, que foi removido. O painel não lê nem grava mais essas colunas (seguem no banco).
-- Backups criados pela migração, uma só vez: `fotos_backup_supremo` e `imoveis_original_backup`. Para desfazer: `scripts/migrar-fotos-banco.mjs --reverter`.
+- As tabelas de backup criadas pela migração (`fotos_backup_supremo`, `imoveis_original_backup`) não existem mais. A tabela `crm_fotos` segue como réplica fiel do export original.
 
 ## Cuidados
 
-- `db/popular_site.sql` e `db/popular_crm.sql` ainda têm os links do Supremo. Recarregar o catálogo por eles traz de volta os links antigos. Rode `migrar-fotos-banco.mjs` depois, ou regenere os arquivos.
-- `dados/fotos-s3.json` é o mapa URL antiga → S3. Está em `dados/`, que é ignorado pelo git; guarde uma cópia se for apagar a pasta.
+- Os SQLs antigos de carga (`popular_site.sql`, `popular_crm.sql`, em `arquivo/` no S3) ainda têm os links do Supremo: não recarregue o catálogo por eles. O banco em uso é a fonte da verdade (backup: `docs/backup-banco.md`).
+- O mapa URL antiga → S3 está em `s3://a3-imoveis-fotos/arquivo/2026-10-23/dados/fotos-s3.json`.
 - Páginas já em cache no Next só mostram as novas fotos depois de `POST /api/revalidar` (ver `src/app/api/revalidar/route.ts`) ou de um novo deploy.
 - Se o bucket for apagado ou ficar privado de novo, todas as fotos do site quebram.
 - A capa é independente da ordem: trocá-la no painel não reordena a galeria. Se a foto da capa for removida, vale a primeira.

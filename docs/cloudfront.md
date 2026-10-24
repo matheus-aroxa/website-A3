@@ -1,7 +1,13 @@
 # CloudFront na frente do bucket de fotos
 
 Objetivo: servir as fotos por uma distribuição CloudFront e deixar o bucket `a3-imoveis-fotos` **privado**.
-Nada disso foi executado ainda: é o roteiro. Perfil AWS CLI: `a3`. Região do bucket: `sa-east-1`.
+Perfil AWS CLI: `a3`. Região do bucket: `sa-east-1`.
+
+**Estado (24/10/2026): os passos 1 e 2 estão feitos.** A distribuição `E2DHJUYDMMVJN4` (`dbn76pzkb0t3o.cloudfront.net`, sem
+domínio próprio) existe e serve as fotos: conferido `200`, `content-type: image/webp`, `x-cache: Hit from cloudfront` a
+partir da segunda chamada e redirecionamento de HTTP para HTTPS. A policy do bucket já tem a regra `LeituraPeloCloudFront`.
+Faltam o passo 3 (site e banco passarem a usar o endereço do CloudFront) e o passo 4 (fechar o bucket). Enquanto isso o site
+serve as fotos direto do S3, sem cache de borda.
 
 ## Custo (resumo)
 Plano sob demanda, faixa gratuita permanente de 1 TB de saída e 10 milhões de requisições por mês; o tráfego do
@@ -44,7 +50,7 @@ Teste: `curl -I https://dXXXX.cloudfront.net/imoveis/259322/g_20260922160213_0/4
 Quando o passo 2 funcionar, estes pontos mudam de `a3-imoveis-fotos.s3.sa-east-1.amazonaws.com` para o domínio do CloudFront:
 1. `src/lib/imoveis/hosts-fotos.ts`: acrescentar o novo host em `HOSTS_FOTOS` (mantenha o do S3 até o fim).
 2. `src/lib/imoveis/carregador-imagem.ts`: `HOST_S3` passa a reconhecer também o novo host (o padrão do nome do arquivo é o mesmo).
-3. `src/lib/site.ts`: `URL_IMAGENS` (foto da equipe).
+3. `src/lib/site.ts`: `URL_IMAGENS` (foto da equipe e `preconnect` do layout raiz).
 4. **Banco** (as URLs são usadas também em Open Graph, JSON-LD e sitemap, então a troca precisa ser no dado). Faça um backup antes e rode numa transação:
 
 ```sql

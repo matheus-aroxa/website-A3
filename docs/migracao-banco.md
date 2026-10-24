@@ -1,43 +1,22 @@
-# Migração do banco para São Paulo
+# Mudar de banco (ou de região)
 
-Motivo: o Supabase atual está na AWS `us-east-1`. A latência até ele é de ~130ms por consulta e ~1s para abrir
-uma conexão nova, o que pesa sempre que o cache do site esfria. Um projeto em `sa-east-1` reduz isso para ~10ms.
+Motivo comum: o Supabase estava na AWS `us-east-1`, com ~130 ms por consulta e ~1 s para abrir uma conexão nova, o que pesa
+sempre que o cache do site esfria. O banco atual fica em `sa-east-1` (São Paulo), junto das funções da Vercel (`vercel.json`).
+Se o banco mudar de região de novo, mude também `regions` no `vercel.json`.
 
 ## Passo a passo
 
-1. **Criar o projeto no Supabase** com a região **South America (São Paulo)**. Anote a senha do banco.
-2. **Copiar a string de conexão** em Project Settings → Database → Connection string. Use a conexão direta
-   (porta 5432) ou a do pooler em modo *session*. Evite o modo *transaction* (porta 6543) para esta cópia.
-3. **Pôr no `.env.local`** (arquivo ignorado pelo git), sem mexer no `DATABASE_URL`:
-   ```
-   NOVO_DATABASE_URL=postgresql://postgres:<senha>@db.<projeto>.supabase.co:5432/postgres
-   ```
-4. **Conferir sem gravar nada:**
-   ```
-   node --env-file=.env.local scripts/copiar-banco.mjs --dry-run
-   ```
-5. **Copiar:**
-   ```
-   node --env-file=.env.local scripts/copiar-banco.mjs
-   ```
-   O script só confirma a cópia se a contagem e o hash de cada tabela baterem. Se algo falhar, o destino não é alterado
-   (o schema pode ficar criado; rodar de novo é seguro, e `--limpar` apaga dados já copiados no destino).
-6. **Trocar o `DATABASE_URL`** (no `.env.local` e no ambiente de produção) pelo valor do banco novo e reiniciar o site.
-7. **Revalidar o cache** (`POST /api/revalidar`) ou fazer um novo deploy.
-8. Manter o banco antigo por alguns dias, só como reserva, e depois pausá-lo ou apagá-lo.
-
-## O que o script faz
-
-- Lê a origem numa transação `READ ONLY` com um retrato consistente: pode ser rodado com o site no ar.
-- Cria o schema no destino a partir de `db/schema.sql` se ele estiver sem tabelas.
-- Copia todas as tabelas de `public` na ordem das chaves estrangeiras, preservando ids, e acerta as sequências
-  (o próximo `id` gerado continua depois do maior copiado).
-- Não copia tabelas `*_backup*` (os backups da troca de links das fotos).
-- Recusa rodar se origem e destino forem o mesmo banco ou se o destino já tiver dados (sem `--limpar`).
+1. **Backup do banco atual** (`npm run backup`, docs/backup-banco.md). Ele é o ponto de volta se algo der errado.
+2. **Criar o projeto novo** no Supabase, na região desejada. Anote a senha do banco.
+3. **Restaurar a cópia** no projeto novo (docs/backup-banco.md, seção "Restaurar") e rodar `db/seguranca-rls.sql`.
+4. **Conferir:** `SELECT count(*)` das tabelas principais no banco novo contra o antigo (`imoveis`, `fotos`, `administradores`).
+5. **Trocar a `DATABASE_URL`** na Vercel (Production, Preview e Development) pela string do *Transaction pooler* do projeto novo
+   e fazer um novo deploy. No `.env.local`, qualquer uma das duas conexões serve.
+6. **Invalidar o cache** (`POST /api/revalidar`) ou aguardar o deploy.
+7. Manter o banco antigo por alguns dias, só como reserva, e depois pausá-lo ou apagá-lo.
 
 ## Cuidados
 
-- Enquanto a cópia não for trocada no `DATABASE_URL`, edições feitas no painel vão para o banco antigo. Evite editar
-  entre o passo 5 e o 6, ou rode a cópia de novo com `--limpar` logo antes de trocar.
-- Uploads do painel ficam em `ADMIN_DADOS_DIR` (disco local), não no banco: não são afetados por esta migração.
-- Testado contra um Postgres 16 descartável em Docker: 12 tabelas copiadas, contagens e hashes iguais, sequências corretas.
+- Enquanto a `DATABASE_URL` não for trocada, as edições do painel vão para o banco antigo. Evite editar entre a restauração
+  e a troca, ou refaça o backup e a restauração (`--clean --if-exists`) logo antes de trocar.
+- As fotos ficam no S3 e não são afetadas por esta mudança.

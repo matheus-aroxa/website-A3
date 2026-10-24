@@ -50,7 +50,7 @@ function destinoSeguro(destino: string) {
 
 export async function entrar(_: EstadoFormulario, fd: FormData): Promise<EstadoFormulario> {
   if (!(await painelConfigurado())) {
-    return { status: 'erro', mensagem: 'Nenhum administrador cadastrado. Cadastre um na tabela administradores (db/administradores.sql).' }
+    return { status: 'erro', mensagem: 'Nenhum administrador cadastrado. Cadastre um na tabela administradores (veja docs/login-admin.md).' }
   }
   const ip = await ipDoCliente()
   const email = texto(fd, 'email', 150)

@@ -25,3 +25,8 @@ next-env.d.ts
 
 # ajustes do catálogo feitos pelo painel (estado do servidor, não do código)
 /dados/
+
+# cópias do banco (têm hash de senha e histórico do painel: nunca no Git)
+/backups/
+*.dump
+a3-banco_*.sql
