@@ -2684,3 +2684,52 @@ a.tabelaQuantidade:hover {
     white-space: nowrap;
   }
 }
+
+/* ---------- Administradores ---------- */
+
+/* Mesma tabela das construtoras, sem busca: nome ordenável, ações (editar e excluir) e paginação. */
+
+/* Linhas de altura fixa: o principal (sem ações) e os demais ocupam o mesmo espaço, e um nome comprido é cortado em vez de crescer. */
+.tabelaAdministradores tbody tr {
+  height: 64px;
+}
+
+.nomeAdministrador {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.nomeAdministradorTexto {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* O botão de cadastrar fica fora da tabela, acima dela e à direita. */
+.novoAdministrador {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 14px;
+}
+
+.marcadorPrincipal {
+  background: var(--mar-claro);
+  color: var(--mar);
+}
+
+/* Senha no cartão de cadastro, com o botão de mostrar do login. */
+.campoSenha {
+  position: relative;
+  display: block;
+}
+
+.campoSenha .campo {
+  padding-right: 52px;
+}
+
+.campoSenha .verSenha {
+  top: 5px;
+}

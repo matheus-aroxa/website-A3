@@ -1,6 +1,6 @@
 -- Estrutura do banco (PostgreSQL 17 / Supabase): schema `public`, sem dados.
 -- Gerada com `pg_dump --schema=public --schema-only --no-owner --no-acl` a partir do banco em uso (24/10/2026) mais as migrações
--- aplicadas depois: db/construtoras.sql e db/relatorios.sql (a anterior, db/suites-faixa.sql, já estava incluída).
+-- aplicadas depois: db/construtoras.sql, db/relatorios.sql e db/administradores.sql (a anterior, db/suites-faixa.sql, já estava incluída).
 -- Os dados ficam no backup (docs/backup-banco.md).
 --
 -- Para montar um banco novo: rodar este arquivo e depois db/seguranca-rls.sql. Requer a extensão pgcrypto, que no Supabase
@@ -116,7 +116,9 @@ CREATE TABLE public.administradores (
     ativo boolean DEFAULT true NOT NULL,
     criado_em timestamp with time zone DEFAULT now() NOT NULL,
     ultimo_acesso timestamp with time zone,
-    CONSTRAINT administradores_email_check CHECK (((email = lower(btrim(email))) AND (email <> ''::text)))
+    principal boolean DEFAULT false NOT NULL,
+    CONSTRAINT administradores_email_check CHECK (((email = lower(btrim(email))) AND (email <> ''::text))),
+    CONSTRAINT administradores_principal_ativo CHECK ((ativo OR (NOT principal)))
 );
 
 
@@ -946,6 +948,13 @@ ALTER TABLE ONLY public.vitrine_destaques
 
 ALTER TABLE ONLY public.vitrine_destaques
     ADD CONSTRAINT vitrine_destaques_pkey PRIMARY KEY (posicao);
+
+
+--
+-- Name: administradores_principal_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX administradores_principal_key ON public.administradores USING btree (principal) WHERE principal;
 
 
 --
