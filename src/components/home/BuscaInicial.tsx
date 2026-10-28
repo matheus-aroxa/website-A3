@@ -57,7 +57,7 @@ function Passo({
 
 export function BuscaInicial({ cidades }: { cidades: Cidade[] }) {
   const router = useRouter()
-  const [modo, setModo] = useState<Modo>('venda')
+  const [modo, setModo] = useState<Modo>('lancamentos')
   const [tipo, setTipo] = useState<TipoImovel | ''>('')
   const [cidadeSlug, setCidadeSlug] = useState('')
   const [bairroSlug, setBairroSlug] = useState('')
