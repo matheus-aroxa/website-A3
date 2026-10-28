@@ -11,7 +11,7 @@ import type { Situacao, TipoImovel } from '@/lib/imoveis/tipos'
 
 export default function PaginaCatalogo({ searchParams }: PageProps<'/admin/relatorios/catalogo'>) {
   return (
-    <PaginaDeRelatorio parametros={searchParams} usaPeriodo={false} arquivo="catalogo">
+    <PaginaDeRelatorio parametros={searchParams} usaPeriodo={false}>
       {async () => <Catalogo />}
     </PaginaDeRelatorio>
   )
@@ -40,10 +40,10 @@ async function Catalogo() {
     { rotulo: 'Cidades', valor: fmtInt(r.local.cidades), nota: `${fmtInt(r.local.bairros)} bairros` },
     { rotulo: 'Fotos', valor: fmtInt(r.midia.fotos), nota: `${(r.midia.fotos / Math.max(1, ativos)).toFixed(1).replace('.', ',')} por imóvel` },
     { rotulo: 'Plantas', valor: fmtInt(r.midia.plantas), nota: `em ${fmtInt(r.midia.imoveisComPlanta)} imóveis` },
-    { rotulo: 'Preço mediano (venda)', valor: fmtMoedaCompacta(r.precos.medianoVenda), nota: `média ${fmtMoeda(r.precos.medioVenda)}` },
+    { rotulo: 'Preço mediano (venda)', valor: fmtMoedaCompacta(r.precos.medianoVenda) },
+    { rotulo: 'Preço médio (venda)', valor: fmtMoedaCompacta(r.precos.medioVenda) },
     { rotulo: 'Aluguel médio', valor: r.precos.medioAluguel ? fmtMoeda(r.precos.medioAluguel) : '—' },
     { rotulo: 'Na vitrine da home', valor: fmtInt(r.imoveis.naVitrine) },
-    { rotulo: 'Administradores', valor: fmtInt(r.administradores), nota: 'Com acesso ao painel' },
   ]
   const tipo = d.tipo.map((x) => ({ ...x, chave: rotuloTipo[x.chave as TipoImovel] ?? x.chave }))
   const CORES_TIPO: Record<string, string> = { apartamento: 'var(--g-1)', 'casa-condominio': 'var(--g-2)', terreno: 'var(--g-3)' }
@@ -52,7 +52,7 @@ async function Catalogo() {
 
   return (
     <>
-      <GradeKpi titulo="Indicadores do catálogo" itens={kpis.map((k) => ({ rotulo: k.rotulo, valor: k.valor }))}>
+      <GradeKpi>
         {kpis.map((k) => <Kpi key={k.rotulo} rotulo={k.rotulo} valor={k.valor} nota={k.nota} />)}
       </GradeKpi>
 
@@ -116,7 +116,7 @@ async function Catalogo() {
         <Cartao titulo="Fotos por imóvel" tabela={tabelaDe('Imóveis por quantidade de fotos', 'Fotos', d.fotos, ativos)}>
           <Colunas itens={d.fotos.map((x) => ({ rotulo: x.chave.replace(' fotos', '').replace('Sem', '0'), nome: x.chave, valor: x.valor }))} formato={fmtInt} />
         </Cartao>
-        <Cartao titulo="Cadastros por mês" descricao="Imóveis ativos pela data de publicação." tabela={tabelaDe('Imóveis por mês de publicação', 'Mês', d.cadastrosPorMes.map((x) => ({ ...x, chave: mesCurto(x.chave) })))}>
+        <Cartao titulo="Cadastros por mês" tabela={tabelaDe('Imóveis por mês de publicação', 'Mês', d.cadastrosPorMes.map((x) => ({ ...x, chave: mesCurto(x.chave) })))}>
           <Colunas itens={d.cadastrosPorMes.map((x) => ({ rotulo: x.chave.endsWith('-01') || x.chave.endsWith('-07') ? mesCurto(x.chave) : '', nome: mesCurto(x.chave), valor: x.valor }))} formato={fmtInt} valores={false} />
         </Cartao>
       </div>

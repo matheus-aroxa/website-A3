@@ -12,7 +12,7 @@ import { descreverFiltro, rotuloTipoFiltro, type NomesDosFiltros } from '@/lib/r
 
 export default function PaginaBuscas({ searchParams }: PageProps<'/admin/relatorios/buscas'>) {
   return (
-    <PaginaDeRelatorio parametros={searchParams} arquivo="buscas">
+    <PaginaDeRelatorio parametros={searchParams}>
       {(ctx) => <Buscas ctx={ctx} />}
     </PaginaDeRelatorio>
   )
@@ -80,15 +80,7 @@ async function Buscas({ ctx }: { ctx: ContextoDoRelatorio }) {
 
   return (
     <>
-      <GradeKpi
-        titulo="Indicadores de busca"
-        itens={[
-          { rotulo: 'Buscas com filtro', valor: fmtInt(buscas) },
-          { rotulo: 'Sem resultado', valor: fmtPct(razao(semResultado, buscas)) },
-          { rotulo: 'Filtros por busca', valor: fmtDec(filtrosPorBusca) },
-          { rotulo: 'Termos digitados', valor: fmtInt(termos.reduce((a, t) => a + t.eventos, 0)) },
-        ]}
-      >
+      <GradeKpi>
         <Kpi rotulo="Buscas com filtro" valor={fmtInt(buscas)} nota={total ? `${fmtInt(total.sessoes)} sessões` : undefined} />
         <Kpi rotulo="Buscas sem resultado" valor={fmtPct(razao(semResultado, buscas))} nota={`${fmtInt(semResultado)} de ${fmtInt(buscas)}`} />
         <Kpi rotulo="Filtros por busca" valor={fmtDec(filtrosPorBusca)} nota="Média de filtros aplicados" />
@@ -127,7 +119,7 @@ async function Buscas({ ctx }: { ctx: ContextoDoRelatorio }) {
         {tiposDeFiltro.length ? <Barras itens={tiposDeFiltro.map(([t, n]) => ({ rotulo: rotuloTipoFiltro[t] ?? t, valor: n, extras: [['Das buscas', fmtPct(razao(n, buscas))]] }))} formato={fmtInt} /> : nada}
       </Cartao>
 
-      <div className={s.grade} data-colunas="3">
+      <div className={s.grade} data-distribuir>
         {listas.map((l) => {
           const itens = ranking(usos, l.tipo, nomes, 10)
           return (

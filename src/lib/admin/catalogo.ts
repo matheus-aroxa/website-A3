@@ -12,6 +12,7 @@ import {
 } from '@/lib/imoveis/consultas-admin'
 import { etiquetaImovel, formatarPreco, rotuloPreco } from '@/lib/imoveis/formato'
 import { listarConstrutorasAdmin } from '@/lib/imoveis/construtoras'
+import type { StatusImovel } from '@/lib/imoveis/painel'
 import { exigirAdmin } from './acesso'
 
 export type { AbaAdmin, FiltroAdmin }
@@ -41,6 +42,8 @@ export interface OpcaoVitrine {
 export interface CatalogoAdmin {
   itens: ItemAdmin[]
   total: number
+  /** O total separado entre publicados e desativados. */
+  porStatus: Record<StatusImovel, number>
   pagina: number
   totalPaginas: number
   /** Quantos imóveis há em cada aba (sem considerar a busca). */

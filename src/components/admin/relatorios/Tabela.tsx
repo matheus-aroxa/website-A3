@@ -1,7 +1,6 @@
 'use client'
 
-// Tabela dos relatórios: ordena pelo cabeçalho, busca por texto e mostra aos poucos. Todas as linhas ficam no HTML (as que
-// passam do limite só ficam escondidas), então a exportação para CSV sempre leva a tabela inteira.
+// Tabela dos relatórios: ordena pelo cabeçalho, busca por texto e mostra aos poucos.
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { Icone } from '@/components/ui/Icone'
@@ -101,14 +100,13 @@ export function TabelaDados({
                 <tr key={i} hidden={escondida}>
                   {colunas.map((c, k) => {
                     const cel = l[c.id] ?? null
-                    const v = valorDe(cel)
                     const href = cel !== null && typeof cel === 'object' ? cel.href : undefined
                     const tom = cel !== null && typeof cel === 'object' ? cel.tom : undefined
                     const conteudo = href ? <Link href={href}>{textoDe(cel)}</Link> : tom ? <span className={s.etiqueta} data-tom={tom === 'etiqueta' ? undefined : tom}>{textoDe(cel)}</span> : textoDe(cel)
                     return k === 0 ? (
-                      <th key={c.id} scope="row" data-v={String(v ?? '')}>{conteudo}</th>
+                      <th key={c.id} scope="row">{conteudo}</th>
                     ) : (
-                      <td key={c.id} data-alinhar={c.numerica ? 'fim' : undefined} data-v={typeof v === 'number' ? String(v) : undefined}>
+                      <td key={c.id} data-alinhar={c.numerica ? 'fim' : undefined}>
                         {conteudo}
                       </td>
                     )

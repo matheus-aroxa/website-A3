@@ -110,25 +110,9 @@ const BLOCOS = [
     "tipo = 'busca' AND valor = 0",
   ),
   porEvento('nao-encontrada', 'caminho', "''", "tipo = 'nao-encontrada'"),
-  porEvento('erro', 'left(COALESCE(rotulo, \'erro\'), 150)', "''", "tipo = 'erro'"),
   `SELECT 'form-erro-campo', e.rotulo || ':' || c.campo, '', 0, count(DISTINCT e.visitante)::int, count(DISTINCT e.sessao)::int, 0, 0, count(*)::int, 0::bigint, 0::bigint
      FROM ev e CROSS JOIN LATERAL jsonb_array_elements_text(COALESCE(e.detalhe -> 'campos', '[]'::jsonb)) AS c(campo)
     WHERE e.tipo = 'formulario-erro' GROUP BY 2`,
-  // Velocidade (Core Web Vitals) por métrica, aparelho e nota. `valor` soma as medidas (CLS ×1000) para tirar a média.
-  `SELECT 'vital', m.nome || ':' || COALESCE(s2.dispositivo, 'desconhecido') || ':' ||
-            CASE WHEN m.v <= m.bom THEN 'bom' WHEN m.v <= m.ruim THEN 'medio' ELSE 'ruim' END,
-          '', 0, 0, 0, 0, 0, count(*)::int, 0::bigint, round(sum(CASE WHEN m.nome = 'cls' THEN m.v * 1000 ELSE m.v END))::bigint
-     FROM ev JOIN s2 ON s2.sessao = ev.sessao
-    CROSS JOIN LATERAL (VALUES
-      ('lcp',  (ev.vitais ->> 'lcp')::float8,  2500, 4000),
-      ('cls',  (ev.vitais ->> 'cls')::float8,  0.1,  0.25),
-      ('inp',  (ev.vitais ->> 'inp')::float8,  200,  500),
-      ('fcp',  (ev.vitais ->> 'fcp')::float8,  1800, 3000),
-      ('ttfb', (ev.vitais ->> 'ttfb')::float8, 800,  1800)
-    ) AS m(nome, v, bom, ruim)
-    WHERE ev.tipo = 'visita' AND ev.vitais IS NOT NULL AND m.v IS NOT NULL GROUP BY 2`,
-  `SELECT 'vital-pagina', caminho, '', 0, 0, 0, 0, 0, count(*)::int, 0::bigint, round(sum((vitais ->> 'lcp')::float8))::bigint
-     FROM ev WHERE tipo = 'visita' AND vitais ->> 'lcp' IS NOT NULL GROUP BY 2`,
 ]
 
 const SQL_DIA = `

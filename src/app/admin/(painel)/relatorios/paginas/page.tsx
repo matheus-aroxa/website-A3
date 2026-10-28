@@ -1,11 +1,11 @@
-import Link from 'next/link'
 import { Cartao } from '@/components/admin/relatorios/Cartao'
 import { Barras, Vazio } from '@/components/admin/relatorios/Graficos'
 import { GradeKpi, Kpi } from '@/components/admin/relatorios/Indicadores'
 import { PaginaDeRelatorio } from '@/components/admin/relatorios/Pagina'
 import s from '@/components/admin/relatorios/Relatorios.module.css'
 import { TabelaDados } from '@/components/admin/relatorios/Tabela'
-import { porDimensao } from '@/lib/relatorios/audiencia'
+import { Icone } from '@/components/ui/Icone'
+import { porDimensao, totalDaDimensao } from '@/lib/relatorios/audiencia'
 import { fmtDuracao, fmtInt, fmtPct, razao } from '@/lib/relatorios/formato'
 import type { ContextoDoRelatorio } from '@/lib/relatorios/pagina'
 import { criarNomeadorDePaginas } from '@/lib/relatorios/paginas'
@@ -13,7 +13,7 @@ import { rotuloTipoDePagina } from '@/lib/relatorios/rotulos'
 
 export default function PaginaPaginas({ searchParams }: PageProps<'/admin/relatorios/paginas'>) {
   return (
-    <PaginaDeRelatorio parametros={searchParams} arquivo="paginas">
+    <PaginaDeRelatorio parametros={searchParams}>
       {(ctx) => <Paginas ctx={ctx} />}
     </PaginaDeRelatorio>
   )
@@ -21,16 +21,14 @@ export default function PaginaPaginas({ searchParams }: PageProps<'/admin/relato
 
 async function Paginas({ ctx }: { ctx: ContextoDoRelatorio }) {
   const { periodo } = ctx
-  const [nomear, paginas, entradas, saidas, naoEncontradas, tipos] = await Promise.all([
+  const [nomear, todas, paginas, entradas, saidas, tipos] = await Promise.all([
     criarNomeadorDePaginas(),
+    totalDaDimensao(periodo, 'pagina'),
     porDimensao(periodo, 'pagina', { ordem: 'visitas', limite: 300 }),
     porDimensao(periodo, 'entrada', { limite: 200 }),
     porDimensao(periodo, 'saida', { limite: 200 }),
-    porDimensao(periodo, 'nao-encontrada', { ordem: 'eventos', limite: 100 }),
     porDimensao(periodo, 'tipo-pagina', { ordem: 'visitas' }),
   ])
-  const total = paginas.reduce((a, p) => a + p.visitas, 0)
-  const n404 = naoEncontradas.reduce((a, p) => a + p.eventos, 0)
   const nada = <Vazio titulo="Sem visitas neste período" />
   const link = (caminho: string) => {
     const { nome, href } = nomear(caminho)
@@ -39,10 +37,16 @@ async function Paginas({ ctx }: { ctx: ContextoDoRelatorio }) {
 
   return (
     <>
-      <GradeKpi titulo="Indicadores de páginas" itens={[{ rotulo: 'Páginas vistas', valor: fmtInt(total) }, { rotulo: 'Páginas diferentes visitadas', valor: fmtInt(paginas.length) }, { rotulo: 'Acessos a páginas inexistentes', valor: fmtInt(n404) }]}>
-        <Kpi rotulo="Páginas vistas" valor={fmtInt(total)} />
-        <Kpi rotulo="Páginas diferentes" valor={fmtInt(paginas.length)} nota="Imóveis, buscas e institucionais" />
-        <Kpi rotulo="Páginas inexistentes" valor={fmtInt(n404)} nota={n404 ? `${fmtInt(naoEncontradas.length)} endereços diferentes` : 'Nenhum acesso a link quebrado'} />
+      <p className={s.aviso} data-centro>
+        <Icone nome="alerta" tamanho={24} />
+        <span>
+          <strong>Páginas vistas</strong> é o <strong>total de vezes</strong> que as páginas do site foram abertas: se alguém abre a mesma página 3 vezes, conta 3. <strong>Páginas diferentes</strong> é <strong>quantos endereços distintos</strong> foram vistos pelo menos uma vez, não importa quantas vezes cada um foi aberto.
+        </span>
+      </p>
+
+      <GradeKpi>
+        <Kpi rotulo="Páginas vistas" valor={fmtInt(todas.visitas)} />
+        <Kpi rotulo="Páginas diferentes" valor={fmtInt(todas.chaves)} nota="Imóveis, buscas e institucionais" />
       </GradeKpi>
 
       <Cartao
@@ -89,23 +93,13 @@ async function Paginas({ ctx }: { ctx: ContextoDoRelatorio }) {
         </Cartao>
       </div>
 
-      <div className={s.grade}>
-        <Cartao
-          titulo="Tipos de página"
-          descricao="Visitas, tempo e rolagem por grupo de páginas."
-          tabela={<TabelaDados legenda="Tipos de página" colunas={[{ id: 'tipo', titulo: 'Tipo' }, { id: 'visitas', titulo: 'Visitas', numerica: true }, { id: 'tempo', titulo: 'Tempo médio', numerica: true }, { id: 'rolagem', titulo: 'Rolagem média', numerica: true }]} linhas={tipos.map((p) => ({ tipo: rotuloTipoDePagina[p.chave] ?? p.chave, visitas: p.visitas, tempo: { v: razao(p.tempo_s, p.eventos), t: fmtDuracao(razao(p.tempo_s, p.eventos)) }, rolagem: { v: razao(p.valor, p.eventos), t: `${Math.round(razao(p.valor, p.eventos))}%` } }))} ordem={{ coluna: 'visitas', decrescente: true }} />}
-        >
-          {tipos.length ? <Barras itens={tipos.map((p) => ({ rotulo: rotuloTipoDePagina[p.chave] ?? p.chave, valor: p.visitas, sub: `${fmtDuracao(razao(p.tempo_s, p.eventos))} · rolagem ${Math.round(razao(p.valor, p.eventos))}%` }))} formato={fmtInt} /> : nada}
-        </Cartao>
-        <Cartao
-          titulo="Páginas que não existem (404)"
-          descricao="Links quebrados, imóveis que saíram do ar e endereços digitados errado."
-          rodape={naoEncontradas.length ? <>Dica: se um endereço antigo de imóvel aparece muito aqui, vale <Link href="/admin">reativar o imóvel</Link> ou avisar quem divulgou o link.</> : undefined}
-          tabela={<TabelaDados legenda="Páginas inexistentes acessadas" colunas={[{ id: 'caminho', titulo: 'Endereço' }, { id: 'acessos', titulo: 'Acessos', numerica: true }, { id: 'sessoes', titulo: 'Sessões', numerica: true }]} linhas={naoEncontradas.map((p) => ({ caminho: p.chave, acessos: p.eventos, sessoes: p.sessoes }))} ordem={{ coluna: 'acessos', decrescente: true }} />}
-        >
-          {naoEncontradas.length ? <Barras itens={naoEncontradas.slice(0, 10).map((p) => ({ rotulo: p.chave, valor: p.eventos }))} formato={fmtInt} cor="var(--g-2)" /> : <Vazio titulo="Nenhum acesso a página inexistente" texto="Bom sinal: os links do site estão funcionando." />}
-        </Cartao>
-      </div>
+      <Cartao
+        titulo="Tipos de página"
+        descricao="Visitas, tempo e rolagem por grupo de páginas."
+        tabela={<TabelaDados legenda="Tipos de página" colunas={[{ id: 'tipo', titulo: 'Tipo' }, { id: 'visitas', titulo: 'Visitas', numerica: true }, { id: 'tempo', titulo: 'Tempo médio', numerica: true }, { id: 'rolagem', titulo: 'Rolagem média', numerica: true }]} linhas={tipos.map((p) => ({ tipo: rotuloTipoDePagina[p.chave] ?? p.chave, visitas: p.visitas, tempo: { v: razao(p.tempo_s, p.eventos), t: fmtDuracao(razao(p.tempo_s, p.eventos)) }, rolagem: { v: razao(p.valor, p.eventos), t: `${Math.round(razao(p.valor, p.eventos))}%` } }))} ordem={{ coluna: 'visitas', decrescente: true }} />}
+      >
+        {tipos.length ? <Barras itens={tipos.map((p) => ({ rotulo: rotuloTipoDePagina[p.chave] ?? p.chave, valor: p.visitas, sub: `${fmtDuracao(razao(p.tempo_s, p.eventos))} · rolagem ${Math.round(razao(p.valor, p.eventos))}%` }))} formato={fmtInt} /> : nada}
+      </Cartao>
     </>
   )
 }

@@ -138,7 +138,7 @@ export function ListaConstrutoras({ construtoras }: { construtoras: ConstrutoraA
               }} />
           </label>
           <button type="button" className={`${s.botao} ${s.botaoSol} ${s.tabelaNova}`} onClick={() => setAcao('criar')}>
-            <Icone nome="mais" tamanho={17} espessura={2.4} /> Nova construtora
+            <Icone nome="mais" tamanho={17} espessura={2.4} /> <span className={s.tabelaNovaTexto}>Nova construtora</span>
           </button>
         </div>
 
@@ -193,7 +193,7 @@ export function ListaConstrutoras({ construtoras }: { construtoras: ConstrutoraA
                     </th>
                     <td data-alinhar="centro">
                       {c.imoveis > 0 ? (
-                        <Link href={`/admin?construtora=${c.id}`} className={s.tabelaQuantidade} title="Ver os imóveis desta construtora">
+                        <Link href={`/admin?aba=todos&construtora=${c.id}`} className={s.tabelaQuantidade} title="Ver os imóveis desta construtora, no site e desativados">
                           {c.imoveis}
                         </Link>
                       ) : (

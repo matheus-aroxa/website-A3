@@ -50,8 +50,6 @@ export interface PontoDeLinha {
   /** Rótulo da dica (ex.: "seg, 12/10/2026"). */
   rotuloLongo: string
   valor: number
-  anterior?: number
-  rotuloAnterior?: string
 }
 
 export function GraficoLinha({
@@ -59,19 +57,16 @@ export function GraficoLinha({
   formato,
   formatoEixo,
   nomeSerie,
-  nomeAnterior = 'Período anterior',
   altura = 240,
 }: {
   pontos: PontoDeLinha[]
   formato: (n: number) => string
   formatoEixo?: (n: number) => string
   nomeSerie: string
-  nomeAnterior?: string
   altura?: number
 }) {
   const n = pontos.length
-  const temAnterior = pontos.some((p) => p.anterior !== undefined)
-  const { max, marcas } = escala(Math.max(0, ...pontos.map((p) => Math.max(p.valor, p.anterior ?? 0))))
+  const { max, marcas } = escala(Math.max(0, ...pontos.map((p) => p.valor)))
   const x = (i: number) => ((i + 0.5) / n) * 1000
   const y = (v: number) => 100 - (v / max) * 100
   const caminho = (valores: number[]) => valores.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(2)}`).join(' ')
@@ -95,9 +90,6 @@ export function GraficoLinha({
           {marcas.map((m, i) => (
             <line key={m} className={i === 0 ? 'grade0' : 'gradeN'} x1="0" x2="1000" y1={y(m)} y2={y(m)} stroke={i === 0 ? 'var(--g-eixo)' : 'var(--g-grade)'} strokeWidth="1" />
           ))}
-          {temAnterior && (
-            <path d={caminho(pontos.map((p) => p.anterior ?? 0))} fill="none" stroke="var(--g-anterior)" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
-          )}
           <path d={area} fill="var(--g-acento-area)" />
           <path d={principal} fill="none" stroke="var(--g-acento)" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
         </svg>
@@ -110,15 +102,11 @@ export function GraficoLinha({
               aria-label={`${p.rotuloLongo}: ${formato(p.valor)}`}
               data-dica={dica({
                 t: p.rotuloLongo,
-                l: [
-                  [nomeSerie, formato(p.valor), 'var(--g-acento)'],
-                  ...(p.anterior !== undefined ? ([[`${nomeAnterior}${p.rotuloAnterior ? ` (${p.rotuloAnterior})` : ''}`, formato(p.anterior), 'var(--g-anterior)']] as [string, string, string][]) : []),
-                ],
+                l: [[nomeSerie, formato(p.valor), 'var(--g-acento)']],
               })}
             >
               <span className={s.linhaCruz} />
               <span className={s.linhaPonto} style={{ bottom: `${(p.valor / max) * 100}%` }} />
-              {p.anterior !== undefined && <span className={s.linhaPonto} data-serie="anterior" style={{ bottom: `${(p.anterior / max) * 100}%` }} />}
             </div>
           ))}
         </div>
@@ -326,22 +314,6 @@ export function Funil({ etapas, formato }: { etapas: EtapaDoFunil[]; formato: (n
         )
       })}
     </ol>
-  )
-}
-
-// ---------- Medidor ----------
-
-export function Medidor({ rotulo, fracao, nivel, texto }: { rotulo: ReactNode; fracao: number; nivel: 'bom' | 'atencao' | 'critico'; texto: string }) {
-  return (
-    <div className={s.medidor} data-nivel={nivel}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, fontSize: 14 }}>
-        <span>{rotulo}</span>
-        <strong style={{ fontVariantNumeric: 'tabular-nums' }}>{texto}</strong>
-      </div>
-      <div className={s.medidorTrilho} role="img" aria-label={`${rotulo}: ${texto}`}>
-        <i className={s.medidorMarca} style={{ ['--p' as string]: Math.min(1, Math.max(0, fracao)) }} />
-      </div>
-    </div>
   )
 }
 

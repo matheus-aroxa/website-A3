@@ -12,19 +12,16 @@ export const ABAS = [
   { href: '/admin/relatorios/buscas', rotulo: 'Buscas', periodo: true },
   { href: '/admin/relatorios/imoveis', rotulo: 'Imóveis', periodo: true },
   { href: '/admin/relatorios/conversoes', rotulo: 'Conversões', periodo: true },
-  { href: '/admin/relatorios/desempenho', rotulo: 'Desempenho', periodo: true },
   null,
   { href: '/admin/relatorios/catalogo', rotulo: 'Catálogo', periodo: false },
   { href: '/admin/relatorios/construtoras', rotulo: 'Construtoras', periodo: true },
-  { href: '/admin/relatorios/qualidade', rotulo: 'Qualidade', periodo: false },
-  { href: '/admin/relatorios/painel', rotulo: 'Painel', periodo: true },
 ] as const
 
 /** Abas dos relatórios. Mantém o período escolhido ao trocar de aba. */
 export function NavegacaoRelatorios() {
   const caminho = usePathname()
   const params = useSearchParams()
-  const consulta = new URLSearchParams([...params].filter(([k]) => ['p', 'de', 'ate', 'cmp'].includes(k))).toString()
+  const consulta = new URLSearchParams([...params].filter(([k]) => ['p', 'de', 'ate'].includes(k))).toString()
   return (
     <div className={s.abas}>
       <nav className={`container ${s.abasLista}`} aria-label="Relatórios">

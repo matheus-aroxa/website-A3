@@ -12,7 +12,7 @@ import { canalDaOrigem, rotuloCanal, rotuloOrigem } from '@/lib/relatorios/rotul
 
 export default function PaginaOrigens({ searchParams }: PageProps<'/admin/relatorios/origens'>) {
   return (
-    <PaginaDeRelatorio parametros={searchParams} arquivo="origens">
+    <PaginaDeRelatorio parametros={searchParams}>
       {(ctx) => <Origens ctx={ctx} />}
     </PaginaDeRelatorio>
   )
@@ -36,14 +36,7 @@ async function Origens({ ctx }: { ctx: ContextoDoRelatorio }) {
 
   return (
     <>
-      <GradeKpi
-        titulo="Indicadores de origem"
-        itens={[
-          { rotulo: 'Sessões', valor: fmtInt(total) },
-          { rotulo: 'Acessos diretos', valor: fmtPct(razao(diretas, total)) },
-          { rotulo: 'Canal que mais converte', valor: melhor ? `${rotuloCanal[melhor.chave] ?? melhor.chave} (${fmtPct(conversao(melhor))})` : '—' },
-        ]}
-      >
+      <GradeKpi>
         <Kpi rotulo="Sessões" valor={fmtInt(total)} />
         <Kpi rotulo="Acessos diretos" valor={fmtPct(razao(diretas, total))} nota="Digitaram o endereço, usaram um favorito ou vieram de um app que não informa a origem" />
         <Kpi rotulo="Canal que mais converte" valor={melhor ? fmtPct(conversao(melhor)) : '—'} nota={melhor ? `${rotuloCanal[melhor.chave] ?? melhor.chave} (a partir de 20 sessões)` : 'Poucas sessões para comparar'} />
@@ -60,7 +53,7 @@ async function Origens({ ctx }: { ctx: ContextoDoRelatorio }) {
         </Cartao>
         <Cartao
           titulo="Quais canais viram contato"
-          descricao="Parte das sessões de cada canal que terminou em WhatsApp, ligação, e-mail ou formulário."
+          descricao="Parte das sessões de cada canal que terminou em WhatsApp ou formulário enviado."
           tabela={<TabelaDados legenda="Taxa de contato por canal" colunas={[{ id: 'canal', titulo: 'Canal' }, { id: 'sessoes', titulo: 'Sessões', numerica: true }, { id: 'contatos', titulo: 'Com contato', numerica: true }, { id: 'taxa', titulo: 'Taxa', numerica: true }]} linhas={canais.map((c) => ({ canal: rotuloCanal[c.chave] ?? c.chave, sessoes: c.sessoes, contatos: c.conversoes, taxa: { v: conversao(c), t: fmtPct(conversao(c)) } }))} ordem={{ coluna: 'taxa', decrescente: true }} />}
         >
           {canais.length ? (

@@ -33,13 +33,7 @@ export function lerCarga(bruto: unknown): Carga | null {
   if (b.t === 'saida') {
     const pv = texto(b.pv, 24)
     if (!pv || !PV.test(pv)) return null
-    const w: Record<string, number> = {}
-    const medidas = b.w && typeof b.w === 'object' ? (b.w as Record<string, unknown>) : {}
-    for (const chave of ['lcp', 'cls', 'inp', 'fcp', 'ttfb'] as const) {
-      const n = medidas[chave]
-      if (typeof n === 'number' && Number.isFinite(n) && n >= 0) w[chave] = chave === 'cls' ? Math.min(10, Math.round(n * 1000) / 1000) : Math.min(600_000, Math.round(n))
-    }
-    return { t: 'saida', pv, s: numero(b.s, 0, 4 * 3600) ?? 0, p: numero(b.p, 0, 100) ?? 0, ...(Object.keys(w).length && { w }) }
+    return { t: 'saida', pv, s: numero(b.s, 0, 4 * 3600) ?? 0, p: numero(b.p, 0, 100) ?? 0 }
   }
 
   if (typeof b.t !== 'string' || !(TIPOS_EVENTO as readonly string[]).includes(b.t)) return null

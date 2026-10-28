@@ -48,8 +48,6 @@ export function Cartao({
   return (
     <section
       className={s.cartao}
-      data-cartao
-      data-titulo={titulo}
       onPointerMove={(e) => (e.pointerType === 'mouse' || e.buttons ? mostrar(e.target as Element, e.clientX, e.clientY, e.currentTarget.getBoundingClientRect()) : undefined)}
       onPointerDown={(e) => mostrar(e.target as Element, e.clientX, e.clientY, e.currentTarget.getBoundingClientRect())}
       onPointerLeave={() => setAberta(null)}

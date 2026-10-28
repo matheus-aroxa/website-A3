@@ -26,12 +26,3 @@ export function fmtDuracao(segundos: number) {
   const m = Math.floor(s / 60)
   return m < 60 ? `${m}min ${String(s % 60).padStart(2, '0')}s` : `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, '0')}min`
 }
-
-export interface Variacao {
-  /** (atual - anterior) / anterior; `null` se não há base de comparação. */
-  fracao: number | null
-  atual: number
-  anterior: number
-}
-
-export const variacao = (atual: number, anterior: number): Variacao => ({ atual, anterior, fracao: anterior > 0 ? (atual - anterior) / anterior : null })

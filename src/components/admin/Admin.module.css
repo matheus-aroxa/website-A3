@@ -428,6 +428,42 @@
   align-self: auto;
 }
 
+/* Aba "todos" (link da página de construtoras): publicados e desativados em seções, cada uma com seu título e total. */
+.grupo + .grupo {
+  margin-top: 32px;
+}
+
+.grupoTitulo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--tinta);
+}
+
+.grupoTitulo span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 26px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: var(--mar-claro);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.grupoTitulo[data-status='inativo'] {
+  color: var(--texto-3);
+}
+
+.grupoTitulo[data-status='inativo'] span {
+  background: #eef1f0;
+}
+
 .lista {
   display: grid;
   gap: 12px;
@@ -2628,5 +2664,23 @@ a.tabelaQuantidade:hover {
   }
   .colunaAcoes {
     width: 112px;
+  }
+  /* Busca e "+" na mesma linha: o botão vira um quadrado da altura do campo e o texto fica só para leitor de tela. */
+  .tabelaTopo {
+    flex-wrap: nowrap;
+  }
+  .tabelaNova {
+    flex: none;
+    width: 52px;
+    height: 52px;
+    padding: 0;
+  }
+  .tabelaNovaTexto {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
   }
 }

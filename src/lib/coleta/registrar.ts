@@ -148,9 +148,8 @@ async function completarSaida(c: CargaSaida) {
   await banco().query(
     `UPDATE eventos
         SET tempo_s = GREATEST(COALESCE(tempo_s, 0), $2),
-            rolagem = GREATEST(COALESCE(rolagem, 0), $3),
-            vitais = CASE WHEN $4::jsonb = '{}'::jsonb THEN vitais ELSE COALESCE(vitais, '{}'::jsonb) || $4::jsonb END
+            rolagem = GREATEST(COALESCE(rolagem, 0), $3)
       WHERE pv = $1`,
-    [c.pv, c.s, c.p, JSON.stringify(c.w ?? {})],
+    [c.pv, c.s, c.p],
   )
 }

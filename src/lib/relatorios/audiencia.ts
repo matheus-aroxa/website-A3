@@ -69,6 +69,17 @@ export async function porDimensao(
   return rows
 }
 
+/** Soma de uma dimensão inteira no período, sem o limite de `porDimensao`, e quantas chaves diferentes tiveram visita. */
+export async function totalDaDimensao(p: Pick<Periodo, 'de' | 'ate'>, dimensao: string): Promise<Medidas & { chaves: number }> {
+  await preparar()
+  const { rows } = await banco().query<Medidas & { chaves: number }>(
+    `SELECT (count(DISTINCT chave) FILTER (WHERE visitas > 0))::int AS chaves, ${SOMAS} FROM resumo_diario
+      WHERE dimensao = $1 AND dia BETWEEN $2 AND $3`,
+    [dimensao, p.de, p.ate],
+  )
+  return rows[0] ?? { chaves: 0, ...vazio() }
+}
+
 /** Visitas por dia da semana (0 = domingo) e hora (0-23), para o mapa de calor. */
 export async function visitasPorHoraESemana(p: Pick<Periodo, 'de' | 'ate'>) {
   await preparar()
@@ -92,34 +103,4 @@ export async function eventosPorDia(p: Pick<Periodo, 'de' | 'ate'>, tipos: strin
   )
   const porDia = new Map(rows.map((r) => [r.dia, r.eventos]))
   return listarDias(p).map((dia) => ({ dia, eventos: porDia.get(dia) ?? 0 }))
-}
-
-export interface NotaVital {
-  bom: number
-  medio: number
-  ruim: number
-  /** Média da medida (ms; CLS sem unidade). */
-  media: number
-}
-
-export type MetricaVital = 'lcp' | 'cls' | 'inp' | 'fcp' | 'ttfb'
-export const METRICAS_VITAIS: MetricaVital[] = ['lcp', 'inp', 'cls', 'fcp', 'ttfb']
-
-/** Core Web Vitals do período: por métrica e aparelho, quantas medições foram boas, medianas e ruins. */
-export async function vitais(p: Pick<Periodo, 'de' | 'ate'>) {
-  const linhas = await porDimensao(p, 'vital', { ordem: 'eventos' })
-  const saida = new Map<string, NotaVital & { amostras: number; soma: number }>()
-  for (const l of linhas) {
-    const [metrica, aparelho, nota] = l.chave.split(':') as [MetricaVital, string, 'bom' | 'medio' | 'ruim']
-    for (const chave of [`${metrica}:${aparelho}`, `${metrica}:todos`]) {
-      const atual = saida.get(chave) ?? { bom: 0, medio: 0, ruim: 0, media: 0, amostras: 0, soma: 0 }
-      atual[nota] += l.eventos
-      atual.amostras += l.eventos
-      atual.soma += l.valor
-      saida.set(chave, atual)
-    }
-  }
-  const resultado: Record<string, NotaVital & { amostras: number }> = {}
-  for (const [chave, v] of saida) resultado[chave] = { bom: v.bom, medio: v.medio, ruim: v.ruim, amostras: v.amostras, media: v.amostras ? v.soma / v.amostras / (chave.startsWith('cls') ? 1000 : 1) : 0 }
-  return resultado
 }

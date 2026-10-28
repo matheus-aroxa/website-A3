@@ -17,14 +17,13 @@ export const TIPOS_EVENTO = [
   'busca',
   'externo',
   'nao-encontrada',
-  'erro',
   'acao',
 ] as const
 
 export type TipoEvento = (typeof TIPOS_EVENTO)[number]
 
-/** O que conta como conversão: a pessoa escolheu falar com a A3. Só a intenção é visível, não a mensagem enviada. */
-export const TIPOS_CONVERSAO: TipoEvento[] = ['whatsapp', 'ligacao', 'email', 'formulario-enviado']
+/** O que conta como conversão: a pessoa escolheu falar com a A3. Clique no telefone ou no e-mail não conta. Só a intenção é visível, não a mensagem enviada. */
+export const TIPOS_CONVERSAO: TipoEvento[] = ['whatsapp', 'formulario-enviado']
 
 /** Eventos que mostram interesse no imóvel sem ser contato (fotos, planta, mapa, compartilhar ou começar a preencher um formulário). */
 export const TIPOS_INTERACAO: TipoEvento[] = ['galeria', 'planta', 'mapa', 'compartilhar', 'formulario-iniciado']
@@ -52,7 +51,7 @@ export interface CargaEvento {
   l?: string
 }
 
-/** Enviado quando a pessoa sai da página: completa a visita com o tempo, a rolagem e a velocidade. */
+/** Enviado quando a pessoa sai da página: completa a visita com o tempo e a rolagem. */
 export interface CargaSaida {
   t: 'saida'
   pv: string
@@ -60,8 +59,6 @@ export interface CargaSaida {
   s: number
   /** Até onde a página foi rolada, de 0 a 100. */
   p: number
-  /** Core Web Vitals medidos na página: lcp, fcp, ttfb e inp em ms; cls sem unidade. */
-  w?: Partial<Record<'lcp' | 'cls' | 'inp' | 'fcp' | 'ttfb', number>>
 }
 
 export type Carga = CargaEvento | CargaSaida

@@ -8,7 +8,8 @@ import type { StatusImovel, Vitrine } from './painel'
 import { LIMITE_DESTAQUES } from './repositorio'
 import type { Finalidade, Situacao } from './tipos'
 
-export const ABAS_ADMIN = ['ativo', 'inativo', 'vitrine'] as const
+/** `todos` não tem botão no painel: é o destino do link da quantidade na página de construtoras. */
+export const ABAS_ADMIN = ['ativo', 'inativo', 'vitrine', 'todos'] as const
 export type AbaAdmin = (typeof ABAS_ADMIN)[number]
 
 export const POR_PAGINA_ADMIN = 24
@@ -69,12 +70,15 @@ const NA_ABA: Record<AbaAdmin, string> = {
   ativo: "status = 'ativo'",
   inativo: "status = 'inativo'",
   vitrine: '(heroi OR destaque)',
+  todos: 'true',
 }
 
 export interface PaginaAdmin {
   itens: LinhaAdmin[]
   /** Imóveis que atendem à aba e à busca (todas as páginas). */
   total: number
+  /** O mesmo total, separado entre publicados e desativados. */
+  porStatus: Record<StatusImovel, number>
   pagina: number
   totalPaginas: number
   /** Quantos há em cada aba, sem considerar a busca. */
@@ -95,17 +99,24 @@ export async function listarPaginaAdmin(f: FiltroAdmin): Promise<PaginaAdmin> {
   const contagens = banco().query<Record<AbaAdmin, number>>(
     `${BASE} SELECT ${ABAS_ADMIN.map((a) => `count(*) FILTER (WHERE ${NA_ABA[a]})::int AS ${a}`).join(', ')} FROM base`,
   )
-  const total = (await banco().query<{ n: number }>(`${BASE} SELECT count(*)::int AS n FROM base WHERE ${onde}`, params)).rows[0]!.n
+  const { n: total, ...porStatus } = (
+    await banco().query<{ n: number } & Record<StatusImovel, number>>(
+      `${BASE} SELECT count(*)::int AS n, count(*) FILTER (WHERE status = 'ativo')::int AS ativo,
+                      count(*) FILTER (WHERE status = 'inativo')::int AS inativo
+                 FROM base WHERE ${onde}`,
+      params,
+    )
+  ).rows[0]!
   const totalPaginas = Math.max(1, Math.ceil(total / POR_PAGINA_ADMIN))
   const pagina = Math.min(Math.max(1, f.pagina), totalPaginas)
   const { rows } = await banco().query<LinhaAdmin>(
     `${BASE} SELECT id, codigo, slug, nome, bairro, cidade, construtora, preco, finalidade, situacao, capa, status, criado, heroi, destaque
        FROM base WHERE ${onde}
-      ORDER BY translate(lower(nome), 'áàâãäéèêëíìîïóòôõöúùûüçñ', 'aaaaaeeeeiiiiooooouuuucn'), id
+      ORDER BY ${f.aba === 'todos' ? "status <> 'ativo', " : ''}translate(lower(nome), 'áàâãäéèêëíìîïóòôõöúùûüçñ', 'aaaaaeeeeiiiiooooouuuucn'), id
       LIMIT ${POR_PAGINA_ADMIN} OFFSET ${(pagina - 1) * POR_PAGINA_ADMIN}`,
     params,
   )
-  return { itens: rows, total, pagina, totalPaginas, contagens: (await contagens).rows[0]! }
+  return { itens: rows, total, porStatus, pagina, totalPaginas, contagens: (await contagens).rows[0]! }
 }
 
 // ---------- Vitrine ----------

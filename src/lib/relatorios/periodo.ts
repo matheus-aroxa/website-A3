@@ -71,13 +71,6 @@ export function lerPeriodo(params: ParametrosPeriodo, hoje: string, primeiroDia:
   return { de, ate: hoje, dias: diferencaEmDias(de, hoje) + 1, preset, rotulo: PRESETS.find((x) => x.valor === preset)!.rotulo }
 }
 
-/** O período de mesmo tamanho que termina um dia antes deste começar. */
-export function periodoAnterior(p: Periodo): Periodo {
-  const ate = somarDias(p.de, -1)
-  const de = somarDias(ate, -(p.dias - 1))
-  return { de, ate, dias: p.dias, preset: null, rotulo: `${formatarDia(de)} a ${formatarDia(ate)}` }
-}
-
 /** Todos os dias do período, em ordem. */
 export function listarDias(p: Pick<Periodo, 'de' | 'ate'>) {
   const dias: string[] = []
@@ -89,7 +82,7 @@ export function listarDias(p: Pick<Periodo, 'de' | 'ate'>) {
 export const diaDaSemana = (iso: string) => paraData(iso).getUTCDay()
 
 /** Monta a query string do período, para os links e o seletor. */
-export function paramsDoPeriodo(p: Periodo, comparar: boolean) {
+export function paramsDoPeriodo(p: Periodo) {
   const sp = new URLSearchParams()
   if (p.preset) {
     if (p.preset !== PRESET_PADRAO) sp.set('p', p.preset)
@@ -97,6 +90,5 @@ export function paramsDoPeriodo(p: Periodo, comparar: boolean) {
     sp.set('de', p.de)
     sp.set('ate', p.ate)
   }
-  if (!comparar) sp.set('cmp', '0')
   return sp
 }

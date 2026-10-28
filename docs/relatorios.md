@@ -1,30 +1,25 @@
 # Relatórios e medição de uso
 
 O painel tem uma área de relatórios (`/admin/relatorios`) com gráficos do cadastro, das visitas, das buscas e dos contatos.
-Parte vem direto das tabelas do site (catálogo e qualidade do cadastro, já com números desde o primeiro dia); a outra parte
+Parte vem direto das tabelas do site (catálogo, já com números desde o primeiro dia); a outra parte
 vem de uma **medição de uso própria**, anônima e sem cookies, que só passa a contar a partir do dia em que entra no ar.
 
 ## O que cada aba mostra
 
 | Aba | Conteúdo | Fonte |
 |---|---|---|
-| Visão geral | Indicadores do site e do cadastro, visitas e contatos por dia, mais vistos, origem, aparelhos e pontos de atenção | os dois |
-| Audiência | Visitas, visitantes, sessões, horários de pico (mapa de calor), aparelho, navegador, sistema, idioma, estado, cidade e país | medição |
+| Visão geral | Indicadores do site e do cadastro, visitas e contatos por dia, mais vistos, origem e pontos de atenção | os dois |
+| Audiência | Visitas, visitantes, sessões, horários de pico (mapa de calor), tipos de página, estado, cidade e país | medição |
 | Origens | Canais (busca, redes sociais, WhatsApp...), sites e apps de origem, campanhas (`utm_*`) e taxa de contato de cada um | medição |
-| Páginas | Mais vistas, de entrada e de saída, tempo e rolagem, páginas inexistentes (404) | medição |
+| Páginas | Mais vistas, de entrada e de saída, tempo e rolagem, tipos de página | medição |
 | Buscas | Filtros e termos mais usados, buscas sem resultado (demanda que o catálogo não atende), "carregar mais" | medição |
 | Imóveis | Mais vistos, com mais contatos, maior taxa de contato, muita visita e pouco contato, sem visita, desempenho por faixa de preço, fase, tipo, cidade e construtora | medição + catálogo |
 | Conversões | Funil (acesso, imóvel, interesse, contato), tipos de contato, botão do WhatsApp, formulários e campos com erro | medição |
-| Desempenho | Core Web Vitals (carregamento, resposta, estabilidade) por aparelho, páginas mais lentas e erros de JavaScript | medição |
 | Catálogo | Imóveis, construtoras, cidades, bairros, preços, faixas, quartos, entrega, fotos e cadastros por mês | tabelas do site |
 | Construtoras | Imóveis, visitas e contatos por construtora; construtoras sem imóveis | catálogo + medição |
-| Qualidade | O que está faltando nos cadastros (coordenadas, endereço, planta, fotos...), com a lista dos imóveis para corrigir | tabelas do site |
-| Painel | Quem alterou o quê e quando; administradores e sessões abertas | `auditoria` |
 
-Todas têm tabela equivalente a cada gráfico ("Ver tabela"), exportação em CSV (todas as tabelas da página, abre direto no Excel)
-e impressão. As abas de audiência aceitam período (hoje, 7, 30, 90 dias, mês, 12 meses, desde o início ou datas escolhidas), que
-vai na URL (`?p=7d` ou `?de=2026-10-01&ate=2026-10-27`) e é mantido ao trocar de aba. Visão geral, Audiência e Conversões comparam
-com o período anterior, desde que a medição já existisse nele.
+Todas têm tabela equivalente a cada gráfico ("Ver tabela"). As abas de audiência aceitam período (hoje, 7, 30, 90 dias, mês, 12 meses, desde o início ou datas escolhidas), que
+vai na URL (`?p=7d` ou `?de=2026-10-01&ate=2026-10-27`) e é mantido ao trocar de aba.
 
 ## Como a medição funciona
 
@@ -54,19 +49,18 @@ com o período anterior, desde que a medição já existisse nele.
 
 ### O que dá e o que não dá para saber
 
-- **Contato = intenção.** Conta o clique no WhatsApp, no telefone ou no e-mail e o formulário enviado. Se a pessoa de fato mandou a
+- **Contato = intenção.** Conta o clique no WhatsApp e o formulário enviado; clique no telefone ou no e-mail não conta. Se a pessoa de fato mandou a
   mensagem no WhatsApp só quem atende sabe.
-- **Não há histórico.** As visitas só existem desde o dia em que a medição foi publicada; os relatórios avisam isso e desligam a
-  comparação com períodos anteriores a essa data.
+- **Não há histórico.** As visitas só existem desde o dia em que a medição foi publicada; os relatórios avisam isso e mostram
+  zerados os dias anteriores.
 - Imóvel excluído continua nos números, como "Imóvel removido" (os eventos guardam o id, sem chave estrangeira).
-- Tentativas de login com senha errada são apagadas em 1 dia, então não há relatório histórico delas.
 
 ## Tabelas (`db/relatorios.sql`)
 
 | Tabela | O que guarda | Quanto tempo |
 |---|---|---|
-| `eventos` | Um evento por linha: visita, clique em WhatsApp/telefone/e-mail, galeria, mapa, busca, formulário, 404, erro | 90 dias |
-| `resumo_diario` | Contagens por dia, dimensão (`canal`, `pagina`, `imovel`, `acao`, `busca-uso`, `vital`...), chave e imóvel | para sempre |
+| `eventos` | Um evento por linha: visita, clique em WhatsApp/telefone/e-mail, galeria, mapa, busca, formulário, 404 | 90 dias |
+| `resumo_diario` | Contagens por dia, dimensão (`canal`, `pagina`, `imovel`, `acao`, `busca-uso`...), chave e imóvel | para sempre |
 | `sal_visitantes` | O sal de cada dia | 2 dias |
 
 As três têm RLS ligado, como as demais (`db/seguranca-rls.sql`).

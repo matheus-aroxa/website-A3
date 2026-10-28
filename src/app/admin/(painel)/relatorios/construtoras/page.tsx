@@ -12,7 +12,7 @@ import type { ContextoDoRelatorio } from '@/lib/relatorios/pagina'
 
 export default function PaginaConstrutoras({ searchParams }: PageProps<'/admin/relatorios/construtoras'>) {
   return (
-    <PaginaDeRelatorio parametros={searchParams} arquivo="construtoras">
+    <PaginaDeRelatorio parametros={searchParams}>
       {(ctx) => <Construtoras ctx={ctx} />}
     </PaginaDeRelatorio>
   )
@@ -34,37 +34,28 @@ async function Construtoras({ ctx }: { ctx: ContextoDoRelatorio }) {
 
   return (
     <>
-      <GradeKpi
-        titulo="Indicadores das construtoras"
-        itens={[
-          { rotulo: 'Construtoras cadastradas', valor: fmtInt(resumo.construtoras.total) },
-          { rotulo: 'Com imóveis ativos', valor: fmtInt(resumo.construtoras.comImoveis) },
-          { rotulo: 'Sem imóveis', valor: fmtInt(semImoveis.length) },
-          { rotulo: 'Imóveis sem construtora informada', valor: fmtInt(resumo.construtoras.imoveisNaoInformados) },
-        ]}
-      >
+      <GradeKpi>
         <Kpi rotulo="Cadastradas" valor={fmtInt(resumo.construtoras.total)} nota="Sem contar “Não informado”" />
         <Kpi rotulo="Com imóveis ativos" valor={fmtInt(resumo.construtoras.comImoveis)} nota={lider ? `${lider.chave} lidera, com ${fmtInt(lider.imoveis)}` : undefined} />
         <Kpi rotulo="Sem imóveis" valor={fmtInt(semImoveis.length)} nota="Cadastradas e sem nenhum imóvel ativo" />
         <Kpi rotulo="Imóveis “Não informado”" valor={fmtInt(resumo.construtoras.imoveisNaoInformados)} nota={naoInformado ? `${fmtPct(razao(resumo.construtoras.imoveisNaoInformados, resumo.imoveis.ativos), 0)} dos imóveis ativos` : undefined} />
       </GradeKpi>
 
-      <div className={s.grade}>
-        <Cartao
-          titulo="Imóveis por construtora"
-          descricao="As 15 construtoras com mais imóveis ativos."
-          tabela={undefined}
-        >
-          <Barras itens={porImoveis.slice(0, 15).map((g) => ({ rotulo: g.chave, valor: g.imoveis }))} formato={fmtInt} />
-        </Cartao>
-        <Cartao
-          titulo="Construtoras mais vistas"
-          descricao="Visitas somadas aos imóveis de cada construtora no período."
-          tabela={undefined}
-        >
-          {maisVistas.length ? <Barras itens={maisVistas.map((g) => ({ rotulo: g.chave, sub: `${fmtInt(g.imoveis)} imóveis · ${razao(g.visitas, g.imoveis).toFixed(1).replace('.', ',')} visitas por imóvel`, valor: g.visitas, extras: [['Contatos', fmtInt(g.contatos)]] }))} formato={fmtInt} /> : <Vazio titulo="Sem visitas neste período" />}
-        </Cartao>
-      </div>
+      <Cartao
+        titulo="Imóveis por construtora"
+        descricao="As 15 construtoras com mais imóveis ativos."
+        tabela={undefined}
+      >
+        <Barras itens={porImoveis.slice(0, 15).map((g) => ({ rotulo: g.chave, valor: g.imoveis }))} formato={fmtInt} />
+      </Cartao>
+
+      <Cartao
+        titulo="Construtoras mais vistas"
+        descricao="Visitas somadas aos imóveis de cada construtora no período."
+        tabela={undefined}
+      >
+        {maisVistas.length ? <Barras itens={maisVistas.map((g) => ({ rotulo: g.chave, sub: `${fmtInt(g.imoveis)} imóveis · ${razao(g.visitas, g.imoveis).toFixed(1).replace('.', ',')} visitas por imóvel`, valor: g.visitas, extras: [['Contatos', fmtInt(g.contatos)]] }))} formato={fmtInt} /> : <Vazio titulo="Sem visitas neste período" />}
+      </Cartao>
 
       <Cartao
         titulo="Desempenho de cada construtora"

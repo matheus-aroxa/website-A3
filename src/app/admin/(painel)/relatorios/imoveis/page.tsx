@@ -14,7 +14,7 @@ import type { Situacao, TipoImovel } from '@/lib/imoveis/tipos'
 
 export default function PaginaImoveis({ searchParams }: PageProps<'/admin/relatorios/imoveis'>) {
   return (
-    <PaginaDeRelatorio parametros={searchParams} arquivo="imoveis">
+    <PaginaDeRelatorio parametros={searchParams}>
       {(ctx) => <Imoveis ctx={ctx} />}
     </PaginaDeRelatorio>
   )
@@ -72,16 +72,7 @@ async function Imoveis({ ctx }: { ctx: ContextoDoRelatorio }) {
 
   return (
     <>
-      <GradeKpi
-        titulo="Indicadores dos imóveis"
-        itens={[
-          { rotulo: 'Imóveis visitados', valor: `${visitados.length} de ${ativos.length}` },
-          { rotulo: 'Sem nenhuma visita', valor: fmtInt(semVisita.length) },
-          { rotulo: 'Visitas por imóvel visitado', valor: temDados ? (visitados.reduce((a, i) => a + i.visitas, 0) / Math.max(1, visitados.length)).toFixed(1) : '—' },
-          { rotulo: 'Taxa de contato', valor: fmtPct(taxaGeral) },
-          { rotulo: 'Com muita visita e pouco contato', valor: fmtInt(oportunidades.length) },
-        ]}
-      >
+      <GradeKpi>
         <Kpi rotulo="Imóveis visitados" valor={fmtInt(visitados.length)} nota={`de ${fmtInt(ativos.length)} ativos (${fmtPct(razao(visitados.length, ativos.length), 0)})`} />
         <Kpi rotulo="Sem nenhuma visita" valor={fmtInt(semVisita.length)} nota="Ativos que ninguém abriu no período" />
         <Kpi rotulo="Visitas por imóvel" valor={temDados ? (visitados.reduce((a, i) => a + i.visitas, 0) / Math.max(1, visitados.length)).toFixed(1).replace('.', ',') : '—'} nota="Média entre os visitados" />
@@ -99,10 +90,10 @@ async function Imoveis({ ctx }: { ctx: ContextoDoRelatorio }) {
         </Cartao>
         <Cartao
           titulo="Mais contatos"
-          descricao="WhatsApp, ligações, e-mails e formulários a partir da página do imóvel."
-          tabela={<TabelaDados legenda="Imóveis com mais contatos" limite={15} colunas={[{ id: 'imovel', titulo: 'Imóvel' }, { id: 'whatsapp', titulo: 'WhatsApp', numerica: true }, { id: 'ligacao', titulo: 'Ligação', numerica: true }, { id: 'email', titulo: 'E-mail', numerica: true }, { id: 'formulario', titulo: 'Formulário', numerica: true }, { id: 'total', titulo: 'Total', numerica: true }]} linhas={maisContatos.map((i) => ({ imovel: i.nome, whatsapp: i.whatsapp, ligacao: i.ligacao, email: i.email, formulario: i.formulario, total: contatosDe(i) }))} ordem={{ coluna: 'total', decrescente: true }} />}
+          descricao="WhatsApp e formulários enviados a partir da página do imóvel."
+          tabela={<TabelaDados legenda="Imóveis com mais contatos" limite={15} colunas={[{ id: 'imovel', titulo: 'Imóvel' }, { id: 'whatsapp', titulo: 'WhatsApp', numerica: true }, { id: 'formulario', titulo: 'Formulário', numerica: true }, { id: 'total', titulo: 'Total', numerica: true }]} linhas={maisContatos.map((i) => ({ imovel: i.nome, whatsapp: i.whatsapp, formulario: i.formulario, total: contatosDe(i) }))} ordem={{ coluna: 'total', decrescente: true }} />}
         >
-          {maisContatos.length ? <Barras itens={maisContatos.map((i) => ({ rotulo: i.nome, sub: local(i), href: link(i), valor: contatosDe(i), extras: [['WhatsApp', fmtInt(i.whatsapp)], ['Formulário', fmtInt(i.formulario)], ['Ligação', fmtInt(i.ligacao)], ['E-mail', fmtInt(i.email)]] }))} formato={fmtInt} /> : <Vazio titulo="Nenhum contato registrado neste período" />}
+          {maisContatos.length ? <Barras itens={maisContatos.map((i) => ({ rotulo: i.nome, sub: local(i), href: link(i), valor: contatosDe(i), extras: [['WhatsApp', fmtInt(i.whatsapp)], ['Formulário', fmtInt(i.formulario)]] }))} formato={fmtInt} /> : <Vazio titulo="Nenhum contato registrado neste período" />}
         </Cartao>
       </div>
 

@@ -1,6 +1,6 @@
 // Peças e contas que várias páginas de relatório usam.
 import type { PontoDia, Medidas } from '@/lib/relatorios/audiencia'
-import { fmtDuracao, fmtInt, fmtPct, razao, variacao } from '@/lib/relatorios/formato'
+import { fmtDuracao, fmtInt, fmtPct, razao } from '@/lib/relatorios/formato'
 import { DIAS_DA_SEMANA } from '@/lib/relatorios/rotulos'
 import { diaDaSemana, formatarDia } from '@/lib/relatorios/periodo'
 import type { PontoDeLinha } from './Graficos'
@@ -13,20 +13,14 @@ export const taxas = (m: Medidas) => ({
   duracao: razao(m.tempo_s, m.sessoes),
 })
 
-/** Série diária pronta para o gráfico de linha, com o período anterior alinhado dia a dia. */
-export function pontosDeLinha(atual: PontoDia[], anterior: PontoDia[] | null, campo: (p: PontoDia) => number): PontoDeLinha[] {
-  return atual.map((p, i) => {
-    const a = anterior?.[i]
-    return {
-      rotulo: formatarDia(p.dia, true),
-      rotuloLongo: `${DIAS_DA_SEMANA[diaDaSemana(p.dia)]}, ${formatarDia(p.dia)}`,
-      valor: campo(p),
-      ...(a && { anterior: campo(a), rotuloAnterior: formatarDia(a.dia, true) }),
-    }
-  })
+/** Série diária pronta para o gráfico de linha. */
+export function pontosDeLinha(atual: PontoDia[], campo: (p: PontoDia) => number): PontoDeLinha[] {
+  return atual.map((p) => ({
+    rotulo: formatarDia(p.dia, true),
+    rotuloLongo: `${DIAS_DA_SEMANA[diaDaSemana(p.dia)]}, ${formatarDia(p.dia)}`,
+    valor: campo(p),
+  }))
 }
-
-export const comparar = (atual: number, anterior: number | undefined) => (anterior === undefined ? undefined : variacao(atual, anterior))
 
 /** Colunas padrão de uma tabela de dimensão (origem, aparelho, página de entrada...). */
 export const COLUNAS_DE_AUDIENCIA: ColunaDaTabela[] = [

@@ -81,8 +81,8 @@ export async function desempenhoDosImoveis(p: Pick<Periodo, 'de' | 'ate'>): Prom
   return rows
 }
 
-/** Total de contatos (WhatsApp, ligação, e-mail e formulário) sobre o imóvel. */
-export const contatosDe = (i: DesempenhoImovel) => i.whatsapp + i.ligacao + i.email + i.formulario
+/** Total de contatos (WhatsApp e formulário enviado) sobre o imóvel. */
+export const contatosDe = (i: DesempenhoImovel) => i.whatsapp + i.formulario
 
 export interface GrupoDeImoveis {
   chave: string

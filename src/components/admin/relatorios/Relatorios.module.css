@@ -53,10 +53,13 @@
   display: none;
 }
 
+/* As abas dividem a largura por igual; em tela estreita, nenhuma fica menor que o texto e a lista rola. */
 .aba {
-  flex: none;
+  flex: 1 1 0;
+  min-width: max-content;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   height: 38px;
   padding: 0 14px;
   border-radius: 10px;
@@ -91,7 +94,7 @@
 .barra {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-end;
   gap: 10px;
   padding: 12px;
   background: #fff;
@@ -100,14 +103,17 @@
 }
 
 .barraPeriodo {
+  display: flex;
   flex: 1 1 220px;
+  flex-direction: column;
+  gap: 2px;
   min-width: 0;
 }
 
 .barraDatas {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-end;
   gap: 8px;
   flex: 1 1 280px;
 }
@@ -117,6 +123,10 @@
   flex: 1 1 130px;
   flex-direction: column;
   gap: 2px;
+}
+
+.barraNome {
+  padding-left: 4px;
   font-size: 11.5px;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -125,41 +135,14 @@
 }
 
 .barraDatas input {
-  height: 44px;
-  padding: 0 12px;
+  height: 52px;
+  padding: 0 14px;
   border: 1px solid var(--borda-campo);
   border-radius: 12px;
   background: #fff;
-  font-size: 15px;
-  letter-spacing: 0;
-  text-transform: none;
+  font-size: 16px;
   font-weight: 500;
   color: var(--tinta);
-}
-
-.barraAcoes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-left: auto;
-}
-
-.comparar {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 44px;
-  padding: 0 4px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--texto-3);
-  cursor: pointer;
-}
-
-.comparar input {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--mar);
 }
 
 .barraResumo {
@@ -202,17 +185,35 @@
   color: var(--g-acento);
 }
 
+.aviso[data-centro] {
+  align-items: center;
+}
+
+.aviso[data-centro] svg {
+  margin-top: 0;
+}
+
 /* ---------- Cartões ---------- */
 
 .grade {
   display: grid;
   gap: 14px;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr));
-  align-items: start;
 }
 
 .grade[data-colunas='3'] {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+}
+
+/* Linha incompleta: os cartões que sobram dividem a largura toda entre si, em vez de deixar um buraco no fim. */
+.grade[data-distribuir] {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.grade[data-distribuir] > * {
+  flex: 1 1 320px;
+  min-width: 0;
 }
 
 .cartao {
@@ -280,6 +281,17 @@
   color: #fff;
 }
 
+/* Cartões lado a lado têm a mesma altura: o conteúdo ocupa o que sobra e o aviso de "sem dados" fica no meio. */
+.visaoGrafico {
+  flex: 1;
+}
+
+.visaoGrafico:not([hidden]):has(> .vazio:only-child) {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .visaoTabela[hidden],
 .visaoGrafico[hidden] {
   display: none;
@@ -309,13 +321,15 @@
 
 /* ---------- Indicadores ---------- */
 
+/* Os indicadores quebram de linha e os de cada linha dividem a largura toda, sem sobrar espaço no fim da última. */
 .kpis {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   gap: 10px;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
 }
 
 .kpi {
+  flex: 1 1 150px;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -350,45 +364,6 @@
   font-size: 12.5px;
   line-height: 1.4;
   color: var(--texto-2);
-}
-
-.delta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  column-gap: 3px;
-  font-size: 12.5px;
-  font-weight: 700;
-}
-
-.delta[data-bom='true'] {
-  color: var(--bom);
-}
-
-.delta[data-bom='false'] {
-  color: var(--ruim);
-}
-
-.delta[data-bom='neutro'] {
-  color: var(--texto-2);
-}
-
-.deltaBase {
-  flex-basis: 100%;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--texto-2);
-}
-
-.mini {
-  display: block;
-  width: 100%;
-  height: 28px;
-  margin-top: 2px;
-}
-
-.mini path {
-  vector-effect: non-scaling-stroke;
 }
 
 /* ---------- Gráfico de linha ---------- */
@@ -480,10 +455,6 @@
   box-sizing: content-box;
   padding: 0;
   opacity: 0;
-}
-
-.linhaPonto[data-serie='anterior'] {
-  background: var(--g-anterior);
 }
 
 .linhaColuna:hover .linhaCruz,
@@ -857,36 +828,6 @@
   color: var(--g-mudo);
 }
 
-/* ---------- Medidor (qualidade) ---------- */
-
-.medidor {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.medidorTrilho {
-  height: 10px;
-  border-radius: 5px;
-  background: var(--g-trilho);
-  overflow: hidden;
-}
-
-.medidorMarca {
-  height: 100%;
-  width: calc(100% * var(--p, 0));
-  border-radius: 5px;
-  background: var(--g-acento);
-}
-
-.medidor[data-nivel='atencao'] .medidorMarca {
-  background: var(--g-4);
-}
-
-.medidor[data-nivel='critico'] .medidorMarca {
-  background: var(--ruim);
-}
-
 /* ---------- Tabela ---------- */
 
 .tabelaRolagem {
@@ -1129,42 +1070,7 @@
   color: var(--g-mudo);
 }
 
-.detalhes summary {
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--mar);
-}
-
-.detalhes ul {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin: 8px 0 0;
-  padding: 0;
-  list-style: none;
-  font-size: 14px;
-}
-
-.detalhes li a {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px 10px;
-  padding: 6px 8px;
-  border-radius: 8px;
-  color: var(--tinta);
-  text-decoration: none;
-}
-
-.detalhes li a:hover {
-  background: var(--fundo-2);
-}
-
-.detalhes small {
-  color: var(--g-mudo);
-}
-
-/* ---------- Responsivo e impressão ---------- */
+/* ---------- Responsivo ---------- */
 
 @media (min-width: 720px) {
   .cartao {
@@ -1202,25 +1108,5 @@
 
   .kpiValor {
     font-size: 26px;
-  }
-}
-
-@media print {
-  .abas,
-  .barra,
-  .alternar,
-  .tabelaMais,
-  .tabelaBusca {
-    display: none !important;
-  }
-
-  .cartao,
-  .kpi {
-    break-inside: avoid;
-    border-color: #ccc;
-  }
-
-  .visaoTabela[hidden] {
-    display: none !important;
   }
 }

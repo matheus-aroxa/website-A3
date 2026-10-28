@@ -72,7 +72,7 @@ export default function PoliticaPrivacidade() {
               <strong>O que medimos:</strong> as páginas vistas e por quanto tempo, até onde a página foi rolada, cliques em
               WhatsApp, telefone, e-mail, fotos, mapa e botão de compartilhar, os filtros e os termos usados na busca, o envio dos
               formulários (só o nome do formulário, o imóvel e quais campos deram erro, nunca o que foi digitado), o tipo de aparelho,
-              o navegador e o sistema, o idioma, o site de onde a pessoa veio, a velocidade de carregamento e erros do site.
+              o navegador e o sistema, o idioma e o site de onde a pessoa veio.
             </li>
             <li>
               <strong>Localização aproximada:</strong> cidade e estado, estimados pelo provedor de hospedagem a partir do endereço IP.
