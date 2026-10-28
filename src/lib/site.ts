@@ -79,7 +79,7 @@ export function mensagemImovel(d: { nome: string; whatsapp: string; mensagem?: s
   ]
     .filter(([, valor]) => valor)
     .map(([rotulo, valor]) => `${rotulo}: ${valor}`)
-  return `Olá! Vim pelo site da A3 e tenho interesse no ${imovel.nome} (cód. ${imovel.codigo}).\n\n${linhas.join('\n')}`
+  return `Olá! Vim pelo site da A3 e tenho interesse no ${imovel.nome}.\n\n${linhas.join('\n')}`
 }
 
 /** Mensagem do pedido de visita, com o resumo dos dias e horários e o que a pessoa preencheu. */
@@ -95,7 +95,7 @@ export function mensagemVisita(
   ]
     .filter(([, valor]) => valor)
     .map(([rotulo, valor]) => `${rotulo}: ${valor}`)
-  return `Olá! Vim pelo site da A3 e quero agendar uma visita ao ${imovel.nome} (cód. ${imovel.codigo}).\n\n${linhas.join('\n')}`
+  return `Olá! Vim pelo site da A3 e quero agendar uma visita ao ${imovel.nome}.\n\n${linhas.join('\n')}`
 }
 
 export function linkWhatsApp(mensagem: string = mensagensWhatsApp.padrao) {
