@@ -159,7 +159,7 @@ export default async function PaginaImovel({ params }: PageProps<'/imovel/[slug]
                 </small>
               </div>
               <div className={s.precoAcoes}>
-                <a className="btn btn-sol btn-quadrado" href={linkWhatsApp(mensagemWhats)} target="_blank" rel="noopener">
+                <a className="btn btn-sol btn-quadrado" href={linkWhatsApp(mensagemWhats)} target="_blank" rel="noopener" data-rastro="ficha-preco">
                   <Icone nome="whatsapp" tamanho={18} espessura={2} />
                   WhatsApp
                 </a>
@@ -358,7 +358,7 @@ export default async function PaginaImovel({ params }: PageProps<'/imovel/[slug]
               </div>
               <div className={`${s.gradeSemelhantes} carrossel-mobile`}>
                 {semelhantes.map((sim) => (
-                  <CardImovel key={sim.id} imovel={sim} />
+                  <CardImovel key={sim.id} imovel={sim} lista="semelhantes" />
                 ))}
               </div>
             </div>
@@ -370,7 +370,7 @@ export default async function PaginaImovel({ params }: PageProps<'/imovel/[slug]
 
       {/* Barra fixa do celular (protótipo mobile). */}
       <div className={s.barraInferior}>
-        <a className="btn btn-linha btn-quadrado" href={linkWhatsApp(mensagemWhats)} target="_blank" rel="noopener">
+        <a className="btn btn-linha btn-quadrado" href={linkWhatsApp(mensagemWhats)} target="_blank" rel="noopener" data-rastro="ficha-barra-celular">
           <Icone nome="whatsapp" tamanho={19} espessura={2} />
           WhatsApp
         </a>

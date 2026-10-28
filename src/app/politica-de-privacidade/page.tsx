@@ -15,8 +15,9 @@ export const metadata: Metadata = {
 }
 
 // Texto-base. Deve ser revisado pelo jurídico/encarregado de dados da A3 antes da publicação.
-// Descreve o que o site faz hoje: os formulários não gravam nada (só abrem o WhatsApp), não há cookies de rastreamento
-// nem ferramentas de análise. Se isso mudar (Analytics, pixel de anúncios, contatos gravados no banco), atualize o texto.
+// Descreve o que o site faz hoje: os formulários não gravam nada (só abrem o WhatsApp) e há uma medição própria de uso,
+// anônima e sem cookies (src/lib/coleta, docs/relatorios.md). Se isso mudar (Analytics de terceiros, pixel de anúncios,
+// contatos gravados no banco, novos dados na medição), atualize o texto.
 export default function PoliticaPrivacidade() {
   return (
     <>
@@ -41,8 +42,9 @@ export default function PoliticaPrivacidade() {
             <li>A mensagem, os dias e horários de preferência e o imóvel de interesse, quando você preenche;</li>
             <li>
               Dados técnicos de navegação (como endereço IP e tipo de navegador), registrados pelos provedores de hospedagem
-              para manter o site funcionando e seguro.
+              para manter o site funcionando e seguro;
             </li>
+            <li>Dados anônimos de uso do site, descritos em “Medição de uso do site”, abaixo.</li>
           </ul>
 
           <h2>Como os formulários funcionam</h2>
@@ -60,10 +62,47 @@ export default function PoliticaPrivacidade() {
             formulário, e a execução de procedimentos preliminares a contratos que você solicitar.
           </p>
 
-          <h2>Cookies e rastreamento</h2>
+          <h2>Medição de uso do site</h2>
           <p>
-            O site não usa cookies de publicidade nem ferramentas de análise ou rastreamento de visitantes. Somente a área
-            administrativa, restrita à equipe da A3, usa um cookie de sessão para manter o login.
+            Para saber quais imóveis interessam, o que as pessoas buscam e se o site está rápido, o próprio site mede o uso de forma
+            anônima. Não usamos Google Analytics nem outra ferramenta de terceiros para isso.
+          </p>
+          <ul>
+            <li>
+              <strong>O que medimos:</strong> as páginas vistas e por quanto tempo, até onde a página foi rolada, cliques em
+              WhatsApp, telefone, e-mail, fotos, mapa e botão de compartilhar, os filtros e os termos usados na busca, o envio dos
+              formulários (só o nome do formulário, o imóvel e quais campos deram erro, nunca o que foi digitado), o tipo de aparelho,
+              o navegador e o sistema, o idioma, o site de onde a pessoa veio, a velocidade de carregamento e erros do site.
+            </li>
+            <li>
+              <strong>Localização aproximada:</strong> cidade e estado, estimados pelo provedor de hospedagem a partir do endereço IP.
+              O endereço IP em si não é gravado.
+            </li>
+            <li>
+              <strong>Sem identificar você:</strong> não usamos cookies nem guardamos nada no seu aparelho para essa medição. Para
+              contar visitantes diferentes, geramos um código a partir do endereço IP e do navegador misturados com um valor
+              secreto que muda todo dia e é apagado em dois dias. Por isso o código não pode ser refeito, não identifica a pessoa e não
+              liga uma visita de um dia a outra.
+            </li>
+            <li>
+              <strong>Por quanto tempo:</strong> os registros detalhados são apagados em 90 dias. Ficam apenas totais diários, como
+              “quantas visitas o imóvel X teve”, que não identificam ninguém.
+            </li>
+            <li>
+              <strong>Como não ser contado:</strong> se o seu navegador envia o sinal “Não rastrear” (DNT) ou “Global Privacy Control”,
+              a medição é desligada para você. A equipe da A3 também fica de fora das estatísticas.
+            </li>
+          </ul>
+          <p>
+            A base legal é o legítimo interesse da A3 em melhorar o site e o atendimento (LGPD, art. 7º, IX), com dados que não
+            identificam as pessoas.
+          </p>
+
+          <h2>Cookies</h2>
+          <p>
+            O site não usa cookies de publicidade nem de rastreamento de visitantes. Somente a área administrativa, restrita à equipe
+            da A3, usa cookies: um de sessão, para manter o login, e um marcador que mantém as visitas da própria equipe fora das
+            estatísticas.
           </p>
 
           <h2>Com quem compartilhamos</h2>
@@ -83,7 +122,8 @@ export default function PoliticaPrivacidade() {
           <h2>Por quanto tempo guardamos</h2>
           <p>
             As conversas ficam no WhatsApp da A3 enquanto houver atendimento em andamento ou pelo prazo exigido por lei.
-            Depois disso, são excluídas ou anonimizadas. Você pode pedir a exclusão antes disso, pelos canais acima.
+            Depois disso, são excluídas ou anonimizadas. Você pode pedir a exclusão antes disso, pelos canais acima. Os dados de
+            uso do site seguem os prazos da seção “Medição de uso do site”.
           </p>
 
           <h2>Quem é a controladora</h2>

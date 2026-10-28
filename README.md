@@ -114,6 +114,7 @@ as fotos do S3) e escolher o imóvel do topo da home e os destaques.
 | Login do painel | `docs/login-admin.md` |
 | Busca paginada no banco | `docs/busca-paginada.md` |
 | SEO | `docs/seo.md` |
+| Relatórios do painel e medição de uso (visitas, buscas, contatos) | `docs/relatorios.md` |
 
 ## Pendências antes de ir ao ar
 
@@ -128,7 +129,8 @@ as fotos do S3) e escolher o imóvel do topo da home e os destaques.
 - Rodar `db/construtoras.sql` no Supabase **antes** de publicar o código das construtoras, e conferir no painel
   (Construtoras) os 57 imóveis que ficaram como "Não informado".
 - Trocar o endereço das fotos pelo do CloudFront e fechar o bucket (docs/cloudfront.md).
-- Analytics (ex.: Vercel Analytics ou GA4), com atualização da política de privacidade, e medição de Core Web Vitals em produção.
+- Rodar `db/relatorios.sql` no Supabase **antes** de publicar o código dos relatórios (a medição de visitas só começa a contar
+  depois da publicação) e revisar com o jurídico a seção "Medição de uso do site" da política de privacidade (docs/relatorios.md).
 
 ## Estrutura
 

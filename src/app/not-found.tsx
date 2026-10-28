@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { RastrearNaoEncontrada } from '@/components/coleta/RastrearNaoEncontrada'
 import { Cabecalho } from '@/components/layout/Cabecalho'
 import { Rodape } from '@/components/layout/Rodape'
 import { linkWhatsApp } from '@/lib/site'
@@ -26,13 +27,14 @@ export default function NaoEncontrada() {
             <Link href="/imoveis" className="btn btn-mar btn-g">
               Ver imóveis disponíveis
             </Link>
-            <a href={linkWhatsApp()} target="_blank" rel="noopener" className="btn btn-contorno btn-g">
+            <a href={linkWhatsApp()} target="_blank" rel="noopener" className="btn btn-contorno btn-g" data-rastro="pagina-404">
               Falar com um corretor
             </a>
           </div>
         </div>
       </main>
       <Rodape />
+      <RastrearNaoEncontrada />
     </>
   )
 }

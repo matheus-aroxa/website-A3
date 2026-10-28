@@ -25,6 +25,7 @@ export function MapaEstatico({
       className={`${s.mapa} ${className ?? ''}`}
       style={altura ? { height: altura } : undefined}
       aria-label={`Abrir ${consulta} no Google Maps`}
+      data-evento="mapa"
     >
       <Image src={mapa} alt="" fill sizes="(max-width: 767px) 100vw, 800px" />
       <span className={s.pino} aria-hidden="true">

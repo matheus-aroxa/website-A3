@@ -84,7 +84,7 @@ export function MenuMobile({
             </ul>
             {rodape ?? (
               <>
-                <a className="btn btn-sol btn-bloco" style={{ height: 54, fontSize: 16 }} href={linkWhatsApp()} target="_blank" rel="noopener">
+                <a className="btn btn-sol btn-bloco" style={{ height: 54, fontSize: 16 }} href={linkWhatsApp()} target="_blank" rel="noopener" data-rastro="menu-mobile">
                   <Icone nome="whatsapp" tamanho={19} />
                   Fale conosco
                 </a>

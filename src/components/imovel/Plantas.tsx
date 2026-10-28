@@ -35,6 +35,8 @@ export function Plantas({ plantas }: { plantas: Planta[] }) {
             className="alternancia"
             aria-pressed={i === selecionada}
             onClick={() => setSelecionada(i)}
+            data-evento="planta"
+            data-rotulo="selecionar"
           >
             <strong>{p.titulo}</strong>
             <span>
