@@ -10,7 +10,7 @@ import { Rodape } from '@/components/layout/Rodape'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { Migalhas } from '@/components/ui/Migalhas'
 import { caminhoDaRota, interpretarSegmentos, segmentosDaRota } from '@/lib/imoveis/filtros'
-import { listarCidades, listarIndice, listarPaginasDeBusca } from '@/lib/imoveis/repositorio'
+import { listarCidades, listarConstrutoras, listarIndice, listarPaginasDeBusca } from '@/lib/imoveis/repositorio'
 import { combinacoesDeRota, migalhasDaBusca, textosDaBusca } from '@/lib/imoveis/rotas'
 import { schemaColecao } from '@/lib/seo'
 import s from '@/components/busca/Busca.module.css'
@@ -23,7 +23,12 @@ export async function generateStaticParams() {
 }
 
 export default async function LayoutBusca({ params, children }: LayoutProps<'/imoveis/[[...filtros]]'>) {
-  const [{ filtros: segmentos }, cidades, paginas] = await Promise.all([params, listarCidades(), listarPaginasDeBusca()])
+  const [{ filtros: segmentos }, cidades, construtoras, paginas] = await Promise.all([
+    params,
+    listarCidades(),
+    listarConstrutoras(),
+    listarPaginasDeBusca(),
+  ])
   const rota = interpretarSegmentos(segmentos, cidades)
   if (!rota) notFound()
   const caminho = caminhoDaRota(rota)
@@ -44,7 +49,7 @@ export default async function LayoutBusca({ params, children }: LayoutProps<'/im
 
         {/* Filtros dependem da query (?quartos=2...), então chegam por streaming logo após o shell. */}
         <Suspense fallback={<EsqueletoBusca />}>
-          <ProvedorBusca rota={rota} cidades={cidades}>
+          <ProvedorBusca rota={rota} cidades={cidades} construtoras={construtoras}>
             <div className={s.topoBarra}>
               <div className="container">
                 <BarraFerramentas />

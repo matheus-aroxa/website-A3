@@ -123,8 +123,10 @@ as fotos do S3) e escolher o imóvel do topo da home e os destaques.
 - Rodar `db/seguranca-rls.sql` no Supabase e cadastrar o administrador.
 - Revisar a política de privacidade com o jurídico.
 - Corrigir os cadastros que prejudicam o site (preço, quartos e tipo errados, anúncios repetidos: lista em docs/seo.md).
-- Endereço completo e coordenadas dos empreendimentos e nome da construtora, onde faltarem (os campos já existem no
-  modelo: `local.logradouro`, `local.geo`, `construtora`).
+- Endereço completo e coordenadas dos empreendimentos, onde faltarem (os campos já existem no modelo: `local.logradouro`,
+  `local.geo`).
+- Rodar `db/construtoras.sql` no Supabase **antes** de publicar o código das construtoras, e conferir no painel
+  (Construtoras) os 57 imóveis que ficaram como "Não informado".
 - Trocar o endereço das fotos pelo do CloudFront e fechar o bucket (docs/cloudfront.md).
 - Analytics (ex.: Vercel Analytics ou GA4), com atualização da política de privacidade, e medição de Core Web Vitals em produção.
 

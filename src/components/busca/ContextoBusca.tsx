@@ -14,11 +14,12 @@ import {
   type Filtros,
   type FiltrosRota,
 } from '@/lib/imoveis/filtros'
-import type { Cidade } from '@/lib/imoveis/tipos'
+import type { Cidade, Construtora } from '@/lib/imoveis/tipos'
 
 interface ValorBusca {
   filtros: Filtros
   cidades: Cidade[]
+  construtoras: Construtora[]
   pendente: boolean
   aplicar: (alteracao: Partial<Filtros>) => void
   /** Troca todos os filtros de uma vez (usado pelo painel do celular ao tocar em "Aplicar"). */
@@ -41,10 +42,12 @@ export function useBusca() {
 export function ProvedorBusca({
   rota,
   cidades,
+  construtoras,
   children,
 }: {
   rota: FiltrosRota
   cidades: Cidade[]
+  construtoras: Construtora[]
   children: React.ReactNode
 }) {
   const router = useRouter()
@@ -64,6 +67,7 @@ export function ProvedorBusca({
     return {
       filtros,
       cidades,
+      construtoras,
       pendente,
       aplicar: (alteracao) => navegar(aplicarAlteracao(filtros, alteracao)),
       substituir: navegar,
@@ -73,7 +77,7 @@ export function ProvedorBusca({
       painelAberto,
       setPainelAberto,
     }
-  }, [filtros, cidades, pendente, total, painelAberto, router, setFiltrosOtimistas])
+  }, [filtros, cidades, construtoras, pendente, total, painelAberto, router, setFiltrosOtimistas])
 
   return <Contexto value={valor}>{children}</Contexto>
 }

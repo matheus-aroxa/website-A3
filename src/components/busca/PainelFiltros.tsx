@@ -4,9 +4,10 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import Image from 'next/image'
 import logoMcmv from '@/assets/marca/logo-mcmv.png'
 import { Icone } from '@/components/ui/Icone'
-import { SITUACOES, TIPOS, pluralImoveis, rotuloSituacao, rotuloTipo } from '@/lib/imoveis/formato'
+import { SITUACOES, TIPOS, normalizarBusca, pluralImoveis, rotuloSituacao, rotuloTipo } from '@/lib/imoveis/formato'
 import { ENTREGAS, aplicarAlteracao, limparFiltros, type Entrega, type Filtros } from '@/lib/imoveis/filtros'
 import { Seletor } from '@/components/ui/Seletor'
+import type { Construtora } from '@/lib/imoveis/tipos'
 import { useBusca } from './ContextoBusca'
 import { useAdiado } from './useAdiado'
 import s from './Busca.module.css'
@@ -16,6 +17,50 @@ const MODOS: { valor: Filtros['categoria']; rotulo: string }[] = [
   { valor: 'venda', rotulo: 'Comprar' },
   { valor: 'aluguel', rotulo: 'Alugar' },
 ]
+
+/** Escolha de várias construtoras: caixas de marcar numa lista rolável, com busca quando a lista é grande. */
+function ListaConstrutoras({
+  construtoras,
+  marcadas,
+  aoMudar,
+}: {
+  construtoras: Construtora[]
+  marcadas: string[]
+  aoMudar: (slugs: string[]) => void
+}) {
+  const [busca, setBusca] = useState('')
+  const termo = normalizarBusca(busca)
+  const visiveis = termo ? construtoras.filter((c) => normalizarBusca(c.nome).includes(termo)) : construtoras
+  const alternar = (slug: string) => aoMudar(marcadas.includes(slug) ? marcadas.filter((x) => x !== slug) : [...marcadas, slug])
+  return (
+    <div className={s.construtoras}>
+      {construtoras.length > 8 && (
+        <input
+          type="search"
+          className="campo"
+          aria-label="Buscar construtora"
+          placeholder="Buscar construtora"
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+        />
+      )}
+      <div className={s.construtorasLista} role="group" aria-label="Construtoras">
+        {visiveis.map((c) => (
+          <label key={c.slug} className={s.construtoraOpcao}>
+            <input type="checkbox" className="caixa" checked={marcadas.includes(c.slug)} onChange={() => alternar(c.slug)} />
+            {c.nome}
+          </label>
+        ))}
+        {!visiveis.length && <p className={s.construtorasVazio}>Nenhuma construtora encontrada.</p>}
+      </div>
+      {marcadas.length > 0 && (
+        <button type="button" className={s.construtorasLimpar} onClick={() => aoMudar([])}>
+          Limpar seleção ({marcadas.length})
+        </button>
+      )}
+    </div>
+  )
+}
 
 function Pilulas({
   legenda,
@@ -96,7 +141,7 @@ function useTelaCheia() {
 
 export function PainelFiltros() {
   const busca = useBusca()
-  const { cidades, total, pendente, painelAberto, setPainelAberto } = busca
+  const { cidades, construtoras, total, pendente, painelAberto, setPainelAberto } = busca
   // No celular o painel edita um rascunho, que só vira busca ao tocar em "Aplicar filtros".
   // No desktop cada alteração é aplicada na hora.
   const telaCheia = useTelaCheia()
@@ -221,6 +266,13 @@ export function PainelFiltros() {
             />
           </label>
         </fieldset>
+
+        {construtoras.length > 0 && (
+          <fieldset className={s.grupo}>
+            <legend>Construtora</legend>
+            <ListaConstrutoras construtoras={construtoras} marcadas={f.construtoras} aoMudar={(c) => aplicar({ construtoras: c })} />
+          </fieldset>
+        )}
 
         <fieldset className={s.grupo}>
           <legend>Tipo de imóvel</legend>

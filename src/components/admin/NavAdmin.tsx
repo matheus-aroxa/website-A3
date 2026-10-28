@@ -16,11 +16,13 @@ import s from './Admin.module.css'
 
 const LINKS = [
   { href: '/admin', rotulo: 'Imóveis', chave: 'imoveis' },
+  { href: '/admin/construtoras', rotulo: 'Construtoras', chave: 'construtoras' },
   { href: '/admin/vitrine', rotulo: 'Vitrine da home', chave: 'vitrine' },
 ] as const
 
 function chaveAtiva(caminho: string) {
   if (caminho === '/admin' || caminho.startsWith('/admin/imoveis')) return 'imoveis'
+  if (caminho.startsWith('/admin/construtoras')) return 'construtoras'
   if (caminho.startsWith('/admin/vitrine')) return 'vitrine'
   return undefined
 }

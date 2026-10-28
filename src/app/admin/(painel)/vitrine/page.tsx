@@ -20,7 +20,7 @@ export default function PaginaVitrine() {
         titulo="Vitrine da home"
         descricao="Escolha o imóvel do topo da página inicial e os destaques. Só imóveis publicados entram."
       />
-      <CorpoPagina estreito>
+      <CorpoPagina>
         <Suspense fallback={<p className={s.contagem}>Carregando…</p>}>
           <Vitrine />
         </Suspense>

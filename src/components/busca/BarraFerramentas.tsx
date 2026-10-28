@@ -9,9 +9,9 @@ import { useAdiado } from './useAdiado'
 import s from './Busca.module.css'
 
 export function BarraFerramentas() {
-  const { filtros, cidades, aplicar, setPainelAberto } = useBusca()
+  const { filtros, cidades, construtoras, aplicar, setPainelAberto } = useBusca()
   const [texto, setTexto] = useState(filtros.q)
-  const nAtivos = chipsAtivos(filtros, cidades).filter((c) => c.chave !== 'q').length
+  const nAtivos = chipsAtivos(filtros, cidades, construtoras).filter((c) => c.chave !== 'q').length
 
   // Sincroniza o campo quando a busca muda por fora (chip removido, "Limpar tudo"),
   // sem atropelar o que a pessoa continua digitando.

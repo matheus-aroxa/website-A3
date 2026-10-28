@@ -26,6 +26,7 @@ import {
 } from '@/lib/imoveis/formato'
 import { urlImovel } from '@/lib/imoveis/rotas'
 import type { Faixa, Imovel } from '@/lib/imoveis/tipos'
+import type { ConstrutoraAdmin } from '@/lib/imoveis/construtoras'
 import type { LocaisDoEstado } from '@/lib/imoveis/locais'
 import { ESTADOS, LIMITES, validarImovel } from '@/lib/imoveis/validacao'
 import { useAvisar } from './Avisos'
@@ -58,7 +59,8 @@ interface Valores {
   entregaMes: string
   entregaAno: string
   unidades: string
-  construtora: string
+  /** Id da construtora; vazio só no cadastro, até o formulário receber a padrão. */
+  construtoraId: string
   logradouro: string
   bairro: string
   cidade: string
@@ -80,7 +82,7 @@ function precoTexto(n: number) {
 }
 
 /** `vagasZero`: cadastro novo, em que as vagas já começam em 0 ("sem vaga") em vez de "a consultar". */
-function valoresDe(im: Imovel, vagasZero = false): Valores {
+function valoresDe(im: Imovel, vagasZero = false, construtoraPadrao = ''): Valores {
   const [ano = '', mes = ''] = im.entrega?.split('-') ?? []
   return {
     nome: im.nome,
@@ -103,7 +105,7 @@ function valoresDe(im: Imovel, vagasZero = false): Valores {
     entregaMes: mes,
     entregaAno: ano,
     unidades: im.unidades ?? '',
-    construtora: im.construtora ?? '',
+    construtoraId: im.construtora.id ? String(im.construtora.id) : construtoraPadrao,
     logradouro: im.local.logradouro ?? '',
     bairro: im.local.bairro,
     cidade: im.local.cidade,
@@ -131,6 +133,7 @@ const IMOVEL_VAZIO: Imovel = {
   quartos: { min: 0, max: 0 },
   banheiros: { min: 0, max: 0 },
   vagas: null,
+  construtora: { id: 0, nome: '', slug: '' },
   mcmv: false,
   destaque: false,
   publicadoEm: '',
@@ -640,11 +643,14 @@ export function FormularioImovel({
   imovel,
   status = 'ativo',
   criado = false,
+  construtoras,
 }: {
   /** Ausente: formulário de cadastro de um imóvel novo. */
   imovel?: Imovel
   status?: StatusImovel
   criado?: boolean
+  /** Opções do campo Construtora: a padrão primeiro, depois as demais em ordem alfabética. */
+  construtoras: Pick<ConstrutoraAdmin, 'id' | 'nome' | 'padrao'>[]
 }) {
   const novo = !imovel
   const im = imovel ?? IMOVEL_VAZIO
@@ -658,7 +664,7 @@ export function FormularioImovel({
   const [salvando, iniciar] = useTransition()
   const [limpando, setLimpando] = useState<PedidoConfirmacao | null>(null)
 
-  const [inicial, setInicial] = useState(() => valoresDe(im, novo))
+  const [inicial, setInicial] = useState(() => valoresDe(im, novo, String(construtoras.find((c) => c.padrao)?.id ?? '')))
   const [v, setV] = useState(inicial)
   // Quando os dados mudam no servidor (por exemplo, ao salvar), os campos acompanham.
   const [anterior, setAnterior] = useState(im)
@@ -997,8 +1003,15 @@ export function FormularioImovel({
               <Campo texto="Unidades" campo="unidades" erros={erros} extra="opcional">
                 <input className="campo" maxLength={120} placeholder="Ex.: 120 em 4 torres" {...texto('unidades')} />
               </Campo>
-              <Campo texto="Construtora" campo="construtora" erros={erros} extra="opcional">
-                <input className="campo" maxLength={120} placeholder="Nome da construtora" {...texto('construtora')} />
+              <Campo texto="Construtora" campo="construtora" erros={erros}>
+                <Seletor
+                  name="construtoraId"
+                  aria-label="Construtora"
+                  valor={v.construtoraId}
+                  aoMudar={(id) => mudar('construtoraId', id)}
+                  opcoes={construtoras.map((c) => ({ valor: String(c.id), rotulo: c.nome }))}
+                  {...invalido(erros, 'construtora')}
+                />
               </Campo>
             </div>
           </Secao>

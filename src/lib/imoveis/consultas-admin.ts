@@ -19,6 +19,8 @@ export interface FiltroAdmin {
   /** Situação de obra, ou 'alugar' para os de aluguel. Vazio: todas. */
   situacao: string
   finalidade: string
+  /** Id da construtora. Vazio: todas. */
+  construtora: string
   pagina: number
 }
 
@@ -29,6 +31,7 @@ export interface LinhaAdmin {
   nome: string
   bairro: string
   cidade: string
+  construtora: string
   preco: number
   finalidade: Finalidade
   situacao: Situacao
@@ -47,7 +50,7 @@ const BASE = `
   destaques_originais AS (SELECT id FROM imoveis WHERE status = 'ativo' AND destaque ORDER BY publicado_em DESC, id LIMIT ${LIMITE_DESTAQUES}),
   base AS (
     SELECT i.id, i.codigo, i.slug, i.nome, i.tipo, i.finalidade, i.situacao, i.preco::float8 AS preco, i.publicado_em,
-           b.nome AS bairro, c.nome AS cidade, i.status, (i.origem = 'painel') AS criado,
+           b.nome AS bairro, c.nome AS cidade, co.nome AS construtora, i.construtora_id, i.status, (i.origem = 'painel') AS criado,
            cp.src AS capa,
            (i.status = 'ativo' AND CASE WHEN vc.personalizada THEN vc.heroi_id = i.id
                                         ELSE i.id IN (SELECT id FROM heroi_original) END) AS heroi,
@@ -57,6 +60,7 @@ const BASE = `
       FROM imoveis i
       JOIN bairros b ON b.id = i.bairro_id
       JOIN cidades c ON c.id = b.cidade_id
+      JOIN construtoras co ON co.id = i.construtora_id
       CROSS JOIN vc
       LEFT JOIN LATERAL (SELECT f.src FROM fotos f WHERE f.imovel_id = i.id ORDER BY f.capa DESC, f.posicao LIMIT 1) cp ON true
   )`
@@ -84,6 +88,7 @@ export async function listarPaginaAdmin(f: FiltroAdmin): Promise<PaginaAdmin> {
   if (f.situacao === 'alugar') c.push("finalidade = 'aluguel'")
   else if (f.situacao) c.push(`(finalidade <> 'aluguel' AND situacao = ${p(f.situacao)})`)
   if (f.finalidade) c.push(`finalidade = ${p(f.finalidade)}`)
+  if (/^\d+$/.test(f.construtora)) c.push(`construtora_id = ${p(Number(f.construtora))}`)
   for (const termo of normalizarBusca(f.q).split(/\s+/).filter(Boolean)) c.push(`strpos(alvo, ${p(termo)}) > 0`)
   const onde = c.join(' AND ')
 
@@ -94,7 +99,7 @@ export async function listarPaginaAdmin(f: FiltroAdmin): Promise<PaginaAdmin> {
   const totalPaginas = Math.max(1, Math.ceil(total / POR_PAGINA_ADMIN))
   const pagina = Math.min(Math.max(1, f.pagina), totalPaginas)
   const { rows } = await banco().query<LinhaAdmin>(
-    `${BASE} SELECT id, codigo, slug, nome, bairro, cidade, preco, finalidade, situacao, capa, status, criado, heroi, destaque
+    `${BASE} SELECT id, codigo, slug, nome, bairro, cidade, construtora, preco, finalidade, situacao, capa, status, criado, heroi, destaque
        FROM base WHERE ${onde}
       ORDER BY translate(lower(nome), 'áàâãäéèêëíìîïóòôõöúùûüçñ', 'aaaaaeeeeiiiiooooouuuucn'), id
       LIMIT ${POR_PAGINA_ADMIN} OFFSET ${(pagina - 1) * POR_PAGINA_ADMIN}`,

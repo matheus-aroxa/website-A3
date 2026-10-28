@@ -4,7 +4,7 @@ import { Suspense } from 'react'
 import { FormularioImovel } from '@/components/admin/FormularioImovel'
 import { TopoPagina } from '@/components/admin/TopoPagina'
 import { Icone } from '@/components/ui/Icone'
-import { obterImovelAdmin } from '@/lib/admin/catalogo'
+import { listarConstrutorasDoPainel, obterImovelAdmin } from '@/lib/admin/catalogo'
 import { etiquetaImovel } from '@/lib/imoveis/formato'
 import { urlImovel } from '@/lib/imoveis/rotas'
 import s from '@/components/admin/Admin.module.css'
@@ -20,7 +20,7 @@ const STATUS = {
 
 async function Edicao({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const dados = await obterImovelAdmin(id)
+  const [dados, construtoras] = await Promise.all([obterImovelAdmin(id), listarConstrutorasDoPainel()])
   if (!dados) notFound()
   const { imovel: im, status, criado } = dados
   const classe = im.finalidade === 'aluguel' ? 'aluguel' : im.situacao
@@ -49,7 +49,7 @@ async function Edicao({ params }: { params: Promise<{ id: string }> }) {
         )}
       </TopoPagina>
 
-      <FormularioImovel imovel={im} status={status} criado={criado} />
+      <FormularioImovel imovel={im} status={status} criado={criado} construtoras={construtoras} />
     </>
   )
 }

@@ -7,6 +7,7 @@ import { useEffect, useOptimistic, useRef, useState, useTransition } from 'react
 import { Icone } from '@/components/ui/Icone'
 import { Seletor } from '@/components/ui/Seletor'
 import type { CatalogoAdmin, FiltroAdmin, ItemAdmin } from '@/lib/admin/catalogo'
+import type { ConstrutoraAdmin } from '@/lib/imoveis/construtoras'
 import type { StatusImovel } from '@/lib/imoveis/painel'
 import { SITUACOES, etiquetaImovel, formatarPreco, rotuloPreco, rotuloSituacao } from '@/lib/imoveis/formato'
 import { urlImovel } from '@/lib/imoveis/rotas'
@@ -71,9 +72,11 @@ export function ListaImoveis({
   filtro,
   titulo,
   descricao,
+  construtoras,
 }: {
   catalogo: CatalogoAdmin
   filtro: FiltroAdmin
+  construtoras: ConstrutoraAdmin[]
   titulo: string
   descricao: string
 }) {
@@ -101,6 +104,7 @@ export function ListaImoveis({
     if (f.q.trim()) sp.set('q', f.q.trim())
     if (f.situacao) sp.set('situacao', f.situacao)
     if (f.finalidade) sp.set('finalidade', f.finalidade)
+    if (f.construtora) sp.set('construtora', f.construtora)
     if (f.pagina > 1) sp.set('pagina', String(f.pagina))
     const query = sp.toString()
     return query ? `${caminho}?${query}` : caminho
@@ -113,7 +117,7 @@ export function ListaImoveis({
     espera.current = setTimeout(() => ir({ q }), ESPERA_BUSCA_MS)
   }
 
-  const filtrando = Boolean(filtro.q.trim() || filtro.situacao || filtro.finalidade)
+  const filtrando = Boolean(filtro.q.trim() || filtro.situacao || filtro.finalidade || filtro.construtora)
   const abaAtual = ABAS.find((a) => a.valor === aba)!
   // Até o servidor responder, o imóvel que mudou de status já sai da aba onde estava e as contagens acompanham.
   const visiveis = lista.filter((i) => (aba === 'vitrine' ? i.status === 'ativo' : i.status === aba))
@@ -175,6 +179,13 @@ export function ListaImoveis({
           </label>
           <Seletor aria-label="Situação" className={s.filtro} valor={filtro.situacao} aoMudar={(situacao) => ir({ situacao })} opcoes={OPCOES_SITUACAO} />
           <Seletor aria-label="Finalidade" className={s.filtro} valor={filtro.finalidade} aoMudar={(finalidade) => ir({ finalidade })} opcoes={OPCOES_FINALIDADE} />
+          <Seletor
+            aria-label="Construtora"
+            className={s.filtro}
+            valor={filtro.construtora}
+            aoMudar={(construtora) => ir({ construtora })}
+            opcoes={[{ valor: '', rotulo: 'Todas as construtoras' }, ...construtoras.map((c) => ({ valor: String(c.id), rotulo: c.nome }))]}
+          />
         </div>
 
         <div className={s.contagemLinha}>
@@ -190,7 +201,7 @@ export function ListaImoveis({
               className={s.limpar}
               onClick={() => {
                 setBusca('')
-                ir({ q: '', situacao: '', finalidade: '' })
+                ir({ q: '', situacao: '', finalidade: '', construtora: '' })
               }}
             >
               Limpar
@@ -214,7 +225,7 @@ export function ListaImoveis({
                             {item.nome}
                           </Link>
                           <span className={s.itemLocal}>
-                            {item.bairro}, {item.cidade}
+                            {item.bairro}, {item.cidade} · {item.construtora}
                           </span>
                         </div>
                       </div>

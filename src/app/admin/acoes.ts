@@ -20,6 +20,14 @@ import {
   slugsEmUso,
 } from '@/lib/imoveis/banco'
 import { idsAtivos } from '@/lib/imoveis/consultas-admin'
+import {
+  criarConstrutora,
+  excluirConstrutora,
+  idConstrutoraPadrao,
+  obterConstrutora,
+  renomearConstrutora,
+  type ResultadoConstrutora,
+} from '@/lib/imoveis/construtoras'
 import { CAMPOS_EDITAVEIS, ID_CRIADO, PREFIXO_CRIADO, capaDe, diferencas } from '@/lib/imoveis/painel'
 import { SITUACOES, TIPOS, lerNumeroBr, slugificar } from '@/lib/imoveis/formato'
 import { fotoPermitida } from '@/lib/imoveis/hosts-fotos'
@@ -177,6 +185,13 @@ async function lerFormulario(fd: FormData, base: Imovel | null): Promise<{ erros
   const srcCapa = texto(fd, 'capa', 500)
   const srcFotos = fd.getAll('fotos').filter((f): f is string => typeof f === 'string').map((f) => f.trim()).slice(0, 100)
 
+  // Sem escolha vale a construtora padrão ("Não informado"); id que não existe é recusado.
+  const pedidoConstrutora = texto(fd, 'construtoraId', 12)
+  const construtora = pedidoConstrutora
+    ? /^\d+$/.test(pedidoConstrutora) ? await obterConstrutora(Number(pedidoConstrutora)) : null
+    : await obterConstrutora(await idConstrutoraPadrao())
+  if (!construtora) erros.construtora = 'Escolha uma construtora da lista.'
+
   if (!srcFotos.length) erros.fotos = base ? 'Mantenha pelo menos uma foto.' : 'Envie pelo menos uma foto.'
   else if (!srcFotos.every(fotoPermitida)) erros.fotos = 'Há fotos de um endereço não permitido.'
 
@@ -230,7 +245,7 @@ async function lerFormulario(fd: FormData, base: Imovel | null): Promise<{ erros
       vagas,
       entrega: opcional(entrega),
       unidades: opcional(texto(fd, 'unidades', 120)),
-      construtora: opcional(texto(fd, 'construtora', 120)),
+      construtora: construtora!,
       local,
       descricao: linhas(fd, 'descricao'),
       lazer: linhas(fd, 'lazer', 5000),
@@ -312,6 +327,32 @@ export async function salvarVitrine(_: EstadoFormulario, fd: FormData): Promise<
   await gravarVitrine({ heroi: ativo(heroi) ? heroi : null, destaques }, admin.email)
   publicar()
   return { status: 'sucesso', mensagem: 'Vitrine atualizada. A home já mostra a nova seleção.' }
+}
+
+// ---------- Construtoras ----------
+
+/** Cadastro, renomeação e exclusão pelo painel. Voltam `{ ok, erro }` para a tela mostrar a mensagem. */
+export async function cadastrarConstrutora(nome: string): Promise<ResultadoConstrutora> {
+  const admin = await exigirAdmin()
+  const r = await criarConstrutora(nome, admin.email)
+  if (r.ok) publicar()
+  return r
+}
+
+export async function renomearConstrutoraAcao(id: number, nome: string): Promise<ResultadoConstrutora> {
+  const admin = await exigirAdmin()
+  if (!Number.isInteger(id)) return { ok: false, erro: 'Construtora não encontrada.' }
+  const r = await renomearConstrutora(id, nome, admin.email)
+  if (r.ok) publicar()
+  return r
+}
+
+export async function excluirConstrutoraAcao(id: number): Promise<ResultadoConstrutora> {
+  const admin = await exigirAdmin()
+  if (!Number.isInteger(id)) return { ok: false, erro: 'Construtora não encontrada.' }
+  const r = await excluirConstrutora(id, admin.email)
+  if (r.ok) publicar()
+  return r
 }
 
 // ---------- Listas do formulário ----------

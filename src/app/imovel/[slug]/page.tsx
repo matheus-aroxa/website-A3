@@ -40,7 +40,7 @@ import {
   tituloDoImovel,
   urlImovel,
 } from '@/lib/imoveis/rotas'
-import type { Imovel } from '@/lib/imoveis/tipos'
+import { SLUG_CONSTRUTORA_PADRAO, type Imovel } from '@/lib/imoveis/tipos'
 import { schemaAnuncio } from '@/lib/seo'
 import { linkWhatsApp, openGraphBase } from '@/lib/site'
 import s from '@/components/imovel/Imovel.module.css'
@@ -90,7 +90,7 @@ export default async function PaginaImovel({ params }: PageProps<'/imovel/[slug]
   const semelhantes = await listarSemelhantes(im)
 
   const aluguel = im.finalidade === 'aluguel'
-  const mensagemWhats = `Olá! Tenho interesse no ${im.nome} (cód. ${im.codigo}).`
+  const mensagemWhats = `Olá! Tenho interesse no ${im.nome}.`
   const quartos = im.suites?.max ? `${formatarFaixa(im.quartos)}, com suíte` : formatarFaixa(im.quartos)
   const ficha: { icone: NomeIcone; rotulo: string; rotuloCurto?: string; valor: string; valorCurto?: string }[] = [
     { icone: 'area', rotulo: 'Área privativa', valor: formatarArea(im.area) },
@@ -300,10 +300,12 @@ export default async function PaginaImovel({ params }: PageProps<'/imovel/[slug]
                   <dt>{aluguel ? 'Finalidade' : 'Situação'}</dt>
                   <dd>{aluguel ? 'Aluguel' : rotuloSituacao[im.situacao]}</dd>
                 </div>
-                {im.construtora && (
+                {im.construtora.slug !== SLUG_CONSTRUTORA_PADRAO && (
                   <div>
                     <dt>Construtora</dt>
-                    <dd>{im.construtora}</dd>
+                    <dd>
+                      <Link href={`/imoveis?construtora=${im.construtora.slug}`}>{im.construtora.nome}</Link>
+                    </dd>
                   </div>
                 )}
                 {im.entrega && im.situacao !== 'pronto' && (

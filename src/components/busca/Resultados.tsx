@@ -21,8 +21,8 @@ export function AreaResultados({ children }: { children: React.ReactNode }) {
 }
 
 export function ResumoResultados({ total }: { total: number }) {
-  const { filtros, cidades, aplicar, limpar, registrarTotal } = useBusca()
-  const chips = chipsAtivos(filtros, cidades)
+  const { filtros, cidades, construtoras, aplicar, limpar, registrarTotal } = useBusca()
+  const chips = chipsAtivos(filtros, cidades, construtoras)
 
   useEffect(() => registrarTotal(total), [total, registrarTotal])
 
