@@ -34,11 +34,13 @@ async function proxyAdmin(request: NextRequest) {
   // POSTs são Server Actions: elas mesmas conferem a sessão (e respondem quando ela expirou).
   if (request.method !== 'GET' && pathname !== '/admin/entrar') return NextResponse.next()
   // A sessão fica no banco: uma consulta por navegação, e só se houver cookie.
-  const logado = (await adminDoToken(request.cookies.get(COOKIE_SESSAO)?.value)) !== null
+  const admin = await adminDoToken(request.cookies.get(COOKIE_SESSAO)?.value)
   if (pathname === '/admin/entrar') {
-    return logado ? NextResponse.redirect(new URL('/admin', request.url)) : NextResponse.next()
+    return admin ? NextResponse.redirect(new URL('/admin', request.url)) : NextResponse.next()
   }
-  if (logado) return NextResponse.next()
+  // A tela de administradores é só do principal (a página e as ações conferem de novo).
+  if (admin && !admin.principal && pathname.startsWith('/admin/administradores')) return NextResponse.redirect(new URL('/admin', request.url))
+  if (admin) return NextResponse.next()
   const login = new URL('/admin/entrar', request.url)
   if (pathname !== '/admin') login.searchParams.set('de', pathname)
   return NextResponse.redirect(login)

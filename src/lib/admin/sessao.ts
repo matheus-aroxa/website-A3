@@ -1,6 +1,7 @@
 // Autenticação do painel, no banco (tabelas em db/schema.sql; como cadastrar administradores: docs/login-admin.md).
 //
 // - Administradores: tabela `administradores`, com a senha em bcrypt (pgcrypto). A conferência roda no próprio SQL.
+//   O principal (um só) é quem cadastra os outros (src/lib/admin/administradores.ts).
 // - Sessão: o cookie leva um token aleatório; a tabela `sessoes_admin` guarda só o SHA-256 dele. Dá para
 //   encerrar uma sessão na hora (sair, desativar o administrador ou apagar a linha), sem esperar o cookie expirar.
 // - Limite de tentativas: tabela `tentativas_login`, por IP e por e-mail. Vale entre reinícios e instâncias.
@@ -17,6 +18,8 @@ export interface Admin {
   id: string
   email: string
   nome: string | null
+  /** O administrador principal: só ele cadastra, desativa e reativa os outros. */
+  principal: boolean
 }
 
 const normalizarEmail = (email: string) => email.trim().toLowerCase()
@@ -36,15 +39,15 @@ export async function painelConfigurado() {
 export async function autenticar(email: string, senha: string): Promise<Admin | null> {
   // Sempre uma linha, e o crypt() roda sempre (com o hash falso se o e-mail não existe ou está inativo).
   // `igual` fica numa coluna própria: dentro de um AND com `a.id IS NOT NULL` o banco poderia pular o crypt().
-  const { rows } = await banco().query<{ id: string | null; email: string | null; nome: string | null; igual: boolean | null }>(
-    `SELECT a.id, a.email, a.nome, (c.hash = a.senha_hash) AS igual
+  const { rows } = await banco().query<{ id: string | null; email: string | null; nome: string | null; principal: boolean | null; igual: boolean | null }>(
+    `SELECT a.id, a.email, a.nome, a.principal, (c.hash = a.senha_hash) AS igual
        FROM (SELECT 1) x
        LEFT JOIN administradores a ON a.email = $1 AND a.ativo
       CROSS JOIN LATERAL (SELECT extensions.crypt($2, COALESCE(a.senha_hash, $3)) AS hash) c`,
     [normalizarEmail(email), senha.normalize('NFKC'), HASH_FALSO],
   )
   const r = rows[0]
-  return r?.igual === true && r.id && r.email ? { id: r.id, email: r.email, nome: r.nome } : null
+  return r?.igual === true && r.id && r.email ? { id: r.id, email: r.email, nome: r.nome, principal: r.principal === true } : null
 }
 
 // ---------- Sessões ----------
@@ -66,7 +69,7 @@ export async function criarSessao(admin: Admin, duracaoS: number, origem: { ip: 
 export async function adminDoToken(token: string | undefined): Promise<Admin | null> {
   if (!token || token.length > 200) return null
   const { rows } = await banco().query<Admin>(
-    `SELECT a.id, a.email, a.nome
+    `SELECT a.id, a.email, a.nome, a.principal
        FROM sessoes_admin s JOIN administradores a ON a.id = s.admin_id
       WHERE s.token_hash = $1 AND s.expira_em > now() AND a.ativo`,
     [hashDoToken(token)],

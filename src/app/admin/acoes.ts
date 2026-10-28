@@ -5,7 +5,8 @@
 import { refresh, updateTag } from 'next/cache'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { encerrarSessao, exigirAdmin, iniciarSessao } from '@/lib/admin/acesso'
+import { encerrarSessao, exigirAdmin, exigirPrincipal, iniciarSessao } from '@/lib/admin/acesso'
+import { criarAdministrador, definirAtivo, type ResultadoAdministrador } from '@/lib/admin/administradores'
 import { autenticar, limparFalhas, loginBloqueado, painelConfigurado, registrarFalha } from '@/lib/admin/sessao'
 import { texto, type EstadoFormulario } from '@/lib/formularios'
 import { apagarDoImovel, apagarFotos } from '@/lib/admin/fotos'
@@ -352,6 +353,27 @@ export async function excluirConstrutoraAcao(id: number): Promise<ResultadoConst
   if (!Number.isInteger(id)) return { ok: false, erro: 'Construtora não encontrada.' }
   const r = await excluirConstrutora(id, admin.email)
   if (r.ok) publicar()
+  return r
+}
+
+// ---------- Administradores (só o principal) ----------
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+export async function cadastrarAdministrador(dados: { nome: string; usuario: string; senha: string }): Promise<ResultadoAdministrador> {
+  const admin = await exigirPrincipal()
+  if (typeof dados !== 'object' || dados === null) return { ok: false, erro: 'Preencha os dados do administrador.' }
+  const r = await criarAdministrador(dados, admin.email)
+  if (r.ok) refresh()
+  return r
+}
+
+/** Desativa (tira o acesso na hora) ou reativa outro administrador. */
+export async function mudarAcessoAdministrador(id: string, ativo: boolean): Promise<ResultadoAdministrador> {
+  const admin = await exigirPrincipal()
+  if (typeof id !== 'string' || !UUID.test(id) || typeof ativo !== 'boolean') return { ok: false, erro: 'Administrador não encontrado.' }
+  const r = await definirAtivo(id, ativo, admin.email)
+  if (r.ok) refresh()
   return r
 }
 

@@ -22,6 +22,13 @@ export async function exigirAdmin(): Promise<Admin> {
   return admin
 }
 
+/** Só o administrador principal: os outros voltam para o início do painel. */
+export async function exigirPrincipal(): Promise<Admin> {
+  const admin = await exigirAdmin()
+  if (!admin.principal) redirect('/admin')
+  return admin
+}
+
 /**
  * `lembrar` ("Manter conectado"): cookie persistente de 30 dias. Sem ele, o cookie some ao
  * fechar o navegador e a sessão vale no máximo 8 h.
