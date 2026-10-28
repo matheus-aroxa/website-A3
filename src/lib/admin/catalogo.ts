@@ -11,6 +11,8 @@ import {
   type LinhaAdmin,
 } from '@/lib/imoveis/consultas-admin'
 import { etiquetaImovel, formatarPreco, rotuloPreco } from '@/lib/imoveis/formato'
+import { listarConstrutorasAdmin } from '@/lib/imoveis/construtoras'
+import type { StatusImovel } from '@/lib/imoveis/painel'
 import { exigirAdmin } from './acesso'
 
 export type { AbaAdmin, FiltroAdmin }
@@ -40,6 +42,8 @@ export interface OpcaoVitrine {
 export interface CatalogoAdmin {
   itens: ItemAdmin[]
   total: number
+  /** O total separado entre publicados e desativados. */
+  porStatus: Record<StatusImovel, number>
   pagina: number
   totalPaginas: number
   /** Quantos imóveis há em cada aba (sem considerar a busca). */
@@ -51,6 +55,12 @@ export async function listarCatalogoAdmin(filtro: FiltroAdmin): Promise<Catalogo
   await exigirAdmin()
   const { itens, ...resto } = await listarPaginaAdmin(filtro)
   return { ...resto, itens: itens.map(({ capa, ...item }) => ({ ...item, ...(capa ? { capa } : {}) })) }
+}
+
+/** Construtoras para o painel (campo do formulário, filtro da lista e página de cadastro), com a contagem de imóveis. */
+export async function listarConstrutorasDoPainel() {
+  await exigirAdmin()
+  return listarConstrutorasAdmin()
 }
 
 export async function obterImovelAdmin(id: string) {

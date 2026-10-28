@@ -35,7 +35,7 @@ export function Rodape({ comBarraInferior = false }: { comBarraInferior?: boolea
                 {l.rotulo}
               </Link>
             ))}
-            <a href={linkWhatsApp(mensagensWhatsApp.anunciar)} target="_blank" rel="noopener" className={s.link}>
+            <a href={linkWhatsApp(mensagensWhatsApp.anunciar)} target="_blank" rel="noopener" className={s.link} data-rastro="rodape-anunciar">
               Anunciar meu imóvel
             </a>
           </nav>
@@ -51,7 +51,7 @@ export function Rodape({ comBarraInferior = false }: { comBarraInferior?: boolea
             <strong>Atendimento</strong>
             <span>Fale com um corretor pelo WhatsApp ou pelo formulário de contato.</span>
             <address className={s.endereco}>
-              <a href={`tel:${site.telefone.replace(/\s|-/g, '')}`} className={s.link}>
+              <a href={`tel:${site.telefone.replace(/\s|-/g, '')}`} className={s.link} data-rastro="rodape">
                 {site.telefoneExibicao}
               </a>
               <span>{site.endereco.exibicao}</span>

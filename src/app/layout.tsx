@@ -2,8 +2,10 @@ import type { Metadata, Viewport } from 'next'
 import { Archivo } from 'next/font/google'
 import { Suspense } from 'react'
 import { preconnect } from 'react-dom'
+import { Rastreador } from '@/components/coleta/Rastreador'
 import { TopoAoMudarDePagina } from '@/components/layout/TopoAoMudarDePagina'
 import { JsonLd } from '@/components/seo/JsonLd'
+import { coletaAtiva } from '@/lib/coleta/ativa'
 import { schemaImobiliaria } from '@/lib/seo'
 import { URL_IMAGENS, openGraphBase, site } from '@/lib/site'
 import './globals.css'
@@ -65,6 +67,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* usePathname() só existe na requisição: sem o Suspense, as rotas de segmento dinâmico (/admin/imoveis/[id]) não prerenderizam. */}
         <Suspense fallback={null}>
           <TopoAoMudarDePagina />
+          {/* Medição de visitas e contatos (sem cookies): docs/relatorios.md. Só no site de verdade. */}
+          <Rastreador ativo={coletaAtiva()} />
         </Suspense>
         {children}
         <JsonLd dados={schemaImobiliaria()} />

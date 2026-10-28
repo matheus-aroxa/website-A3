@@ -165,7 +165,7 @@ export default async function Home() {
               </div>
               <CarrosselDestaques porVez={DESTAQUES_POR_VEZ} classeGrade={s.gradeDestaques}>
                 {destaques.map((im) => (
-                  <CardImovel key={im.id} imovel={im} variante="destaque" />
+                  <CardImovel key={im.id} imovel={im} variante="destaque" lista="home" />
                 ))}
               </CarrosselDestaques>
               <Link href="/imoveis" className={`btn btn-sol btn-g btn-bloco ${s.verTodosMobile}`}>
@@ -197,7 +197,7 @@ export default async function Home() {
                   <h3>{sv.titulo}</h3>
                   <p>{sv.texto}</p>
                   {sv.href.startsWith('http') ? (
-                    <a href={sv.href} target="_blank" rel="noopener" className={s.servicoLink}>
+                    <a href={sv.href} target="_blank" rel="noopener" className={s.servicoLink} data-rastro="home-servico">
                       {sv.link} <Icone nome="seta" tamanho={16} espessura={2} />
                     </a>
                   ) : (
@@ -220,7 +220,7 @@ export default async function Home() {
                 <p>Cadastre seu imóvel e a A3 cuida da divulgação e do atendimento aos interessados.</p>
               </div>
               <div className={s.anunciarAcoes}>
-                <a href={linkWhatsApp(mensagensWhatsApp.anunciar)} target="_blank" rel="noopener" className="btn btn-tinta btn-g">
+                <a href={linkWhatsApp(mensagensWhatsApp.anunciar)} target="_blank" rel="noopener" className="btn btn-tinta btn-g" data-rastro="home-anunciar">
                   Anunciar meu imóvel <Icone nome="seta" tamanho={18} espessura={2} />
                 </a>
                 <a
@@ -228,6 +228,7 @@ export default async function Home() {
                   target="_blank"
                   rel="noopener"
                   className="btn btn-contorno btn-g"
+                  data-rastro="home-anunciar"
                 >
                   Falar com um corretor
                 </a>
@@ -323,7 +324,7 @@ export default async function Home() {
               </p>
               <ul className={s.canais}>
                 <li>
-                  <a href={linkWhatsApp()} target="_blank" rel="noopener">
+                  <a href={linkWhatsApp()} target="_blank" rel="noopener" data-rastro="home-contato">
                     <span className={s.canalIcone}>
                       <Icone nome="whatsapp" tamanho={22} />
                     </span>
@@ -334,7 +335,7 @@ export default async function Home() {
                   </a>
                 </li>
                 <li>
-                  <a href={`mailto:${site.email}`}>
+                  <a href={`mailto:${site.email}`} data-rastro="home-contato">
                     <span className={s.canalIcone}>
                       <Icone nome="email" tamanho={22} />
                     </span>

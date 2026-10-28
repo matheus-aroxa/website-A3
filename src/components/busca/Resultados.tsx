@@ -1,10 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { CardImovel } from '@/components/imoveis/CardImovel'
 import { Icone } from '@/components/ui/Icone'
 import { pluralImoveis } from '@/lib/imoveis/formato'
-import { chipsAtivos } from '@/lib/imoveis/filtros'
+import { filtrosAtivos } from '@/lib/coleta/busca'
+import { registrar } from '@/lib/coleta/cliente'
+import { chipsAtivos, montarUrl } from '@/lib/imoveis/filtros'
 import type { ImovelResumo } from '@/lib/imoveis/tipos'
 import { linkWhatsApp } from '@/lib/site'
 import { useBusca } from './ContextoBusca'
@@ -21,10 +23,20 @@ export function AreaResultados({ children }: { children: React.ReactNode }) {
 }
 
 export function ResumoResultados({ total }: { total: number }) {
-  const { filtros, cidades, aplicar, limpar, registrarTotal } = useBusca()
-  const chips = chipsAtivos(filtros, cidades)
+  const { filtros, cidades, construtoras, pendente, aplicar, limpar, registrarTotal } = useBusca()
+  const chips = chipsAtivos(filtros, cidades, construtoras)
+  const ultimaBusca = useRef('')
 
   useEffect(() => registrarTotal(total), [total, registrarTotal])
+
+  // Medição de uso: uma busca por combinação de filtros, quando o resultado chega (não durante a troca). O total mostra as
+  // buscas sem resultado, que são os imóveis que as pessoas procuram e o site não tem.
+  useEffect(() => {
+    const chave = `${montarUrl(filtros, 1)}|${total}`
+    if (pendente || chips.length === 0 || ultimaBusca.current === chave) return
+    ultimaBusca.current = chave
+    registrar('busca', { v: total, d: { f: filtrosAtivos(filtros), ...(filtros.q.trim() && { q: filtros.q.trim().toLowerCase() }) } })
+  }, [filtros, total, pendente, chips.length])
 
   return (
     <div className={s.resumo}>
@@ -69,6 +81,7 @@ export function SemResultados() {
           href={linkWhatsApp('Olá! Não encontrei no site o imóvel que procuro. Podem me ajudar?')}
           target="_blank"
           rel="noopener"
+          data-rastro="busca-sem-resultado"
         >
           Falar com um corretor
         </a>
@@ -121,13 +134,13 @@ export function CarregarMais({
       {extras.length > 0 && (
         <div className={s.grade}>
           {extras.map((im) => (
-            <CardImovel key={im.id} imovel={im} nivelTitulo={2} />
+            <CardImovel key={im.id} imovel={im} nivelTitulo={2} lista="busca" />
           ))}
         </div>
       )}
       {proxima.url && (
         <div className={s.carregarMais}>
-          <a href={proxima.url} className="btn btn-linha btn-quadrado btn-bloco" style={{ height: 54, fontSize: 16 }} onClick={carregar} aria-busy={carregando}>
+          <a href={proxima.url} className="btn btn-linha btn-quadrado btn-bloco" style={{ height: 54, fontSize: 16 }} onClick={carregar} aria-busy={carregando} data-evento="acao" data-rotulo="carregar-mais">
             {carregando ? 'Carregando…' : 'Carregar mais imóveis'}
           </a>
           <p>{erro ? 'Não foi possível carregar. Toque para tentar de novo.' : `Mostrando ${mostrando} de ${total}`}</p>

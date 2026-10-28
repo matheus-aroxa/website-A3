@@ -29,6 +29,7 @@ export function BotaoCompartilhar({ className, titulo }: { className?: string; t
       aria-label={copiado ? 'Link copiado' : 'Compartilhar'}
       title={copiado ? 'Link copiado!' : 'Compartilhar'}
       onClick={compartilhar}
+      data-evento="compartilhar"
     >
       <Icone nome={copiado ? 'check' : 'compartilhar'} tamanho={19} espessura={copiado ? 2.4 : 1.8} />
     </button>

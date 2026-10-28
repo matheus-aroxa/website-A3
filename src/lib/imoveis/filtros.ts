@@ -7,7 +7,7 @@
 // Todos os segmentos são opcionais, mas mantêm essa ordem.
 
 import { SITUACOES, TIPOS, rotuloSituacao, rotuloTipo } from './formato'
-import type { Cidade, Situacao, TipoImovel } from './tipos'
+import type { Cidade, Construtora, Situacao, TipoImovel } from './tipos'
 
 export type Categoria = 'todos' | 'venda' | 'aluguel'
 export type Ordem = 'recentes' | 'menor-preco' | 'maior-preco' | 'maior-area' | 'mais-quartos'
@@ -19,6 +19,8 @@ export interface Filtros {
   tipos: TipoImovel[]
   cidade: string | null
   bairro: string | null
+  /** Slugs das construtoras escolhidas (qualquer uma delas). */
+  construtoras: string[]
   quartos: number
   banheiros: number
   vagas: number
@@ -36,6 +38,7 @@ export const FILTROS_PADRAO: Filtros = {
   tipos: [],
   cidade: null,
   bairro: null,
+  construtoras: [],
   quartos: 0,
   banheiros: 0,
   vagas: 0,
@@ -48,6 +51,9 @@ export const FILTROS_PADRAO: Filtros = {
 }
 
 export const POR_PAGINA = 9
+
+/** Quantas construtoras a busca aceita de uma vez (limita o tamanho da URL e da consulta). */
+export const MAX_CONSTRUTORAS = 30
 
 export const ORDENS: { valor: Ordem; rotulo: string }[] = [
   { valor: 'recentes', rotulo: 'Mais recentes' },
@@ -152,6 +158,7 @@ export function lerFiltros(rota: FiltrosRota, query: ParametrosBrutos): { filtro
     tipos: unicos(rota.tipo ? [rota.tipo, ...tiposQuery] : tiposQuery),
     cidade: rota.cidade,
     bairro: rota.bairro,
+    construtoras: unicos(sp.getAll('construtora').filter((c) => /^[a-z0-9-]{1,80}$/.test(c))).slice(0, MAX_CONSTRUTORAS),
     quartos: inteiro(sp.get('quartos'), 4),
     banheiros: inteiro(sp.get('banheiros'), 3),
     vagas: inteiro(sp.get('vagas'), 3),
@@ -183,6 +190,7 @@ export function montarUrl(f: Filtros, pagina = 1) {
   const sp = new URLSearchParams()
   if (rota.categoria !== 'lancamentos') f.situacoes.forEach((s) => sp.append('situacao', s))
   if (!rota.tipo) f.tipos.forEach((t) => sp.append('tipo', t))
+  f.construtoras.forEach((c) => sp.append('construtora', c))
   if (f.quartos) sp.set('quartos', String(f.quartos))
   if (f.banheiros) sp.set('banheiros', String(f.banheiros))
   if (f.vagas) sp.set('vagas', String(f.vagas))
@@ -204,7 +212,7 @@ export interface ChipFiltro {
   remover: Partial<Filtros>
 }
 
-export function chipsAtivos(f: Filtros, cidades: Cidade[]): ChipFiltro[] {
+export function chipsAtivos(f: Filtros, cidades: Cidade[], construtoras: Construtora[]): ChipFiltro[] {
   const chips: ChipFiltro[] = []
   const cidade = cidades.find((c) => c.slug === f.cidade)
   if (f.categoria !== 'todos')
@@ -213,6 +221,11 @@ export function chipsAtivos(f: Filtros, cidades: Cidade[]): ChipFiltro[] {
   if (cidade) chips.push({ chave: 'cidade', rotulo: cidade.nome, remover: { cidade: null, bairro: null } })
   const bairro = cidade?.bairros.find((b) => b.slug === f.bairro)
   if (bairro) chips.push({ chave: 'bairro', rotulo: bairro.nome, remover: { bairro: null } })
+  f.construtoras.forEach((slug) => {
+    const construtora = construtoras.find((c) => c.slug === slug)
+    if (construtora)
+      chips.push({ chave: `construtora-${slug}`, rotulo: construtora.nome, remover: { construtoras: f.construtoras.filter((x) => x !== slug) } })
+  })
   f.situacoes.forEach((s) =>
     chips.push({ chave: `situacao-${s}`, rotulo: rotuloSituacao[s], remover: { situacoes: f.situacoes.filter((x) => x !== s) } })
   )

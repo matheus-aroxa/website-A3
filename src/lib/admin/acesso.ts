@@ -6,6 +6,7 @@ import { cookies, headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { connection } from 'next/server'
 import { cache } from 'react'
+import { COOKIE_EQUIPE } from '@/lib/coleta/tipos'
 import { COOKIE_SESSAO, DURACAO_LEMBRAR_S, DURACAO_SESSAO_S, adminDoToken, criarSessao, encerrarSessaoDoToken, type Admin } from './sessao'
 
 export const obterAdmin = cache(async (): Promise<Admin | null> => {
@@ -36,6 +37,15 @@ export async function iniciarSessao(admin: Admin, ip: string, lembrar = false) {
     sameSite: 'strict',
     path: '/admin',
     ...(lembrar && { maxAge: DURACAO_LEMBRAR_S }),
+  })
+  // Marca este navegador como da equipe: as visitas dele ao site não entram nos relatórios (src/app/api/coleta/route.ts).
+  // Não sai junto com a sessão: quem trabalha na A3 continua fora dos números mesmo depois de sair do painel.
+  jar.set(COOKIE_EQUIPE, '1', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 365 * 24 * 60 * 60,
   })
 }
 

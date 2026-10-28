@@ -22,7 +22,7 @@ export const CONSULTA_SITE = `
          i.preco::float8 AS preco,
          i.area_min::float8 AS area_min, i.area_max::float8 AS area_max,
          i.quartos_min, i.quartos_max, i.banheiros_min, i.banheiros_max, i.vagas_min, i.vagas_max,
-         i.suites_min, i.suites_max, i.entrega, i.mcmv, i.destaque, i.heroi, i.chamada, i.construtora, i.unidades,
+         i.suites_min, i.suites_max, i.entrega, i.mcmv, i.destaque, i.heroi, i.chamada, co.id AS construtora_id, co.nome AS construtora, co.slug AS construtora_slug, i.unidades,
          i.descricao, i.lazer, i.proximidades,
          to_char(i.publicado_em, 'YYYY-MM-DD') AS publicado_em,
          to_char(i.atualizado_em, 'YYYY-MM-DD') AS atualizado_em,
@@ -39,7 +39,8 @@ export const CONSULTA_SITE = `
              FROM plantas p WHERE p.imovel_id = i.id), '[]'::json) AS plantas
     FROM imoveis i
     JOIN bairros b ON b.id = i.bairro_id
-    JOIN cidades c ON c.id = b.cidade_id`
+    JOIN cidades c ON c.id = b.cidade_id
+    JOIN construtoras co ON co.id = i.construtora_id`
 
 interface LinhaFoto {
   src: string
@@ -93,7 +94,9 @@ export interface Linha {
   destaque: boolean
   heroi: boolean
   chamada: string
-  construtora: string | null
+  construtora_id: number
+  construtora: string
+  construtora_slug: string
   unidades: string | null
   descricao: string[]
   lazer: string[]
@@ -162,7 +165,7 @@ export function paraImovel(l: Linha): Imovel {
     plantas,
     lazer: l.lazer,
     proximidades: l.proximidades,
-    construtora: l.construtora ?? undefined,
+    construtora: { id: l.construtora_id, nome: l.construtora, slug: l.construtora_slug },
     unidades: l.unidades ?? undefined,
   }
 }
@@ -258,14 +261,14 @@ function valoresEditaveis(im: Imovel, bairroId: number) {
     im.local.geo?.lat ?? null, im.local.geo?.lng ?? null, im.preco,
     im.area.min, im.area.max, im.quartos.min, im.quartos.max, im.banheiros.min, im.banheiros.max,
     im.vagas?.min ?? null, im.vagas?.max ?? null, im.suites?.min ?? null, im.suites?.max ?? null, im.entrega ?? null, im.mcmv,
-    im.chamada, im.construtora ?? null, im.unidades ?? null, im.descricao, im.lazer, im.proximidades,
+    im.chamada, im.construtora.id, im.unidades ?? null, im.descricao, im.lazer, im.proximidades,
   ]
 }
 
 const COLUNAS_EDITAVEIS = [
   'nome', 'tipo', 'finalidade', 'situacao', 'bairro_id', 'logradouro', 'latitude', 'longitude', 'preco',
   'area_min', 'area_max', 'quartos_min', 'quartos_max', 'banheiros_min', 'banheiros_max',
-  'vagas_min', 'vagas_max', 'suites_min', 'suites_max', 'entrega', 'mcmv', 'chamada', 'construtora', 'unidades',
+  'vagas_min', 'vagas_max', 'suites_min', 'suites_max', 'entrega', 'mcmv', 'chamada', 'construtora_id', 'unidades',
   'descricao', 'lazer', 'proximidades',
 ]
 
@@ -276,7 +279,7 @@ export interface Auditoria {
   campos?: unknown
 }
 
-async function registrar(cliente: Cliente, { autor, acao, imovelId, campos }: Auditoria) {
+export async function registrar(cliente: Cliente, { autor, acao, imovelId, campos }: Auditoria) {
   await cliente.query('INSERT INTO auditoria (imovel_id, acao, autor, campos) VALUES ($1, $2, $3, $4)', [
     imovelId ?? null,
     acao,

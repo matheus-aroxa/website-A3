@@ -38,9 +38,9 @@ export function TopoPagina({
 }
 
 /** Área cinza abaixo do topo, onde ficam os cartões. */
-export function CorpoPagina({ children, estreito }: { children: ReactNode; estreito?: boolean }) {
+export function CorpoPagina({ children }: { children: ReactNode }) {
   return (
-    <div className={`container ${s.corpo}`} data-estreito={estreito || undefined}>
+    <div className={`container ${s.corpo}`}>
       {children}
     </div>
   )

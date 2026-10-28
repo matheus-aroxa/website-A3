@@ -61,7 +61,7 @@ async function Resultados({ params, searchParams }: Props) {
         <>
           <div className={s.grade}>
             {itens.map((im, i) => (
-              <CardImovel key={im.id} imovel={im} nivelTitulo={2} prioritario={i < 2} />
+              <CardImovel key={im.id} imovel={im} nivelTitulo={2} prioritario={i < 2} lista="busca" />
             ))}
           </div>
           <CarregarMais

@@ -62,6 +62,8 @@ export function Galeria({ fotos }: { fotos: Foto[] }) {
               data-fora-do-mosaico={posicao === 0 && !ehPrincipal ? true : undefined}
               style={{ ['--ordem' as string]: posicao }}
               onClick={() => setAmpliada(i)}
+              data-evento="galeria"
+              data-rotulo="ampliar"
               aria-label={`Ampliar foto: ${foto.legenda ?? foto.alt}`}
             >
               <Image
@@ -95,10 +97,10 @@ export function Galeria({ fotos }: { fotos: Foto[] }) {
           <span className={s.contador}>
             {visivel + 1} / {total}
           </span>
-          <button type="button" className={`${s.seta} ${s.setaEsquerda}`} onClick={() => irPara(visivel - 1)} aria-label="Foto anterior">
+          <button type="button" className={`${s.seta} ${s.setaEsquerda}`} onClick={() => irPara(visivel - 1)} aria-label="Foto anterior" data-evento="galeria" data-rotulo="navegar">
             <Icone nome="chevron-esquerda" espessura={2.2} />
           </button>
-          <button type="button" className={`${s.seta} ${s.setaDireita}`} onClick={() => irPara(visivel + 1)} aria-label="Próxima foto">
+          <button type="button" className={`${s.seta} ${s.setaDireita}`} onClick={() => irPara(visivel + 1)} aria-label="Próxima foto" data-evento="galeria" data-rotulo="navegar">
             <Icone nome="chevron-direita" espessura={2.2} />
           </button>
           <div className={s.pontos}>
@@ -109,6 +111,8 @@ export function Galeria({ fotos }: { fotos: Foto[] }) {
                 aria-label={`Ver foto ${i + 1}`}
                 aria-current={i === visivel || undefined}
                 onClick={() => irPara(i)}
+                data-evento="galeria"
+                data-rotulo="navegar"
               />
             ))}
           </div>
@@ -144,10 +148,10 @@ export function Galeria({ fotos }: { fotos: Foto[] }) {
         </button>
         {total > 1 && (
           <>
-            <button type="button" className={`${s.seta} ${s.setaEsquerda}`} onClick={() => navegarAmpliada(-1)} aria-label="Foto anterior">
+            <button type="button" className={`${s.seta} ${s.setaEsquerda}`} onClick={() => navegarAmpliada(-1)} aria-label="Foto anterior" data-evento="galeria" data-rotulo="navegar">
               <Icone nome="chevron-esquerda" espessura={2.2} />
             </button>
-            <button type="button" className={`${s.seta} ${s.setaDireita}`} onClick={() => navegarAmpliada(1)} aria-label="Próxima foto">
+            <button type="button" className={`${s.seta} ${s.setaDireita}`} onClick={() => navegarAmpliada(1)} aria-label="Próxima foto" data-evento="galeria" data-rotulo="navegar">
               <Icone nome="chevron-direita" espessura={2.2} />
             </button>
           </>

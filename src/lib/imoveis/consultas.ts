@@ -6,7 +6,7 @@ import { CONSULTA_SITE, paraImovel, type Linha } from './banco'
 import { POR_PAGINA, type Entrega, type Filtros, type Ordem } from './filtros'
 import { altDaFoto, nomeDoLocal, normalizarBusca } from './formato'
 import type { IndiceImovel } from './rotas'
-import type { Cidade, Imovel, ImovelResumo } from './tipos'
+import { SLUG_CONSTRUTORA_PADRAO, type Cidade, type Construtora, type Imovel, type ImovelResumo } from './tipos'
 
 const FIM_DO_ANO: Record<Exclude<Entrega, 'pronto'>, string> = { '2026': '2026-12', '2027': '2027-12', '2028': '2028-12' }
 
@@ -17,7 +17,8 @@ export const SEM_ACENTO = (texto: string) =>
 const DE = `
   FROM imoveis i
   JOIN bairros b ON b.id = i.bairro_id
-  JOIN cidades c ON c.id = b.cidade_id`
+  JOIN cidades c ON c.id = b.cidade_id
+  JOIN construtoras co ON co.id = i.construtora_id`
 
 const ORDEM_SQL: Record<Ordem, string> = {
   recentes: 'i.publicado_em DESC, i.id',
@@ -39,6 +40,7 @@ function onde(f: Filtros) {
   if (f.tipos.length) c.push(`i.tipo = ANY(${p(f.tipos)}::tipo_imovel[])`)
   if (f.cidade) c.push(`c.slug = ${p(f.cidade)}`)
   if (f.bairro) c.push(`b.slug = ${p(f.bairro)}`)
+  if (f.construtoras.length) c.push(`co.slug = ANY(${p(f.construtoras)}::text[])`)
   if (f.quartos) c.push(`i.quartos_max >= ${p(f.quartos)}`)
   if (f.banheiros) c.push(`i.banheiros_max >= ${p(f.banheiros)}`)
   if (f.vagas) c.push(`COALESCE(i.vagas_max, 0) >= ${p(f.vagas)}`)
@@ -213,6 +215,15 @@ export async function buscarCidades(): Promise<Cidade[]> {
     mapa.set(r.cidade_slug, cidade)
   }
   return [...mapa.values()].map((c) => ({ ...c, bairros: c.bairros.sort(porNome) })).sort(porNome)
+}
+
+/** Construtoras com imóvel publicado, em ordem alfabética, para o filtro da busca. A padrão ("Não informado") vai por último. */
+export async function buscarConstrutoras(): Promise<Construtora[]> {
+  const { rows } = await banco().query<Construtora>(
+    `SELECT co.id, co.nome, co.slug FROM construtoras co
+      WHERE EXISTS (SELECT 1 FROM imoveis i WHERE i.construtora_id = co.id AND i.status = 'ativo')`,
+  )
+  return rows.sort((a, b) => Number(a.slug === SLUG_CONSTRUTORA_PADRAO) - Number(b.slug === SLUG_CONSTRUTORA_PADRAO) || a.nome.localeCompare(b.nome, 'pt-BR'))
 }
 
 /** O mínimo de cada imóvel publicado, para gerar rotas e sitemap (sem descrição nem galeria). */

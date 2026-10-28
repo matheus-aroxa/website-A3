@@ -80,7 +80,7 @@ function FormVisita({ imovelId, aoRefazer }: { imovelId: string; aoRefazer: () =
   )
 
   return (
-    <form action={acao} className={f.form} noValidate style={{ gap: 20 }}>
+    <form action={acao} className={f.form} noValidate style={{ gap: 20 }} data-formulario="visita">
       <Armadilha />
       <input type="hidden" name="imovel" value={imovelId} />
       {dias.map((d) => (
@@ -167,7 +167,7 @@ function FormCorretor({
     )
 
   return (
-    <form action={acao} className={f.form} noValidate>
+    <form action={acao} className={f.form} noValidate data-formulario="corretor">
       <Armadilha />
       <input type="hidden" name="imovel" value={imovelId} />
       <Campo rotulo="Nome" name="nome" estado={estado} autoComplete="name" placeholder="Seu nome completo" required />

@@ -241,10 +241,6 @@
   padding-top: 20px;
 }
 
-.corpo[data-estreito] {
-  max-width: calc(920px + 2 * var(--margem));
-}
-
 @media (min-width: 960px) {
   .corpo {
     gap: 18px;
@@ -376,15 +372,22 @@
 /* ---------- Lista de imóveis ---------- */
 
 .ferramentas {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 10px;
 }
 
+/* Cada controle ocupa o que precisa e divide a linha com os outros; o que sobra sozinho numa linha estica até o fim. */
 .campoBusca {
   position: relative;
   display: block;
-  grid-column: 1 / -1;
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+.filtro {
+  flex: 1 1 140px;
+  min-width: 0;
 }
 
 .campoBusca svg {
@@ -402,15 +405,6 @@
 
 .filtro :global(.seletor-botao) {
   font-size: 14px;
-}
-
-@media (min-width: 960px) {
-  .ferramentas {
-    grid-template-columns: minmax(0, 1fr) 240px 210px;
-  }
-  .campoBusca {
-    grid-column: auto;
-  }
 }
 
 .contagemLinha {
@@ -432,6 +426,42 @@
 
 .contagemLinha .limpar {
   align-self: auto;
+}
+
+/* Aba "todos" (link da página de construtoras): publicados e desativados em seções, cada uma com seu título e total. */
+.grupo + .grupo {
+  margin-top: 32px;
+}
+
+.grupoTitulo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--tinta);
+}
+
+.grupoTitulo span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 26px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: var(--mar-claro);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.grupoTitulo[data-status='inativo'] {
+  color: var(--texto-3);
+}
+
+.grupoTitulo[data-status='inativo'] span {
+  background: #eef1f0;
 }
 
 .lista {
@@ -1929,6 +1959,26 @@
   color: #b23a2e;
 }
 
+.confirmacaoIcone[data-neutro] {
+  background: var(--mar-claro);
+  color: var(--mar);
+}
+
+.confirmacaoCampo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--texto-2);
+}
+
+.confirmacaoCampo .campo {
+  height: 52px;
+  font-size: 16px;
+  font-weight: 400;
+}
+
 .confirmacaoCaixa h2 {
   font-size: 22px;
   font-weight: 800;
@@ -2426,4 +2476,211 @@
   justify-content: flex-end;
   gap: 10px;
   padding-bottom: 12px;
+}
+
+/* ---------- Construtoras ---------- */
+
+/* Tabela: cartão branco com cabeçalho que ordena, linhas com realce e ações em ícones (cabe em 360px sem rolar). */
+.tabelaBloco {
+  background: #fff;
+  border: 1px solid var(--borda-2);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.tabelaTopo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  padding: 14px;
+  border-bottom: 1px solid var(--borda-2);
+}
+
+.tabelaTopo .campoBusca {
+  flex: 1 1 240px;
+  max-width: 380px;
+}
+
+.paginar .paginarBotao {
+  width: auto;
+}
+
+.tabelaRolagem {
+  overflow-x: auto;
+}
+
+/* Larguras fixas: as colunas não mudam de lugar conforme o tamanho do nome. Só a de nome se ajusta à tela. */
+.tabela {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.colunaImoveis {
+  width: 130px;
+}
+
+.colunaAcoes {
+  width: 132px;
+}
+
+.tabela th,
+.tabela td {
+  padding: 10px 14px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.tabela [data-alinhar='fim'] {
+  text-align: right;
+}
+
+.tabela [data-alinhar='centro'] {
+  text-align: center;
+}
+
+.tabela thead th {
+  position: sticky;
+  top: 0;
+  background: var(--fundo-3);
+  border-bottom: 1px solid var(--borda-2);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--texto-2);
+  white-space: nowrap;
+}
+
+.tabela tbody tr + tr > * {
+  border-top: 1px solid var(--borda-3);
+}
+
+.tabela tbody tr:hover {
+  background: var(--fundo-2);
+}
+
+.tabelaOrdenar {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.tabelaOrdenar[data-ativa] {
+  color: var(--tinta);
+}
+
+.tabelaSeta {
+  display: inline-flex;
+  opacity: 0.35;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.tabelaOrdenar[data-ativa] .tabelaSeta {
+  opacity: 1;
+}
+
+.tabelaSeta[data-cima] {
+  transform: rotate(180deg);
+}
+
+.tabelaNome {
+  font-weight: 700;
+  color: var(--tinta);
+  overflow-wrap: anywhere;
+}
+
+.tabelaQuantidade {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--mar-claro);
+  font-weight: 700;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  color: var(--tinta);
+  text-decoration: none;
+}
+
+a.tabelaQuantidade:hover {
+  background: var(--mar);
+  color: #fff;
+}
+
+.tabelaQuantidade[data-zero] {
+  background: transparent;
+  color: var(--texto-3);
+  font-weight: 500;
+}
+
+.tabelaAcoes {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.tabelaEdicao {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tabelaEdicao .campo {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+.tabelaVazia {
+  padding: 28px 14px;
+  text-align: center;
+  color: var(--texto-3);
+}
+
+@media (max-width: 559px) {
+  .tabela th,
+  .tabela td {
+    padding: 8px 10px;
+  }
+  .tabela {
+    font-size: 14px;
+  }
+  .colunaImoveis {
+    width: 92px;
+  }
+  .colunaAcoes {
+    width: 112px;
+  }
+  /* Busca e "+" na mesma linha: o botão vira um quadrado da altura do campo e o texto fica só para leitor de tela. */
+  .tabelaTopo {
+    flex-wrap: nowrap;
+  }
+  .tabelaNova {
+    flex: none;
+    width: 52px;
+    height: 52px;
+    padding: 0;
+  }
+  .tabelaNovaTexto {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
 }

@@ -1,6 +1,7 @@
 -- Estrutura do banco (PostgreSQL 17 / Supabase): schema `public`, sem dados.
--- Gerada com `pg_dump --schema=public --schema-only --no-owner --no-acl` a partir do banco em uso (24/10/2026) e já inclui
--- as migrações anteriores (db/suites-faixa.sql). Os dados ficam no backup (docs/backup-banco.md).
+-- Gerada com `pg_dump --schema=public --schema-only --no-owner --no-acl` a partir do banco em uso (24/10/2026) mais as migrações
+-- aplicadas depois: db/construtoras.sql e db/relatorios.sql (a anterior, db/suites-faixa.sql, já estava incluída).
+-- Os dados ficam no backup (docs/backup-banco.md).
 --
 -- Para montar um banco novo: rodar este arquivo e depois db/seguranca-rls.sql. Requer a extensão pgcrypto, que no Supabase
 -- já vem ativa no schema `extensions` (o login confere a senha com extensions.crypt, ver docs/login-admin.md).
@@ -84,6 +85,19 @@ BEGIN
   RETURN NEW;
 END;
 $$;
+
+
+--
+-- Name: construtora_padrao_fixa(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.construtora_padrao_fixa() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  IF OLD.padrao THEN RAISE EXCEPTION 'A construtora padrão não pode ser alterada nem excluída.'; END IF;
+  RETURN CASE WHEN TG_OP = 'DELETE' THEN OLD ELSE NEW END;
+END $$;
 
 
 SET default_tablespace = '';
@@ -178,6 +192,34 @@ CREATE TABLE public.cidades (
 
 ALTER TABLE public.cidades ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
     SEQUENCE NAME public.cidades_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: construtoras; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.construtoras (
+    id integer NOT NULL,
+    nome text NOT NULL,
+    slug text NOT NULL,
+    padrao boolean DEFAULT false NOT NULL,
+    criado_em timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT construtoras_nome_check CHECK ((btrim(nome) <> ''::text))
+);
+
+
+--
+-- Name: construtoras_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+ALTER TABLE public.construtoras ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.construtoras_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -407,6 +449,54 @@ ALTER TABLE public.crm_importacoes ALTER COLUMN id ADD GENERATED ALWAYS AS IDENT
 
 
 --
+-- Name: eventos; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.eventos (
+    id bigint NOT NULL,
+    em timestamp with time zone DEFAULT now() NOT NULL,
+    dia date DEFAULT ((now() AT TIME ZONE 'America/Recife'::text))::date NOT NULL,
+    tipo text NOT NULL,
+    visitante text NOT NULL,
+    sessao uuid NOT NULL,
+    nova_sessao boolean DEFAULT false NOT NULL,
+    pv text,
+    caminho text NOT NULL,
+    imovel_id text,
+    rotulo text,
+    valor integer,
+    detalhe jsonb,
+    canal text,
+    origem text,
+    campanha text,
+    dispositivo text,
+    navegador text,
+    so text,
+    idioma text,
+    pais text,
+    estado text,
+    cidade text,
+    tempo_s integer,
+    rolagem smallint,
+    vitais jsonb
+);
+
+
+--
+-- Name: eventos_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+ALTER TABLE public.eventos ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.eventos_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
 -- Name: fotos; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -487,6 +577,7 @@ CREATE TABLE public.imoveis (
     alterado_em timestamp with time zone DEFAULT now() NOT NULL,
     suites_min integer,
     suites_max integer,
+    construtora_id integer DEFAULT 1 NOT NULL,
     CONSTRAINT coordenadas CHECK (((latitude IS NULL) = (longitude IS NULL))),
     CONSTRAINT faixa_area CHECK ((area_min <= area_max)),
     CONSTRAINT faixa_banheiros CHECK ((banheiros_min <= banheiros_max)),
@@ -529,6 +620,36 @@ ALTER TABLE public.plantas ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
     NO MINVALUE
     NO MAXVALUE
     CACHE 1
+);
+
+
+--
+-- Name: resumo_diario; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.resumo_diario (
+    dia date NOT NULL,
+    dimensao text NOT NULL,
+    chave text NOT NULL,
+    imovel_id text DEFAULT ''::text NOT NULL,
+    visitas integer DEFAULT 0 NOT NULL,
+    visitantes integer DEFAULT 0 NOT NULL,
+    sessoes integer DEFAULT 0 NOT NULL,
+    rejeicoes integer DEFAULT 0 NOT NULL,
+    conversoes integer DEFAULT 0 NOT NULL,
+    eventos integer DEFAULT 0 NOT NULL,
+    tempo_s bigint DEFAULT 0 NOT NULL,
+    valor bigint DEFAULT 0 NOT NULL
+);
+
+
+--
+-- Name: sal_visitantes; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sal_visitantes (
+    dia date NOT NULL,
+    sal text NOT NULL
 );
 
 
@@ -652,6 +773,14 @@ ALTER TABLE ONLY public.cidades
 
 
 --
+-- Name: construtoras construtoras_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.construtoras
+    ADD CONSTRAINT construtoras_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: crm_empreendimentos crm_empreendimentos_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -681,6 +810,14 @@ ALTER TABLE ONLY public.crm_imoveis
 
 ALTER TABLE ONLY public.crm_importacoes
     ADD CONSTRAINT crm_importacoes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: eventos eventos_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.eventos
+    ADD CONSTRAINT eventos_pkey PRIMARY KEY (id);
 
 
 --
@@ -756,6 +893,22 @@ ALTER TABLE ONLY public.plantas
 
 
 --
+-- Name: resumo_diario resumo_diario_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.resumo_diario
+    ADD CONSTRAINT resumo_diario_pkey PRIMARY KEY (dia, dimensao, chave, imovel_id);
+
+
+--
+-- Name: sal_visitantes sal_visitantes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sal_visitantes
+    ADD CONSTRAINT sal_visitantes_pkey PRIMARY KEY (dia);
+
+
+--
 -- Name: sessoes_admin sessoes_admin_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -810,6 +963,27 @@ CREATE INDEX auditoria_recentes ON public.auditoria USING btree (em DESC);
 
 
 --
+-- Name: construtoras_nome_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX construtoras_nome_key ON public.construtoras USING btree (lower(nome));
+
+
+--
+-- Name: construtoras_padrao_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX construtoras_padrao_key ON public.construtoras USING btree (padrao) WHERE padrao;
+
+
+--
+-- Name: construtoras_slug_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX construtoras_slug_key ON public.construtoras USING btree (slug);
+
+
+--
 -- Name: crm_empreendimentos_publicado; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -831,6 +1005,27 @@ CREATE UNIQUE INDEX crm_fotos_posicao_imo ON public.crm_fotos USING btree (imove
 
 
 --
+-- Name: eventos_dia; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX eventos_dia ON public.eventos USING btree (dia);
+
+
+--
+-- Name: eventos_pv; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX eventos_pv ON public.eventos USING btree (pv) WHERE (pv IS NOT NULL);
+
+
+--
+-- Name: eventos_visitante; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX eventos_visitante ON public.eventos USING btree (visitante, em DESC);
+
+
+--
 -- Name: fotos_uma_capa; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -842,6 +1037,13 @@ CREATE UNIQUE INDEX fotos_uma_capa ON public.fotos USING btree (imovel_id) WHERE
 --
 
 CREATE INDEX imoveis_busca ON public.imoveis USING btree (finalidade, tipo, bairro_id) WHERE (status = 'ativo'::public.status_imovel);
+
+
+--
+-- Name: imoveis_construtora_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX imoveis_construtora_id_idx ON public.imoveis USING btree (construtora_id);
 
 
 --
@@ -863,6 +1065,13 @@ CREATE INDEX imoveis_status ON public.imoveis USING btree (status);
 --
 
 CREATE UNIQUE INDEX imoveis_um_heroi ON public.imoveis USING btree (heroi) WHERE heroi;
+
+
+--
+-- Name: resumo_diario_dimensao; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX resumo_diario_dimensao ON public.resumo_diario USING btree (dimensao, dia);
 
 
 --
@@ -891,6 +1100,13 @@ CREATE INDEX tentativas_login_email ON public.tentativas_login USING btree (emai
 --
 
 CREATE INDEX tentativas_login_ip ON public.tentativas_login USING btree (ip, em DESC);
+
+
+--
+-- Name: construtoras construtora_padrao_fixa; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER construtora_padrao_fixa BEFORE DELETE OR UPDATE ON public.construtoras FOR EACH ROW EXECUTE FUNCTION public.construtora_padrao_fixa();
 
 
 --
@@ -965,6 +1181,14 @@ ALTER TABLE ONLY public.imoveis
 
 
 --
+-- Name: imoveis imoveis_construtora_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.imoveis
+    ADD CONSTRAINT imoveis_construtora_id_fkey FOREIGN KEY (construtora_id) REFERENCES public.construtoras(id) ON DELETE RESTRICT;
+
+
+--
 -- Name: imoveis imoveis_crm_empreendimento_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1010,6 +1234,7 @@ ALTER TABLE ONLY public.vitrine_config
 
 ALTER TABLE ONLY public.vitrine_destaques
     ADD CONSTRAINT vitrine_destaques_imovel_id_fkey FOREIGN KEY (imovel_id) REFERENCES public.imoveis(id) ON DELETE CASCADE;
+
 
 -- Linha única de configuração da vitrine da home: as consultas fazem CROSS JOIN com ela, então sem esta linha nada aparece.
 INSERT INTO public.vitrine_config (id, personalizada) VALUES (true, false) ON CONFLICT DO NOTHING;

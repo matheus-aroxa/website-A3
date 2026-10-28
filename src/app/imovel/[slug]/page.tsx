@@ -40,7 +40,7 @@ import {
   tituloDoImovel,
   urlImovel,
 } from '@/lib/imoveis/rotas'
-import type { Imovel } from '@/lib/imoveis/tipos'
+import { SLUG_CONSTRUTORA_PADRAO, type Imovel } from '@/lib/imoveis/tipos'
 import { schemaAnuncio } from '@/lib/seo'
 import { linkWhatsApp, openGraphBase } from '@/lib/site'
 import s from '@/components/imovel/Imovel.module.css'
@@ -90,7 +90,7 @@ export default async function PaginaImovel({ params }: PageProps<'/imovel/[slug]
   const semelhantes = await listarSemelhantes(im)
 
   const aluguel = im.finalidade === 'aluguel'
-  const mensagemWhats = `Olá! Tenho interesse no ${im.nome} (cód. ${im.codigo}).`
+  const mensagemWhats = `Olá! Tenho interesse no ${im.nome}.`
   const quartos = im.suites?.max ? `${formatarFaixa(im.quartos)}, com suíte` : formatarFaixa(im.quartos)
   const ficha: { icone: NomeIcone; rotulo: string; rotuloCurto?: string; valor: string; valorCurto?: string }[] = [
     { icone: 'area', rotulo: 'Área privativa', valor: formatarArea(im.area) },
@@ -159,7 +159,7 @@ export default async function PaginaImovel({ params }: PageProps<'/imovel/[slug]
                 </small>
               </div>
               <div className={s.precoAcoes}>
-                <a className="btn btn-sol btn-quadrado" href={linkWhatsApp(mensagemWhats)} target="_blank" rel="noopener">
+                <a className="btn btn-sol btn-quadrado" href={linkWhatsApp(mensagemWhats)} target="_blank" rel="noopener" data-rastro="ficha-preco">
                   <Icone nome="whatsapp" tamanho={18} espessura={2} />
                   WhatsApp
                 </a>
@@ -300,10 +300,12 @@ export default async function PaginaImovel({ params }: PageProps<'/imovel/[slug]
                   <dt>{aluguel ? 'Finalidade' : 'Situação'}</dt>
                   <dd>{aluguel ? 'Aluguel' : rotuloSituacao[im.situacao]}</dd>
                 </div>
-                {im.construtora && (
+                {im.construtora.slug !== SLUG_CONSTRUTORA_PADRAO && (
                   <div>
                     <dt>Construtora</dt>
-                    <dd>{im.construtora}</dd>
+                    <dd>
+                      <Link href={`/imoveis?construtora=${im.construtora.slug}`}>{im.construtora.nome}</Link>
+                    </dd>
                   </div>
                 )}
                 {im.entrega && im.situacao !== 'pronto' && (
@@ -356,7 +358,7 @@ export default async function PaginaImovel({ params }: PageProps<'/imovel/[slug]
               </div>
               <div className={`${s.gradeSemelhantes} carrossel-mobile`}>
                 {semelhantes.map((sim) => (
-                  <CardImovel key={sim.id} imovel={sim} />
+                  <CardImovel key={sim.id} imovel={sim} lista="semelhantes" />
                 ))}
               </div>
             </div>
@@ -368,7 +370,7 @@ export default async function PaginaImovel({ params }: PageProps<'/imovel/[slug]
 
       {/* Barra fixa do celular (protótipo mobile). */}
       <div className={s.barraInferior}>
-        <a className="btn btn-linha btn-quadrado" href={linkWhatsApp(mensagemWhats)} target="_blank" rel="noopener">
+        <a className="btn btn-linha btn-quadrado" href={linkWhatsApp(mensagemWhats)} target="_blank" rel="noopener" data-rastro="ficha-barra-celular">
           <Icone nome="whatsapp" tamanho={19} espessura={2} />
           WhatsApp
         </a>

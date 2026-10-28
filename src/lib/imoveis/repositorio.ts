@@ -10,6 +10,7 @@ import {
   buscarAtivoPorId,
   buscarAtivoPorSlug,
   buscarCidades,
+  buscarConstrutoras,
   buscarDestaques,
   buscarHeroi,
   buscarIndice,
@@ -21,7 +22,7 @@ import {
 import { lerFiltros, type Filtros, type FiltrosRota } from './filtros'
 import { paginasDeBusca, type PaginaBusca } from './paginas'
 import type { IndiceImovel } from './rotas'
-import type { Cidade, Imovel, ImovelResumo } from './tipos'
+import type { Cidade, Construtora, Imovel, ImovelResumo } from './tipos'
 
 export const TAG_IMOVEIS = 'imoveis'
 
@@ -77,6 +78,13 @@ export async function listarCidades(): Promise<Cidade[]> {
   cacheLife('hours')
   cacheTag(TAG_IMOVEIS)
   return buscarCidades()
+}
+
+export async function listarConstrutoras(): Promise<Construtora[]> {
+  'use cache'
+  cacheLife('hours')
+  cacheTag(TAG_IMOVEIS)
+  return buscarConstrutoras()
 }
 
 export type ResultadoBusca = PaginaResumos

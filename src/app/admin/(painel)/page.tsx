@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { ListaImoveis } from '@/components/admin/ListaImoveis'
 import { CorpoPagina, TopoPagina } from '@/components/admin/TopoPagina'
-import { listarCatalogoAdmin, type FiltroAdmin } from '@/lib/admin/catalogo'
+import { listarCatalogoAdmin, listarConstrutorasDoPainel, type FiltroAdmin } from '@/lib/admin/catalogo'
 import { ABAS_ADMIN } from '@/lib/imoveis/consultas-admin'
 import s from '@/components/admin/Admin.module.css'
 
@@ -24,6 +24,7 @@ function filtroDaUrl(busca: Busca): FiltroAdmin {
     q: primeiro(busca.q).slice(0, 80),
     situacao: primeiro(busca.situacao).slice(0, 20),
     finalidade,
+    construtora: /^\d{1,9}$/.test(primeiro(busca.construtora)) ? primeiro(busca.construtora) : '',
     pagina: Math.max(1, Number.parseInt(primeiro(busca.pagina), 10) || 1),
   }
 }
@@ -31,8 +32,8 @@ function filtroDaUrl(busca: Busca): FiltroAdmin {
 async function Catalogo({ busca }: { busca: Promise<Busca> }) {
   const filtro = filtroDaUrl(await busca)
   // A sessão já foi lida (connection): a página é sempre da requisição, então o relógio pode ser usado.
-  const catalogo = await listarCatalogoAdmin(filtro)
-  return <ListaImoveis catalogo={catalogo} filtro={filtro} titulo={TITULO} descricao={DESCRICAO} />
+  const [catalogo, construtoras] = await Promise.all([listarCatalogoAdmin(filtro), listarConstrutorasDoPainel()])
+  return <ListaImoveis catalogo={catalogo} filtro={filtro} construtoras={construtoras} titulo={TITULO} descricao={DESCRICAO} />
 }
 
 export default function PaginaImoveis({ searchParams }: PageProps<'/admin'>) {

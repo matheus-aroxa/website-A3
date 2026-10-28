@@ -9,6 +9,7 @@ export function BotaoWhatsApp({ mensagem, somenteDesktop = false }: { mensagem?:
       href={linkWhatsApp(mensagem)}
       target="_blank"
       rel="noopener"
+      data-rastro="botao-flutuante"
       aria-label="Fale conosco pelo WhatsApp"
       className={`btn btn-sol ${s.botao}`}
       data-somente-desktop={somenteDesktop || undefined}

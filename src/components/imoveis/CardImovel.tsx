@@ -27,18 +27,21 @@ export function CardImovel({
   variante = 'lista',
   nivelTitulo = 3,
   prioritario = false,
+  lista,
 }: {
   imovel: ImovelResumo
   variante?: 'destaque' | 'lista'
   nivelTitulo?: 2 | 3
   /** Primeiros cards visíveis: carregam a imagem sem lazy loading. */
   prioritario?: boolean
+  /** De onde o card aparece (home, busca, semelhantes): vai para a medição de cliques. */
+  lista?: string
 }) {
   const Titulo = `h${nivelTitulo}` as const
   const classeEtiqueta = imovel.finalidade === 'aluguel' ? 'etiqueta-aluguel' : `etiqueta-${imovel.situacao}`
 
   return (
-    <article className={`elevar ${s.card}`} data-variante={variante}>
+    <article className={`elevar ${s.card}`} data-variante={variante} data-lista={lista}>
       <div className={s.foto}>
         <Image
           loader={carregadorImagem}

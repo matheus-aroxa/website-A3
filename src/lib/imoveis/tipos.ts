@@ -72,9 +72,19 @@ export interface Imovel {
   plantas: Planta[]
   lazer: string[]
   proximidades: string[]
-  construtora?: string
+  construtora: Construtora
   unidades?: string
 }
+
+/** Construtora cadastrada no painel. Imóvel sem construtora informada aponta para a padrão, "Não informado". */
+export interface Construtora {
+  id: number
+  nome: string
+  slug: string
+}
+
+/** Slug da construtora padrão (a dos imóveis sem construtora informada). */
+export const SLUG_CONSTRUTORA_PADRAO = 'nao-informado'
 
 /** Dados mínimos para os cards de listagem (o que trafega para o navegador). */
 export interface ImovelResumo {

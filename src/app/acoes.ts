@@ -10,6 +10,7 @@ import {
   validarNome,
   validarWhatsapp,
 } from '@/lib/formularios'
+import { medirFormulario } from '@/lib/coleta/formulario'
 import { obterImovelPorId } from '@/lib/imoveis/repositorio'
 import { linkWhatsApp, mensagemAtendimento, mensagemImovel, mensagemVisita } from '@/lib/site'
 
@@ -28,6 +29,8 @@ type Erros = NonNullable<EstadoFormulario['erros']>
 function semErros(erros: Erros) {
   return Object.values(erros).every((e) => !e)
 }
+
+const camposComErro = (erros: Erros) => Object.keys(erros).filter((c) => erros[c])
 
 function valoresDe(fd: FormData) {
   const valores: Record<string, string> = {}
@@ -59,9 +62,13 @@ export async function enviarContato(_: EstadoFormulario, fd: FormData): Promise<
     whatsapp: validarWhatsapp(dados.whatsapp),
     consentimento: validarConsentimento(fd),
   }
-  if (!semErros(erros)) return { status: 'erro', erros, valores: valoresDe(fd) }
+  if (!semErros(erros)) {
+    await medirFormulario('formulario-erro', 'contato', { camposComErro: camposComErro(erros) })
+    return { status: 'erro', erros, valores: valoresDe(fd) }
+  }
 
   // A conversa é aberta no WhatsApp da A3, já com os dados preenchidos no formulário.
+  await medirFormulario('formulario-enviado', 'contato')
   return {
     status: 'sucesso',
     mensagem: 'Abrindo o WhatsApp da A3 com a sua mensagem.',
@@ -86,9 +93,13 @@ export async function solicitarVisita(_: EstadoFormulario, fd: FormData): Promis
     consentimento: validarConsentimento(fd),
     imovel: imovel ? undefined : 'Imóvel não encontrado. Recarregue a página.',
   }
-  if (!semErros(erros)) return { status: 'erro', erros, valores: valoresDe(fd) }
+  if (!semErros(erros)) {
+    await medirFormulario('formulario-erro', 'visita', { imovelId: imovel?.id, camposComErro: camposComErro(erros) })
+    return { status: 'erro', erros, valores: valoresDe(fd) }
+  }
 
   // A conversa é aberta no WhatsApp da A3, já com a disponibilidade escolhida.
+  await medirFormulario('formulario-enviado', 'visita', { imovelId: imovel!.id })
   const agenda = `${DIAS_DA_SEMANA.filter(([d]) => dias.includes(d)).map(([, nome]) => nome).join(', ')}, às ${[...horarios]
     .sort()
     .map((h) => `${parseInt(h, 10)}h`)
@@ -116,9 +127,13 @@ export async function falarComCorretor(_: EstadoFormulario, fd: FormData): Promi
     consentimento: validarConsentimento(fd),
     imovel: imovel ? undefined : 'Imóvel não encontrado. Recarregue a página.',
   }
-  if (!semErros(erros)) return { status: 'erro', erros, valores: valoresDe(fd) }
+  if (!semErros(erros)) {
+    await medirFormulario('formulario-erro', 'corretor', { imovelId: imovel?.id, camposComErro: camposComErro(erros) })
+    return { status: 'erro', erros, valores: valoresDe(fd) }
+  }
 
   // A conversa é aberta no WhatsApp da A3, já com os dados preenchidos no formulário.
+  await medirFormulario('formulario-enviado', 'corretor', { imovelId: imovel!.id })
   const rotuloCanal = dados.canalPreferido === 'ligacao' ? 'Ligação' : 'WhatsApp'
   return {
     status: 'sucesso',

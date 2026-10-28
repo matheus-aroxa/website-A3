@@ -18,9 +18,9 @@ import s from './BuscaInicial.module.css'
 type Modo = 'venda' | 'aluguel' | 'lancamentos'
 
 const MODOS: { valor: Modo; rotulo: string }[] = [
-  { valor: 'venda', rotulo: 'Comprar' },
-  { valor: 'aluguel', rotulo: 'Alugar' },
   { valor: 'lancamentos', rotulo: 'Lançamentos' },
+  { valor: 'venda', rotulo: 'Imóveis prontos' },
+  { valor: 'aluguel', rotulo: 'Alugar' },
 ]
 
 function Passo({
