@@ -3,11 +3,11 @@
 // Ações do painel administrativo. Cada uma confere a sessão por conta própria:
 // Server Actions são endpoints públicos e não podem confiar no que a página mostrou.
 import { refresh, updateTag } from 'next/cache'
-import { headers } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { encerrarSessao, exigirAdmin, exigirPrincipal, iniciarSessao } from '@/lib/admin/acesso'
-import { criarAdministrador, definirAtivo, type ResultadoAdministrador } from '@/lib/admin/administradores'
-import { autenticar, limparFalhas, loginBloqueado, painelConfigurado, registrarFalha } from '@/lib/admin/sessao'
+import { criarAdministrador, editarAdministrador, excluirAdministrador, type ResultadoAdministrador } from '@/lib/admin/administradores'
+import { COOKIE_SESSAO, autenticar, hashDoToken, limparFalhas, loginBloqueado, painelConfigurado, registrarFalha } from '@/lib/admin/sessao'
 import { texto, type EstadoFormulario } from '@/lib/formularios'
 import { apagarDoImovel, apagarFotos } from '@/lib/admin/fotos'
 import {
@@ -368,11 +368,23 @@ export async function cadastrarAdministrador(dados: { nome: string; usuario: str
   return r
 }
 
-/** Desativa (tira o acesso na hora) ou reativa outro administrador. */
-export async function mudarAcessoAdministrador(id: string, ativo: boolean): Promise<ResultadoAdministrador> {
+/** Nome, usuário e senha de um administrador (o principal também edita os próprios); senha vazia mantém a atual. */
+export async function editarDadosAdministrador(id: string, dados: { nome: string; usuario: string; senha: string }): Promise<ResultadoAdministrador> {
   const admin = await exigirPrincipal()
-  if (typeof id !== 'string' || !UUID.test(id) || typeof ativo !== 'boolean') return { ok: false, erro: 'Administrador não encontrado.' }
-  const r = await definirAtivo(id, ativo, admin.email)
+  if (typeof id !== 'string' || !UUID.test(id)) return { ok: false, erro: 'Administrador não encontrado.' }
+  if (typeof dados !== 'object' || dados === null) return { ok: false, erro: 'Preencha os dados do administrador.' }
+  // Trocando a própria senha, a sessão em uso continua valendo; as outras caem.
+  const token = (await cookies()).get(COOKIE_SESSAO)?.value
+  const r = await editarAdministrador(id, dados, admin.email, id === admin.id && token ? hashDoToken(token) : undefined)
+  if (r.ok) refresh()
+  return r
+}
+
+/** Exclui outro administrador de vez; o acesso dele acaba na hora. */
+export async function excluirAdministradorAcao(id: string): Promise<ResultadoAdministrador> {
+  const admin = await exigirPrincipal()
+  if (typeof id !== 'string' || !UUID.test(id)) return { ok: false, erro: 'Administrador não encontrado.' }
+  const r = await excluirAdministrador(id, admin.email)
   if (r.ok) refresh()
   return r
 }

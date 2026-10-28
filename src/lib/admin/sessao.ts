@@ -18,12 +18,12 @@ export interface Admin {
   id: string
   email: string
   nome: string | null
-  /** O administrador principal: só ele cadastra, desativa e reativa os outros. */
+  /** O administrador principal: só ele cadastra, edita e exclui os outros. */
   principal: boolean
 }
 
 const normalizarEmail = (email: string) => email.trim().toLowerCase()
-const hashDoToken = (token: string) => createHash('sha256').update(token).digest('hex')
+export const hashDoToken = (token: string) => createHash('sha256').update(token).digest('hex')
 
 // Hash de uma senha qualquer, com o mesmo custo dos reais: quando o e-mail não existe o banco confere a senha
 // contra ele, para a resposta levar o mesmo tempo (não revela quem é administrador).

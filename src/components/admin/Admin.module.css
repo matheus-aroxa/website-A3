@@ -2687,34 +2687,36 @@ a.tabelaQuantidade:hover {
 
 /* ---------- Administradores ---------- */
 
-/* Mesma tabela das construtoras: nome com o usuário e o último acesso embaixo, situação e uma ação. */
-.colunaSituacao {
-  width: 130px;
+/* Mesma tabela das construtoras, sem busca: nome ordenável, ações (editar e excluir) e paginação. */
+
+/* Linhas de altura fixa: o principal (sem ações) e os demais ocupam o mesmo espaço, e um nome comprido é cortado em vez de crescer. */
+.tabelaAdministradores tbody tr {
+  height: 64px;
 }
 
-.colunaAcao {
-  width: 76px;
+.nomeAdministrador {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
 }
 
-.tabelaDetalhe {
-  display: block;
-  margin-top: 2px;
-  font-size: 13px;
-  font-weight: 400;
-  color: var(--texto-3);
+.nomeAdministradorTexto {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.tabela tr[data-inativo] .tabelaNome {
-  color: var(--texto-3);
+/* O botão de cadastrar fica fora da tabela, acima dela e à direita. */
+.novoAdministrador {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 14px;
 }
 
 .marcadorPrincipal {
   background: var(--mar-claro);
-  color: var(--mar);
-}
-
-.marcadorAtivo {
-  box-shadow: inset 0 0 0 1px var(--mar);
   color: var(--mar);
 }
 
@@ -2730,13 +2732,4 @@ a.tabelaQuantidade:hover {
 
 .campoSenha .verSenha {
   top: 5px;
-}
-
-@media (max-width: 559px) {
-  .colunaSituacao {
-    width: 104px;
-  }
-  .colunaAcao {
-    width: 64px;
-  }
 }

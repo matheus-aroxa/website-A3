@@ -17,7 +17,7 @@ export default function PaginaAdministradores() {
     <>
       <TopoPagina
         titulo="Administradores"
-        descricao="Cadastre quem pode entrar no painel e tire o acesso de quem não precisa mais. Só você, o administrador principal, vê esta página."
+        descricao="Cadastre quem pode entrar no painel, corrija nome, usuário ou senha e exclua quem não precisa mais de acesso. Só você, o administrador principal, vê esta página."
       />
       <CorpoPagina>
         <Suspense fallback={<p className={s.contagem}>Carregando…</p>}>

@@ -22,18 +22,23 @@ Administradores, sessões e limite de tentativas ficam no banco (tabelas em `db/
 - **Encerrar o acesso:** `ativo = false` derruba as sessões do administrador na hora. Sair apaga a sessão do banco.
 
 ## Administrador principal
-Só o principal cadastra, desativa e reativa os outros administradores, pela página **Administradores** do painel
+Só o principal cadastra, edita e exclui os outros administradores, pela página **Administradores** do painel
 (`/admin/administradores`). Os demais usam todo o resto do painel, mas não veem o link, são levados de volta ao início
 se abrirem o endereço (`src/proxy.ts` e a própria página) e as Server Actions recusam o pedido (`exigirPrincipal`).
 
 - **Cadastrar:** nome, usuário e uma senha de primeiro acesso (10 a 200 caracteres), que o principal repassa à pessoa.
-- **Desativar:** o acesso acaba na hora e as sessões abertas são apagadas (reativar não ressuscita sessão antiga).
-- O principal não pode ser desativado (restrição `administradores_principal_ativo` no banco). Ao aplicar
+- **Editar:** nome, usuário e senha de qualquer outro administrador. Senha em branco mantém a atual;
+  senha nova encerra as sessões abertas dele. O principal também edita os próprios dados; ao trocar a própria senha, ele continua conectado neste aparelho e
+  os outros caem.
+- **Excluir:** apaga o administrador de vez (não há desativar/reativar pelo painel) e as sessões abertas dele caem junto.
+- O principal não pode ser excluído nem desativado (restrição `administradores_principal_ativo` no banco). Ao aplicar
   `db/administradores.sql`, o administrador ativo mais antigo vira o principal.
-- Tudo fica na tabela `auditoria` (`admin-criar`, `admin-desativar`, `admin-ativar`), com o usuário de quem fez.
+- Tudo fica na tabela `auditoria` (`admin-criar`, `admin-editar`, `admin-excluir`; na edição, só o
+  que mudou, e a senha aparece apenas como `trocada`), com o usuário de quem fez.
 
 ## Pelo SQL Editor do Supabase
-O primeiro administrador de um banco novo, a troca de senha e a troca do principal continuam sendo feitos aqui.
+O primeiro administrador de um banco novo, a troca de senha do próprio principal e a troca do principal continuam sendo
+feitos aqui.
 ```sql
 -- Cadastrar (use uma senha longa e única)
 INSERT INTO administradores (email, nome, senha_hash)
@@ -60,5 +65,5 @@ Senha certa e errada, e-mail inexistente e administrador inativo (mesmo tempo de
 gravada só com o hash do token, flags do cookie, desativar derruba a sessão, sessão expirada e bloqueio por tentativas.
 
 ## Fora desta versão
-Sem fluxo de "esqueci a senha" e sem troca de senha pelo painel. Fora a página de administradores, que é só do
+Sem fluxo de "esqueci a senha"; a senha só muda pelo painel quando o principal edita outro administrador. Fora a página de administradores, que é só do
 principal, todo administrador tem o mesmo acesso.
