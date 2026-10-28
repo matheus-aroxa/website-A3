@@ -212,6 +212,21 @@ const CAMINHOS = {
       <path d="M12 7.5V12l3 2" />
     </>
   ),
+  grafico: <path d="M4 20V11M10 20V5M16 20v-7M22 20H2" />,
+  baixar: <path d="M12 4v11M7 11l5 5 5-5M5 20h14" />,
+  imprimir: (
+    <>
+      <path d="M7 9V4h10v5" />
+      <rect x="4" y="9" width="16" height="8" rx="2" />
+      <path d="M7 14h10v6H7z" />
+    </>
+  ),
+  tabela: (
+    <>
+      <rect x="4" y="5" width="16" height="14" rx="2" />
+      <path d="M4 10h16M4 15h16M10 5v14" />
+    </>
+  ),
 } as const
 
 export type NomeIcone = keyof typeof CAMINHOS
