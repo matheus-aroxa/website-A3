@@ -3,12 +3,11 @@
 import 'server-only'
 import { banco } from '@/lib/db'
 import { CONSULTA_SITE, paraImovel, type Linha } from './banco'
-import { POR_PAGINA, type Entrega, type Filtros, type Ordem } from './filtros'
+import { FIM_DO_ANO } from './filtragem'
+import { POR_PAGINA, type Filtros, type Ordem } from './filtros'
 import { altDaFoto, nomeDoLocal, normalizarBusca } from './formato'
 import type { IndiceImovel } from './rotas'
 import { SLUG_CONSTRUTORA_PADRAO, type Cidade, type Construtora, type Imovel, type ImovelResumo } from './tipos'
-
-const FIM_DO_ANO: Record<Exclude<Entrega, 'pronto'>, string> = { '2026': '2026-12', '2027': '2027-12', '2028': '2028-12' }
 
 // Sem extensão `unaccent`: tira os acentos do português com translate (mesmo efeito de normalizarBusca).
 export const SEM_ACENTO = (texto: string) =>

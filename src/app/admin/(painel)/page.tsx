@@ -2,8 +2,10 @@ import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { ListaImoveis } from '@/components/admin/ListaImoveis'
 import { CorpoPagina, TopoPagina } from '@/components/admin/TopoPagina'
+import { Icone } from '@/components/ui/Icone'
 import { listarCatalogoAdmin, listarConstrutorasDoPainel, type FiltroAdmin } from '@/lib/admin/catalogo'
 import { ABAS_ADMIN } from '@/lib/imoveis/consultas-admin'
+import { catalogoNoPainel } from '@/lib/imoveis/fonte'
 import s from '@/components/admin/Admin.module.css'
 
 export const metadata: Metadata = { title: 'Imóveis' }
@@ -36,7 +38,33 @@ async function Catalogo({ busca }: { busca: Promise<Busca> }) {
   return <ListaImoveis catalogo={catalogo} filtro={filtro} construtoras={construtoras} titulo={TITULO} descricao={DESCRICAO} />
 }
 
+/** Catálogo na Viniun (FONTE_IMOVEIS=viniun): o cadastro, as fotos, os destaques e as construtoras são mantidos lá. */
+function CatalogoNaViniun() {
+  return (
+    <>
+      <TopoPagina titulo={TITULO} descricao="Os imóveis do site vêm do CRM Viniun." />
+      <CorpoPagina>
+        <div className={s.vazio}>
+          <span className={s.vazioIcone}>
+            <Icone nome="predio" tamanho={24} espessura={2} />
+          </span>
+          <h2>Os imóveis são gerenciados na Viniun</h2>
+          <p>
+            Cadastre, edite, tire do ar e marque os destaques da home no painel da Viniun. Só entram no site os imóveis marcados
+            para aparecer no site, e as mudanças chegam aqui em até uma hora.
+          </p>
+          <a className="btn btn-sol btn-p" href="https://painel.viniun.com.br/imoveis" target="_blank" rel="noopener">
+            Abrir o painel da Viniun
+            <Icone nome="externo" tamanho={16} />
+          </a>
+        </div>
+      </CorpoPagina>
+    </>
+  )
+}
+
 export default function PaginaImoveis({ searchParams }: PageProps<'/admin'>) {
+  if (!catalogoNoPainel()) return <CatalogoNaViniun />
   return (
     <Suspense
       fallback={

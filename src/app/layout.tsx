@@ -6,6 +6,8 @@ import { Rastreador } from '@/components/coleta/Rastreador'
 import { TopoAoMudarDePagina } from '@/components/layout/TopoAoMudarDePagina'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { coletaAtiva } from '@/lib/coleta/ativa'
+import { fonteDosImoveis } from '@/lib/imoveis/fonte'
+import { HOST_VINIUN_FOTOS } from '@/lib/imoveis/hosts-fotos'
 import { schemaImobiliaria } from '@/lib/seo'
 import { URL_IMAGENS, openGraphBase, site } from '@/lib/site'
 import './globals.css'
@@ -58,6 +60,8 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   // As fotos vêm de outra origem (S3): abre a conexão enquanto o HTML ainda é lido, antes de a primeira foto ser pedida.
   preconnect(URL_IMAGENS)
+  // Catálogo na Viniun: as fotos dos imóveis vêm do servidor de mídia deles.
+  if (fonteDosImoveis() === 'viniun') preconnect(`https://${HOST_VINIUN_FOTOS}`)
   return (
     <html lang="pt-BR" className={archivo.variable} data-scroll-behavior="smooth">
       <body>

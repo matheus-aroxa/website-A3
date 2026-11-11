@@ -3,7 +3,9 @@ import { COOKIE_SESSAO, adminDoToken } from '@/lib/admin/sessao'
 import { versaoDoCatalogo } from '@/lib/imoveis/banco'
 import { buscarCidades } from '@/lib/imoveis/consultas'
 import { interpretarSegmentos } from '@/lib/imoveis/filtros'
+import { catalogoNoPainel, fonteDosImoveis } from '@/lib/imoveis/fonte'
 import type { Cidade } from '@/lib/imoveis/tipos'
+import { baixarCidades } from '@/lib/imoveis/viniun/carga'
 
 // As páginas de busca são transmitidas por streaming (o status 200 sai antes do conteúdo).
 // Para que URLs inexistentes como /imoveis/xyz respondam 404 de verdade — e não um
@@ -13,6 +15,24 @@ const VALIDADE_MS = 10 * 60 * 1000
 // A versão do catálogo é conferida no máximo a cada tanto: é uma consulta ao banco por requisição.
 const CONFERIR_A_CADA_MS = 5 * 1000
 let cache: { cidades: Cidade[]; expiraEm: number; versao: string; conferidoEm: number } | null = null
+
+// Catálogo na Viniun: não há "versão" barata de conferir, então a lista vale alguns minutos. Um bairro novo pode
+// responder 404 nesse intervalo. Se a Viniun estiver fora do ar, segue com a última lista que deu certo.
+const VALIDADE_VINIUN_MS = 5 * 60 * 1000
+let cacheViniun: { cidades: Cidade[]; expiraEm: number } | null = null
+
+async function cidadesDaViniun(): Promise<Cidade[] | null> {
+  const agora = Date.now()
+  if (cacheViniun && cacheViniun.expiraEm > agora) return cacheViniun.cidades
+  try {
+    cacheViniun = { cidades: await baixarCidades(), expiraEm: agora + VALIDADE_VINIUN_MS }
+  } catch (erro) {
+    console.error('[proxy] cidades da Viniun:', erro)
+    if (!cacheViniun) return null
+    cacheViniun.expiraEm = agora + 30_000
+  }
+  return cacheViniun.cidades
+}
 
 async function cidades() {
   const agora = Date.now()
@@ -40,6 +60,10 @@ async function proxyAdmin(request: NextRequest) {
   }
   // A tela de administradores é só do principal (a página e as ações conferem de novo).
   if (admin && !admin.principal && pathname.startsWith('/admin/administradores')) return NextResponse.redirect(new URL('/admin', request.url))
+  // Catálogo na Viniun: cadastro, vitrine e construtoras são feitos lá (o início do painel explica). As ações conferem de novo.
+  if (admin && !catalogoNoPainel() && /^\/admin\/(imoveis|vitrine|construtoras)(\/|$)/.test(pathname)) {
+    return NextResponse.redirect(new URL('/admin', request.url))
+  }
   if (admin) return NextResponse.next()
   const login = new URL('/admin/entrar', request.url)
   if (pathname !== '/admin') login.searchParams.set('de', pathname)
@@ -49,7 +73,9 @@ async function proxyAdmin(request: NextRequest) {
 export async function proxy(request: NextRequest) {
   if (request.nextUrl.pathname === '/admin' || request.nextUrl.pathname.startsWith('/admin/')) return await proxyAdmin(request)
   const segmentos = request.nextUrl.pathname.replace(/^\/imoveis\/?/, '').split('/').filter(Boolean)
-  if (interpretarSegmentos(segmentos, await cidades())) return NextResponse.next()
+  const lista = fonteDosImoveis() === 'viniun' ? await cidadesDaViniun() : await cidades()
+  // Sem a lista (Viniun fora do ar e nada guardado), deixa a página decidir em vez de responder 404 para tudo.
+  if (!lista || interpretarSegmentos(segmentos, lista)) return NextResponse.next()
   // Caminho sem rota: o Next responde com a página not-found e status 404.
   return NextResponse.rewrite(new URL('/_pagina-inexistente', request.url))
 }

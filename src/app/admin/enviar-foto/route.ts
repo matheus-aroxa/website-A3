@@ -1,5 +1,6 @@
 import type { NextRequest } from 'next/server'
 import { obterAdmin } from '@/lib/admin/acesso'
+import { catalogoNoPainel } from '@/lib/imoveis/fonte'
 import { HOST_S3_FOTOS } from '@/lib/imoveis/hosts-fotos'
 import { TAMANHO_MAXIMO_FOTO, apagarFotos, guardarFoto, pastaDoImovel } from '@/lib/admin/fotos'
 
@@ -23,6 +24,7 @@ export async function POST(request: NextRequest) {
   // O cookie da sessão é SameSite=Strict; a origem é conferida também, como nas Server Actions.
   if (!mesmaOrigem(request)) return Response.json({ erro: 'Origem não permitida.' }, { status: 403 })
   if (!(await obterAdmin())) return Response.json({ erro: 'Sua sessão expirou. Entre de novo.' }, { status: 401 })
+  if (!catalogoNoPainel()) return Response.json({ erro: 'Os imóveis vêm da Viniun: envie as fotos por lá.' }, { status: 409 })
 
   if (Number(request.headers.get('content-length')) > TAMANHO_MAXIMO_FOTO + 64 * 1024) {
     return Response.json({ erro: 'A foto passa de 15 MB.' }, { status: 413 })
