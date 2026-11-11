@@ -29,6 +29,7 @@ import {
   renomearConstrutora,
   type ResultadoConstrutora,
 } from '@/lib/imoveis/construtoras'
+import { catalogoNoPainel } from '@/lib/imoveis/fonte'
 import { CAMPOS_EDITAVEIS, ID_CRIADO, PREFIXO_CRIADO, capaDe, diferencas } from '@/lib/imoveis/painel'
 import { SITUACOES, TIPOS, lerNumeroBr, slugificar } from '@/lib/imoveis/formato'
 import { fotoPermitida } from '@/lib/imoveis/hosts-fotos'
@@ -43,6 +44,11 @@ type Erros = NonNullable<EstadoFormulario['erros']>
 function publicar() {
   updateTag(TAG_IMOVEIS)
   refresh()
+}
+
+/** Catálogo na Viniun (FONTE_IMOVEIS=viniun): imóveis, vitrine e construtoras são mantidos lá, não no painel. */
+function exigirCatalogoNoPainel() {
+  if (!catalogoNoPainel()) throw new Error('Os imóveis vêm da Viniun: cadastre e edite por lá (docs/integracao-viniun.md).')
 }
 
 // ---------- Sessão ----------
@@ -90,6 +96,7 @@ export type AcaoStatus = (typeof ACOES_STATUS)[number]
 /** Desativar tira o imóvel do site sem apagar nada; reativar o devolve. Chamada pelos botões do painel e pelo "Desfazer". */
 export async function mudarStatus(id: string, acao: AcaoStatus) {
   const admin = await exigirAdmin()
+  exigirCatalogoNoPainel()
   // Os argumentos chegam da rede: confere tipo e valor antes de usar.
   if (typeof id !== 'string' || !ACOES_STATUS.includes(acao) || !(await obterRegistro(id))) return
   await mudarStatusNoBanco(id, acao, admin.email)
@@ -103,6 +110,7 @@ export async function mudarStatus(id: string, acao: AcaoStatus) {
  */
 export async function excluirImovel(id: string): Promise<{ ok: boolean; arquivos?: number; falhas?: number }> {
   const admin = await exigirAdmin()
+  exigirCatalogoNoPainel()
   if (typeof id !== 'string' || !(await obterRegistro(id))) return { ok: false }
   const imagens = await excluirImovelNoBanco(id, admin.email)
   updateTag(TAG_IMOVEIS)
@@ -262,6 +270,7 @@ const hoje = () => new Date().toISOString().slice(0, 10)
 
 export async function salvarImovel(id: string, _: EstadoFormulario, fd: FormData): Promise<EstadoFormulario> {
   const admin = await exigirAdmin()
+  exigirCatalogoNoPainel()
   const registro = await obterRegistro(id)
   if (!registro) return { status: 'erro', mensagem: 'Imóvel não encontrado no catálogo.' }
   const { imovel: atual } = registro
@@ -283,6 +292,7 @@ export async function salvarImovel(id: string, _: EstadoFormulario, fd: FormData
 /** Cadastra um imóvel novo. Já nasce publicado; depois segue o mesmo fluxo de edição dos demais. */
 export async function criarImovel(_: EstadoFormulario, fd: FormData): Promise<EstadoFormulario> {
   const admin = await exigirAdmin()
+  exigirCatalogoNoPainel()
   const lido = await lerFormulario(fd, null)
   if (lido.erros) return { status: 'erro', mensagem: 'Confira os campos destacados.', erros: lido.erros }
 
@@ -316,6 +326,7 @@ export async function criarImovel(_: EstadoFormulario, fd: FormData): Promise<Es
 
 export async function salvarVitrine(_: EstadoFormulario, fd: FormData): Promise<EstadoFormulario> {
   const admin = await exigirAdmin()
+  exigirCatalogoNoPainel()
   const heroi = fd.get('heroi')
   const pedidos = [...new Set(fd.getAll('destaques'))].filter((id): id is string => typeof id === 'string')
   const publicados = await idsAtivos([...pedidos, ...(typeof heroi === 'string' ? [heroi] : [])])
@@ -335,6 +346,7 @@ export async function salvarVitrine(_: EstadoFormulario, fd: FormData): Promise<
 /** Cadastro, renomeação e exclusão pelo painel. Voltam `{ ok, erro }` para a tela mostrar a mensagem. */
 export async function cadastrarConstrutora(nome: string): Promise<ResultadoConstrutora> {
   const admin = await exigirAdmin()
+  exigirCatalogoNoPainel()
   const r = await criarConstrutora(nome, admin.email)
   if (r.ok) publicar()
   return r
@@ -342,6 +354,7 @@ export async function cadastrarConstrutora(nome: string): Promise<ResultadoConst
 
 export async function renomearConstrutoraAcao(id: number, nome: string): Promise<ResultadoConstrutora> {
   const admin = await exigirAdmin()
+  exigirCatalogoNoPainel()
   if (!Number.isInteger(id)) return { ok: false, erro: 'Construtora não encontrada.' }
   const r = await renomearConstrutora(id, nome, admin.email)
   if (r.ok) publicar()
@@ -350,6 +363,7 @@ export async function renomearConstrutoraAcao(id: number, nome: string): Promise
 
 export async function excluirConstrutoraAcao(id: number): Promise<ResultadoConstrutora> {
   const admin = await exigirAdmin()
+  exigirCatalogoNoPainel()
   if (!Number.isInteger(id)) return { ok: false, erro: 'Construtora não encontrada.' }
   const r = await excluirConstrutora(id, admin.email)
   if (r.ok) publicar()

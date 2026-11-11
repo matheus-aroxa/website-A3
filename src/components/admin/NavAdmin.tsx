@@ -2,6 +2,7 @@
 
 // Cabeçalho do painel: o mesmo do site público (estilos de Cabecalho.module.css e o MenuMobile),
 // com os links do painel e o "Sair" no lugar do "Fale conosco". "Administradores" só aparece para o principal.
+// Com o catálogo na Viniun (`catalogo` falso), "Construtoras" e "Vitrine da home" somem: são mantidas lá.
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -22,6 +23,9 @@ const LINKS = [
 ] as const
 
 const LINKS_PRINCIPAL = [...LINKS, { href: '/admin/administradores', rotulo: 'Administradores', chave: 'administradores' }] as const
+
+/** Telas que só existem com o catálogo no banco. */
+const SO_COM_CATALOGO: string[] = ['construtoras', 'vitrine']
 
 function chaveAtiva(caminho: string) {
   if (caminho === '/admin' || caminho.startsWith('/admin/imoveis')) return 'imoveis'
@@ -47,9 +51,17 @@ function BotaoSair({ className }: { className: string }) {
  * Sem caminho (prerenderização, fallback do Suspense), nenhum link aparece como ativo
  * e o logo é um link comum (o LinkInicio lê o caminho atual).
  */
-export function CabecalhoAdminEstatico({ caminho, principal = false }: { caminho?: string; principal?: boolean }) {
+export function CabecalhoAdminEstatico({
+  caminho,
+  principal = false,
+  catalogo = true,
+}: {
+  caminho?: string
+  principal?: boolean
+  catalogo?: boolean
+}) {
   const ativo = chaveAtiva(caminho ?? '')
-  const links = principal ? LINKS_PRINCIPAL : LINKS
+  const links = (principal ? LINKS_PRINCIPAL : LINKS).filter((l) => catalogo || !SO_COM_CATALOGO.includes(l.chave))
   const Inicio = caminho === undefined ? Link : LinkInicio
   return (
     <header className={c.cabecalho}>
@@ -75,6 +87,6 @@ export function CabecalhoAdminEstatico({ caminho, principal = false }: { caminho
   )
 }
 
-export function CabecalhoAdmin({ principal }: { principal: boolean }) {
-  return <CabecalhoAdminEstatico caminho={usePathname()} principal={principal} />
+export function CabecalhoAdmin({ principal, catalogo }: { principal: boolean; catalogo: boolean }) {
+  return <CabecalhoAdminEstatico caminho={usePathname()} principal={principal} catalogo={catalogo} />
 }

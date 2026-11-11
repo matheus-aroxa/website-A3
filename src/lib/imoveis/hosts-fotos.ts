@@ -1,9 +1,12 @@
 // Origens de onde o site aceita fotos (next/image só otimiza imagens desses hosts).
 // Usado no next.config.ts e na validação das fotos do painel administrativo.
 export const HOST_S3_FOTOS = 'a3-imoveis-fotos.s3.sa-east-1.amazonaws.com'
+/** Fotos do catálogo quando ele vem do CRM Viniun (docs/integracao-viniun.md). */
+export const HOST_VINIUN_FOTOS = 'midia.viniun.com.br'
 
 export const HOSTS_FOTOS = [
   HOST_S3_FOTOS,
+  HOST_VINIUN_FOTOS,
   'cdn.sistemasupremo.com.br',
   'ss.cloudadmin.com.br',
   'arquivos.sistemasupremo.com.br',

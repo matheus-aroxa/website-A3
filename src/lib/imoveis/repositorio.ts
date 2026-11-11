@@ -1,7 +1,7 @@
 // Consultas ao catálogo, com cache do Next.js ("use cache"). Tudo o que as páginas leem
-// passa por aqui, então o banco é consultado no máximo uma vez por janela de cache.
-// Cada função traz só o que a página usa (uma página de busca, um imóvel, os destaques...): o catálogo
-// inteiro nunca é carregado. Os filtros e a paginação rodam no SQL (consultas.ts).
+// passa por aqui, então a fonte do catálogo é consultada no máximo uma vez por janela de cache.
+// A fonte é o banco (consultas.ts: filtros e paginação no SQL, sem carregar o catálogo inteiro) ou o CRM Viniun
+// (viniun/consultas.ts), conforme FONTE_IMOVEIS: ver consultas-site.ts e docs/integracao-viniun.md.
 // Para atualizar na hora após uma mudança no catálogo: POST /api/revalidar (tag "imoveis").
 // O painel administrativo invalida a mesma tag ao salvar.
 import 'server-only'
@@ -18,13 +18,14 @@ import {
   buscarSemelhantes,
   contarImoveis,
   type PaginaResumos,
-} from './consultas'
+} from './consultas-site'
+import { TAG_IMOVEIS } from './fonte'
 import { lerFiltros, type Filtros, type FiltrosRota } from './filtros'
 import { paginasDeBusca, type PaginaBusca } from './paginas'
 import type { IndiceImovel } from './rotas'
 import type { Cidade, Construtora, Imovel, ImovelResumo } from './tipos'
 
-export const TAG_IMOVEIS = 'imoveis'
+export { TAG_IMOVEIS }
 
 /** Quantos imóveis o painel pode pôr em destaque na home. */
 export const LIMITE_DESTAQUES = 12

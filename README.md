@@ -1,8 +1,8 @@
 # A3 Soluções Imobiliárias — site
 
 Site em **Next.js 16 (App Router)**. O catálogo fica no **PostgreSQL** (Supabase) e é mantido pelo painel `/admin`; as fotos
-ficam no **S3**. Não há integração com nenhum sistema externo: os contatos feitos pelos formulários viram uma mensagem pronta
-no WhatsApp da A3.
+ficam no **S3**. Com `FONTE_IMOVEIS=viniun`, os imóveis passam a vir do CRM **Viniun** (docs/integracao-viniun.md). Os contatos
+feitos pelos formulários viram uma mensagem pronta no WhatsApp da A3.
 
 ## Rodando
 
@@ -30,6 +30,7 @@ ser o endereço real do site: ele alimenta canonical, Open Graph, sitemap e JSON
 | `/sitemap.xml`, `/robots.txt`, `/manifest.webmanifest` | SEO técnico | Gerados |
 | `/api/imoveis` | JSON do "Carregar mais" (celular) | Dinâmica |
 | `/api/revalidar` | Webhook (protegido por `REVALIDATE_SECRET`) para invalidar o cache | Dinâmica |
+| `/api/viniun` | Webhook da Viniun (assinado com `VINIUN_WEBHOOK_SECRET`): imóvel mudou no CRM | Dinâmica |
 | `/admin` | Painel administrativo (login, imóveis, vitrine da home) | Dinâmica, `noindex` |
 
 Filtros que não viram página (quartos, vagas, área, ordem, página…) vão na query string
@@ -65,7 +66,8 @@ Detalhes, como conferir e o que depende de fora do código: **docs/seo.md**.
 
 O catálogo vive só no banco de dados (PostgreSQL/Supabase). Os imóveis foram importados uma vez de um export do sistema
 anterior (Supremo) e, daí em diante, são mantidos pelo painel `/admin`. Todas as leituras passam por
-`src/lib/imoveis/consultas.ts` (SQL), envolvidas com `"use cache"` em `src/lib/imoveis/repositorio.ts`.
+`src/lib/imoveis/consultas.ts` (SQL), envolvidas com `"use cache"` em `src/lib/imoveis/repositorio.ts`. Com
+`FONTE_IMOVEIS=viniun`, `src/lib/imoveis/consultas-site.ts` troca o SQL pelo catálogo da Viniun (`src/lib/imoveis/viniun/`).
 
 - Cada gravação feita pelo painel invalida o cache, e o site se atualiza na hora.
 - `POST /api/revalidar` com `Authorization: Bearer <REVALIDATE_SECRET>` invalida o cache à mão (por exemplo, depois
@@ -112,6 +114,7 @@ as fotos do S3) e escolher o imóvel do topo da home e os destaques.
 | Fotos no S3 e usuário IAM do site | `docs/fotos-s3.md` |
 | CloudFront na frente do bucket | `docs/cloudfront.md` |
 | Login do painel | `docs/login-admin.md` |
+| Imóveis vindos do CRM Viniun (e o que ainda falta lá) | `docs/integracao-viniun.md` |
 | Busca paginada no banco | `docs/busca-paginada.md` |
 | SEO | `docs/seo.md` |
 | Relatórios do painel e medição de uso (visitas, buscas, contatos) | `docs/relatorios.md` |
@@ -131,6 +134,8 @@ as fotos do S3) e escolher o imóvel do topo da home e os destaques.
 - Trocar o endereço das fotos pelo do CloudFront e fechar o bucket (docs/cloudfront.md).
 - Rodar `db/relatorios.sql` no Supabase **antes** de publicar o código dos relatórios (a medição de visitas só começa a contar
   depois da publicação) e revisar com o jurídico a seção "Medição de uso do site" da política de privacidade (docs/relatorios.md).
+
+- Antes de ligar `FONTE_IMOVEIS=viniun`: rodar `db/viniun.sql` no Supabase e ler docs/integracao-viniun.md.
 
 ## Estrutura
 

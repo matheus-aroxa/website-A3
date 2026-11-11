@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
   // Shell estático + streaming (Partial Prerendering). Páginas de imóvel e a home
   // saem 100% estáticas; a busca entrega o shell na hora e transmite os resultados.
   cacheComponents: true,
+  // Com o catálogo na Viniun (docs/integracao-viniun.md), a primeira carga com a cópia das fichas vazia baixa ~330 fichas
+  // (~40 s, pelo limite de chamadas deles). O padrão (60 s, e 54 s para cada "use cache") fica justo demais.
+  staticPageGenerationTimeout: 180,
   partialPrefetching: true,
   poweredByHeader: false,
   images: {

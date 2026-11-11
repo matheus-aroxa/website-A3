@@ -36,6 +36,8 @@ const decimal = (casas: number) =>
 export function formatarPreco(valor: number, finalidade: Finalidade) {
   // Intl usa espaço não separável entre "R$" e o número; mantém a quebra de linha correta.
   // Centavos só aparecem quando existem: "R$ 265.000" e "R$ 265.000,50".
+  // Sem preço (a Viniun aceita imóvel sem valor): "Sob consulta", nunca "R$ 0".
+  if (!(valor > 0)) return 'Sob consulta'
   const texto = (Number.isInteger(valor) ? reais : reaisComCentavos).format(valor)
   return finalidade === 'aluguel' ? `${texto}/mês` : texto
 }
