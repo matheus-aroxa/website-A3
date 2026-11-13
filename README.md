@@ -88,8 +88,8 @@ A política de privacidade descreve isso; se um dia os contatos passarem a ser g
 Permite à equipe cadastrar e editar imóveis, desativá-los (somem do site, continuam no painel), excluí-los (apaga de vez, com
 as fotos do S3) e escolher o imóvel do topo da home e os destaques.
 
-Com `FONTE_IMOVEIS=viniun`, o cadastro de imóveis, as construtoras e as abas de relatório que leem o cadastro do banco
-somem do painel (ficam relatórios, vitrine e administradores); voltam com `FONTE_IMOVEIS=banco` (docs/integracao-viniun.md).
+Com `FONTE_IMOVEIS=viniun`, o cadastro de imóveis, as construtoras e os relatórios somem do painel (ficam a vitrine e os
+administradores); voltam com `FONTE_IMOVEIS=banco` (docs/integracao-viniun.md).
 
 **Primeiro acesso:** não existe administrador padrão. Cadastre cada administrador com o `INSERT` do
 `docs/login-admin.md`.

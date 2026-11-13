@@ -120,13 +120,6 @@ function vitrineEfetivaViniun({ personalizada, vitrine }: { personalizada: boole
   return { heroi: null, destaques: marcados.slice(0, LIMITE_DESTAQUES).map((im) => im.id) }
 }
 
-/** Quantos imóveis estão na vitrine em vigor no modo Viniun (o do topo conta uma vez). */
-export async function contarNaVitrineViniun(): Promise<number> {
-  const [imoveis, estado] = await Promise.all([imoveisDaViniunComFoto(), obterVitrine()])
-  const v = vitrineEfetivaViniun(estado, imoveis)
-  return new Set([v.heroi, ...v.destaques].filter(Boolean)).size
-}
-
 async function vitrineDaViniun() {
   const [imoveis, estado] = await Promise.all([imoveisDaViniunComFoto(), obterVitrine()])
   const ordenados = [...imoveis].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR') || a.id.localeCompare(b.id))

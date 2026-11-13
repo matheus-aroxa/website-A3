@@ -7,6 +7,7 @@ import { redirect } from 'next/navigation'
 import { connection } from 'next/server'
 import { cache } from 'react'
 import { COOKIE_EQUIPE } from '@/lib/coleta/tipos'
+import { inicioDoPainel } from '@/lib/imoveis/fonte'
 import { COOKIE_SESSAO, DURACAO_LEMBRAR_S, DURACAO_SESSAO_S, adminDoToken, criarSessao, encerrarSessaoDoToken, type Admin } from './sessao'
 
 export const obterAdmin = cache(async (): Promise<Admin | null> => {
@@ -25,7 +26,7 @@ export async function exigirAdmin(): Promise<Admin> {
 /** Só o administrador principal: os outros voltam para o início do painel. */
 export async function exigirPrincipal(): Promise<Admin> {
   const admin = await exigirAdmin()
-  if (!admin.principal) redirect('/admin')
+  if (!admin.principal) redirect(inicioDoPainel())
   return admin
 }
 

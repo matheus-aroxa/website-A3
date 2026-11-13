@@ -1,13 +1,8 @@
 // Desempenho de cada imóvel no período (visitas, interesse e contatos), cruzado com os dados do catálogo.
 // Imóvel excluído continua nos números, como "Imóvel removido".
-// Com o catálogo na Viniun, os dados do imóvel vêm de lá (o que está no site agora); o que saiu do site fica "inativo",
-// com os dados da tabela imoveis (o catálogo de antes da Viniun).
 import 'server-only'
 import { exigirAdmin } from '@/lib/admin/acesso'
 import { banco } from '@/lib/db'
-import { fonteDosImoveis } from '@/lib/imoveis/fonte'
-import type { Imovel } from '@/lib/imoveis/tipos'
-import { catalogo as catalogoDaViniun } from '@/lib/imoveis/viniun/consultas'
 import type { Periodo } from './periodo'
 import { atualizarResumo } from './resumo'
 
@@ -83,40 +78,8 @@ export async function desempenhoDosImoveis(p: Pick<Periodo, 'de' | 'ate'>): Prom
        LEFT JOIN a ON a.imovel_id = base.imovel_id`,
     [p.de, p.ate],
   )
-  return fonteDosImoveis() === 'viniun' ? comDadosDaViniun(rows, await catalogoDaViniun()) : rows
+  return rows
 }
-
-function comDadosDaViniun(rows: DesempenhoImovel[], lista: Imovel[]): DesempenhoImovel[] {
-  const noSite = new Map(lista.map((im) => [im.id, im]))
-  const resultado = rows.map((r): DesempenhoImovel => {
-    const im = noSite.get(r.id)
-    noSite.delete(r.id)
-    return im ? { ...r, ...dadosDoSite(im) } : { ...r, status: r.status === null ? null : 'inativo' }
-  })
-  // No site, sem visita no período e sem registro antigo (cadastrados direto na Viniun).
-  for (const im of noSite.values()) resultado.push({ ...SEM_NUMEROS, id: im.id, ...dadosDoSite(im) })
-  return resultado
-}
-
-function dadosDoSite(im: Imovel) {
-  return {
-    nome: im.nome,
-    slug: im.slug,
-    cidade: im.local.cidade,
-    bairro: im.local.bairro,
-    construtora: im.construtora.nome,
-    tipo: im.tipo,
-    finalidade: im.finalidade,
-    situacao: im.situacao,
-    preco: im.preco,
-    status: 'ativo',
-  } satisfies Partial<DesempenhoImovel>
-}
-
-const SEM_NUMEROS = {
-  visitas: 0, visitantes: 0, sessoes: 0, conversoes: 0, tempoMedio: 0, rolagemMedia: 0,
-  whatsapp: 0, ligacao: 0, email: 0, formulario: 0, galeria: 0, mapa: 0, compartilhar: 0, cliques: 0,
-} satisfies Partial<DesempenhoImovel>
 
 /** Total de contatos (WhatsApp e formulário enviado) sobre o imóvel. */
 export const contatosDe = (i: DesempenhoImovel) => i.whatsapp + i.formulario

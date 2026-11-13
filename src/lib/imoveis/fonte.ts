@@ -18,3 +18,6 @@ export function fonteDosImoveis(): FonteImoveis {
 
 /** Se o painel cadastra e edita imóveis e construtoras (só quando o catálogo vem do banco). A vitrine vale nos dois modos. */
 export const catalogoNoPainel = () => fonteDosImoveis() === 'banco'
+
+/** Primeira tela do painel: a lista de imóveis (banco) ou, com o catálogo na Viniun, a vitrine da home. */
+export const inicioDoPainel = () => (catalogoNoPainel() ? '/admin' : '/admin/vitrine')

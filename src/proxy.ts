@@ -3,7 +3,7 @@ import { COOKIE_SESSAO, adminDoToken } from '@/lib/admin/sessao'
 import { versaoDoCatalogo } from '@/lib/imoveis/banco'
 import { buscarCidades } from '@/lib/imoveis/consultas'
 import { interpretarSegmentos } from '@/lib/imoveis/filtros'
-import { catalogoNoPainel, fonteDosImoveis } from '@/lib/imoveis/fonte'
+import { catalogoNoPainel, fonteDosImoveis, inicioDoPainel } from '@/lib/imoveis/fonte'
 import type { Cidade } from '@/lib/imoveis/tipos'
 import { baixarCidades } from '@/lib/imoveis/viniun/carga'
 
@@ -48,7 +48,7 @@ async function cidades() {
 }
 
 /** Telas do painel que só existem com o catálogo no banco (FONTE_IMOVEIS=banco). */
-const SO_COM_CATALOGO = /^\/admin(\/(imoveis|construtoras|relatorios\/(catalogo|imoveis|construtoras))(\/.*)?)?$/
+const SO_COM_CATALOGO = /^\/admin(\/(imoveis|construtoras|relatorios)(\/.*)?)?$/
 
 // Painel: quem não tem sessão válida vai para o login antes de qualquer renderização.
 // É só a primeira barreira; páginas e Server Actions conferem a sessão de novo (src/lib/admin/acesso.ts).
@@ -59,14 +59,14 @@ async function proxyAdmin(request: NextRequest) {
   // A sessão fica no banco: uma consulta por navegação, e só se houver cookie.
   const admin = await adminDoToken(request.cookies.get(COOKIE_SESSAO)?.value)
   if (pathname === '/admin/entrar') {
-    return admin ? NextResponse.redirect(new URL('/admin', request.url)) : NextResponse.next()
+    return admin ? NextResponse.redirect(new URL(inicioDoPainel(), request.url)) : NextResponse.next()
   }
   // A tela de administradores é só do principal (a página e as ações conferem de novo).
-  if (admin && !admin.principal && pathname.startsWith('/admin/administradores')) return NextResponse.redirect(new URL('/admin', request.url))
-  // Catálogo na Viniun: imóveis e construtoras são cadastrados lá, e os relatórios que leem o cadastro do banco somem.
-  // O painel abre nos relatórios. As páginas e as ações conferem de novo.
+  if (admin && !admin.principal && pathname.startsWith('/admin/administradores')) return NextResponse.redirect(new URL(inicioDoPainel(), request.url))
+  // Catálogo na Viniun: imóveis e construtoras são cadastrados lá, e os relatórios somem. O painel abre na vitrine.
+  // As páginas e as ações conferem de novo.
   if (admin && !catalogoNoPainel() && SO_COM_CATALOGO.test(pathname)) {
-    return NextResponse.redirect(new URL('/admin/relatorios', request.url))
+    return NextResponse.redirect(new URL(inicioDoPainel(), request.url))
   }
   if (admin) return NextResponse.next()
   const login = new URL('/admin/entrar', request.url)

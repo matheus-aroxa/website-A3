@@ -29,7 +29,7 @@ import {
   renomearConstrutora,
   type ResultadoConstrutora,
 } from '@/lib/imoveis/construtoras'
-import { catalogoNoPainel } from '@/lib/imoveis/fonte'
+import { catalogoNoPainel, inicioDoPainel } from '@/lib/imoveis/fonte'
 import { CAMPOS_EDITAVEIS, ID_CRIADO, PREFIXO_CRIADO, capaDe, diferencas } from '@/lib/imoveis/painel'
 import { SITUACOES, TIPOS, lerNumeroBr, slugificar } from '@/lib/imoveis/formato'
 import { fotoPermitida } from '@/lib/imoveis/hosts-fotos'
@@ -60,7 +60,7 @@ async function ipDoCliente() {
 
 /** Só aceita voltar para caminhos do próprio painel (evita redirecionamento aberto). */
 function destinoSeguro(destino: string) {
-  return /^\/admin(\/[\w\-/]*)?$/.test(destino) && destino !== '/admin/entrar' ? destino : '/admin'
+  return /^\/admin(\/[\w\-/]*)?$/.test(destino) && destino !== '/admin/entrar' && destino !== '/admin' ? destino : inicioDoPainel()
 }
 
 export async function entrar(_: EstadoFormulario, fd: FormData): Promise<EstadoFormulario> {

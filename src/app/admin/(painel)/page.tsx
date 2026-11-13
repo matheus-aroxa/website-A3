@@ -5,7 +5,7 @@ import { ListaImoveis } from '@/components/admin/ListaImoveis'
 import { CorpoPagina, TopoPagina } from '@/components/admin/TopoPagina'
 import { listarCatalogoAdmin, listarConstrutorasDoPainel, type FiltroAdmin } from '@/lib/admin/catalogo'
 import { ABAS_ADMIN } from '@/lib/imoveis/consultas-admin'
-import { catalogoNoPainel } from '@/lib/imoveis/fonte'
+import { catalogoNoPainel, inicioDoPainel } from '@/lib/imoveis/fonte'
 import s from '@/components/admin/Admin.module.css'
 
 export const metadata: Metadata = { title: 'Imóveis' }
@@ -39,8 +39,8 @@ async function Catalogo({ busca }: { busca: Promise<Busca> }) {
 }
 
 export default function PaginaImoveis({ searchParams }: PageProps<'/admin'>) {
-  // Catálogo na Viniun (FONTE_IMOVEIS=viniun): não há lista de imóveis; o painel abre nos relatórios (o proxy já redireciona).
-  if (!catalogoNoPainel()) redirect('/admin/relatorios')
+  // Catálogo na Viniun (FONTE_IMOVEIS=viniun): não há lista de imóveis; o painel abre na vitrine (o proxy já redireciona).
+  if (!catalogoNoPainel()) redirect(inicioDoPainel())
   return (
     <Suspense
       fallback={

@@ -8,7 +8,6 @@ import { pontosDeLinha, taxas } from '@/components/admin/relatorios/blocos'
 import s from '@/components/admin/relatorios/Relatorios.module.css'
 import { Icone } from '@/components/ui/Icone'
 import { porDimensao, serieDiaria, somar } from '@/lib/relatorios/audiencia'
-import { catalogoNoPainel } from '@/lib/imoveis/fonte'
 import { resumoDoCatalogo } from '@/lib/relatorios/catalogo'
 import { fmtDuracao, fmtInt, fmtPct, razao } from '@/lib/relatorios/formato'
 import { contatosDe, desempenhoDosImoveis } from '@/lib/relatorios/imoveis'
@@ -45,12 +44,9 @@ async function VisaoGeral({ ctx }: { ctx: ContextoDoRelatorio }) {
   const totalBuscas = buscas.find((b) => b.chave === 'total')?.eventos ?? 0
   const n404 = naoEncontradas.reduce((a, b) => a + b.eventos, 0)
 
-  // Com o catálogo na Viniun não há a aba Imóveis: os avisos sobre imóveis ficam sem link.
-  const noBanco = catalogoNoPainel()
-  const abaImoveis = noBanco ? '/admin/relatorios/imoveis' : undefined
-  const atencoes: { n: number; texto: string; href?: string }[] = [
-    ...(temDados && semContato ? [{ n: semContato, texto: 'imóveis com bastante visita e nenhum contato no período. Vale rever preço, fotos e descrição.', href: abaImoveis }] : []),
-    ...(temDados && semVisita ? [{ n: semVisita, texto: 'imóveis ativos que ninguém abriu no período.', href: abaImoveis }] : []),
+  const atencoes = [
+    ...(temDados && semContato ? [{ n: semContato, texto: 'imóveis com bastante visita e nenhum contato no período. Vale rever preço, fotos e descrição.', href: '/admin/relatorios/imoveis' }] : []),
+    ...(temDados && semVisita ? [{ n: semVisita, texto: 'imóveis ativos que ninguém abriu no período.', href: '/admin/relatorios/imoveis' }] : []),
     ...(semResultado ? [{ n: semResultado, texto: `buscas sem nenhum imóvel (${fmtPct(semResultado / Math.max(1, totalBuscas), 0)} das buscas com filtro): é a demanda que o catálogo não atende.`, href: '/admin/relatorios/buscas' }] : []),
     ...(n404 ? [{ n: n404, texto: 'acessos a páginas que não existem (links quebrados ou imóveis que saíram do ar).', href: '/admin/relatorios/paginas' }] : []),
   ]
@@ -70,7 +66,7 @@ async function VisaoGeral({ ctx }: { ctx: ContextoDoRelatorio }) {
     { rotulo: 'Imóveis ativos', valor: fmtInt(ativos), nota: `${fmtInt(catalogo.imoveis.venda)} à venda · ${fmtInt(catalogo.imoveis.aluguel)} para alugar${catalogo.imoveis.inativos ? ` · ${fmtInt(catalogo.imoveis.inativos)} desativados` : ''}` },
     { rotulo: 'Lançamentos', valor: fmtInt(catalogo.imoveis.lancamentos), nota: `${fmtPct(razao(catalogo.imoveis.lancamentos, catalogo.imoveis.venda), 0)} dos imóveis à venda` },
     { rotulo: 'Minha Casa Minha Vida', valor: fmtInt(catalogo.imoveis.mcmv), nota: `${fmtPct(razao(catalogo.imoveis.mcmv, ativos), 0)} dos imóveis` },
-    { rotulo: 'Construtoras', valor: fmtInt(catalogo.construtoras.comImoveis), nota: noBanco ? `${fmtInt(catalogo.construtoras.total)} cadastradas${catalogo.construtoras.semImoveis ? ` · ${catalogo.construtoras.semImoveis} sem imóvel` : ''}` : 'Com imóvel no site' },
+    { rotulo: 'Construtoras', valor: fmtInt(catalogo.construtoras.comImoveis), nota: `${fmtInt(catalogo.construtoras.total)} cadastradas${catalogo.construtoras.semImoveis ? ` · ${catalogo.construtoras.semImoveis} sem imóvel` : ''}` },
     { rotulo: 'Cidades', valor: fmtInt(catalogo.local.cidades), nota: `${fmtInt(catalogo.local.bairros)} bairros` },
     { rotulo: 'Fotos', valor: fmtInt(catalogo.midia.fotos), nota: `${(catalogo.midia.fotos / Math.max(1, ativos)).toFixed(1).replace('.', ',')} por imóvel` },
     { rotulo: 'Na vitrine da home', valor: fmtInt(catalogo.imoveis.naVitrine), nota: 'Imóveis em destaque na página inicial' },
@@ -99,18 +95,11 @@ async function VisaoGeral({ ctx }: { ctx: ContextoDoRelatorio }) {
           <ul className={s.atencoes}>
             {atencoes.map((a) => (
               <li key={a.texto}>
-                {a.href ? (
-                  <Link href={a.href}>
-                    <b>{fmtInt(a.n)}</b>
-                    <span>{a.texto}</span>
-                    <Icone nome="chevron-direita" tamanho={18} />
-                  </Link>
-                ) : (
-                  <div className={s.atencao}>
-                    <b>{fmtInt(a.n)}</b>
-                    <span>{a.texto}</span>
-                  </div>
-                )}
+                <Link href={a.href}>
+                  <b>{fmtInt(a.n)}</b>
+                  <span>{a.texto}</span>
+                  <Icone nome="chevron-direita" tamanho={18} />
+                </Link>
               </li>
             ))}
           </ul>
@@ -163,7 +152,7 @@ async function VisaoGeral({ ctx }: { ctx: ContextoDoRelatorio }) {
         <Cartao
           titulo="Imóveis mais vistos"
           descricao="Páginas vistas no período."
-          rodape={noBanco ? <Link href="/admin/relatorios/imoveis">Ver todos os imóveis</Link> : undefined}
+          rodape={<Link href="/admin/relatorios/imoveis">Ver todos os imóveis</Link>}
           tabela={<TabelaDados legenda="Imóveis mais vistos" limite={8} colunas={[{ id: 'nome', titulo: 'Imóvel' }, { id: 'visitas', titulo: 'Visitas', numerica: true }]} linhas={maisVistos.map((i) => ({ nome: i.nome, visitas: i.visitas }))} ordem={{ coluna: 'visitas', decrescente: true }} />}
         >
           {maisVistos.length ? (

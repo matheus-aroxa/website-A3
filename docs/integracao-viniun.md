@@ -35,10 +35,9 @@ antigos dos imóveis e a cópia das fichas da Viniun (abaixo).
   `imovel.despublicado`, e coloque o segredo em `VINIUN_WEBHOOK_SECRET`.
 - **Endereços preservados (SEO):** o imóvel que já existia no banco (mesmo código, ex.: `AP0277`) mantém a URL e o id
   de antes; cidades e bairros também mantêm os slugs. Só imóveis novos, cadastrados direto na Viniun, usam a URL da Viniun.
-- **Painel no modo Viniun:** somem o cadastro de imóveis, as construtoras e as abas de relatório que leem o cadastro do
-  banco (Imóveis, Catálogo e Construtoras); o painel abre nos relatórios. Ficam os relatórios (Visão geral, Audiência,
-  Origens, Páginas, Buscas e Conversões, com os dados dos imóveis vindos da Viniun), a vitrine da home e os
-  administradores. Nada é apagado: com `FONTE_IMOVEIS=banco` tudo volta a aparecer.
+- **Painel no modo Viniun:** somem o cadastro de imóveis, as construtoras e os relatórios; o painel abre na vitrine da
+  home. Ficam a vitrine e os administradores. Nada é apagado: com `FONTE_IMOVEIS=banco` tudo volta a aparecer. A medição
+  de visitas do site continua rodando nos dois modos, então os relatórios voltam com o histórico completo.
 - **Vitrine da home:** o imóvel do topo e os destaques são escolhidos no painel (`/admin/vitrine`), nos dois modos. No
   modo Viniun, a lista traz os imóveis publicados lá com foto; enquanto a vitrine nunca foi salva, valem os marcados como
   "Destaque" na Viniun. As escolhas ficam nas mesmas tabelas: um imóvel escolhido no modo Viniun que não existe no banco
