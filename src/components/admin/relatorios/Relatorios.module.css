@@ -1037,7 +1037,8 @@
   list-style: none;
 }
 
-.atencoes a {
+.atencoes a,
+.atencao {
   display: flex;
   align-items: center;
   gap: 12px;

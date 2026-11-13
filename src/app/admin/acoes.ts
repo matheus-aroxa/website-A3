@@ -20,7 +20,7 @@ import {
   slugDaCidade,
   slugsEmUso,
 } from '@/lib/imoveis/banco'
-import { idsAtivos } from '@/lib/imoveis/consultas-admin'
+import { idsParaVitrine } from '@/lib/admin/catalogo'
 import {
   criarConstrutora,
   excluirConstrutora,
@@ -35,7 +35,7 @@ import { SITUACOES, TIPOS, lerNumeroBr, slugificar } from '@/lib/imoveis/formato
 import { fotoPermitida } from '@/lib/imoveis/hosts-fotos'
 import { cidadeDoEstado, locaisDoEstado, type LocaisDoEstado } from '@/lib/imoveis/locais'
 import { UFS, validarImovel, type EntradaImovel } from '@/lib/imoveis/validacao'
-import { LIMITE_DESTAQUES, TAG_IMOVEIS } from '@/lib/imoveis/repositorio'
+import { LIMITE_DESTAQUES, TAG_IMOVEIS, TAG_VITRINE } from '@/lib/imoveis/repositorio'
 import type { Faixa, Finalidade, Foto, Imovel } from '@/lib/imoveis/tipos'
 
 type Erros = NonNullable<EstadoFormulario['erros']>
@@ -46,7 +46,7 @@ function publicar() {
   refresh()
 }
 
-/** Catálogo na Viniun (FONTE_IMOVEIS=viniun): imóveis, vitrine e construtoras são mantidos lá, não no painel. */
+/** Catálogo na Viniun (FONTE_IMOVEIS=viniun): imóveis e construtoras são mantidos lá, não no painel. A vitrine vale nos dois. */
 function exigirCatalogoNoPainel() {
   if (!catalogoNoPainel()) throw new Error('Os imóveis vêm da Viniun: cadastre e edite por lá (docs/integracao-viniun.md).')
 }
@@ -324,12 +324,12 @@ export async function criarImovel(_: EstadoFormulario, fd: FormData): Promise<Es
 
 // ---------- Vitrine da home ----------
 
+/** Vale nos dois modos: no da Viniun, escolhe entre os imóveis publicados lá. */
 export async function salvarVitrine(_: EstadoFormulario, fd: FormData): Promise<EstadoFormulario> {
   const admin = await exigirAdmin()
-  exigirCatalogoNoPainel()
   const heroi = fd.get('heroi')
   const pedidos = [...new Set(fd.getAll('destaques'))].filter((id): id is string => typeof id === 'string')
-  const publicados = await idsAtivos([...pedidos, ...(typeof heroi === 'string' ? [heroi] : [])])
+  const publicados = await idsParaVitrine([...pedidos, ...(typeof heroi === 'string' ? [heroi] : [])])
   const ativo = (id: unknown): id is string => typeof id === 'string' && publicados.has(id)
   const destaques = pedidos.filter(ativo)
 
@@ -337,7 +337,9 @@ export async function salvarVitrine(_: EstadoFormulario, fd: FormData): Promise<
     return { status: 'erro', mensagem: `A home mostra no máximo ${LIMITE_DESTAQUES} destaques.` }
   }
   await gravarVitrine({ heroi: ativo(heroi) ? heroi : null, destaques }, admin.email)
-  publicar()
+  // Só o topo e os destaques da home: no modo Viniun, não precisa reler o catálogo de lá.
+  updateTag(TAG_VITRINE)
+  refresh()
   return { status: 'sucesso', mensagem: 'Vitrine atualizada. A home já mostra a nova seleção.' }
 }
 

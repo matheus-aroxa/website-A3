@@ -351,6 +351,9 @@ export async function excluirImovelNoBanco(id: string, autor: string): Promise<s
       [id],
     )
     const imovel = await cliente.query<{ nome: string; codigo: string }>('SELECT nome, codigo FROM imoveis WHERE id = $1', [id])
+    // A vitrine guarda ids sem chave estrangeira (no modo Viniun, aceita imóveis que não existem aqui): limpa à mão.
+    await cliente.query('DELETE FROM vitrine_destaques WHERE imovel_id = $1', [id])
+    await cliente.query('UPDATE vitrine_config SET heroi_id = NULL WHERE heroi_id = $1', [id])
     await cliente.query('DELETE FROM imoveis WHERE id = $1', [id])
     await registrar(cliente, { autor, acao: 'excluir', campos: { id, ...imovel.rows[0] } })
     return rows.map((r) => r.src)

@@ -1,9 +1,15 @@
 // Relatórios do catálogo: o que está cadastrado hoje (imóveis, construtoras, cidades...).
 // Lê direto das tabelas do site, então não depende da medição de uso e já tem números desde o primeiro dia.
+// Com o catálogo na Viniun, só o resumo (visão geral) é usado, e ele vem do catálogo de lá (as abas Catálogo e
+// Construtoras somem nesse modo).
 import 'server-only'
 import { exigirAdmin } from '@/lib/admin/acesso'
 import { banco } from '@/lib/db'
+import { contarNaVitrineViniun } from '@/lib/admin/catalogo'
 import { obterVitrineEfetiva } from '@/lib/imoveis/consultas-admin'
+import { fonteDosImoveis } from '@/lib/imoveis/fonte'
+import { SLUG_CONSTRUTORA_PADRAO } from '@/lib/imoveis/tipos'
+import { catalogo as catalogoDaViniun } from '@/lib/imoveis/viniun/consultas'
 
 export interface Contagem {
   chave: string
@@ -29,6 +35,7 @@ export interface ResumoDoCatalogo {
 
 export async function resumoDoCatalogo(): Promise<ResumoDoCatalogo> {
   await exigirAdmin()
+  if (fonteDosImoveis() === 'viniun') return resumoDaViniun()
   const [{ rows }, vitrine] = await Promise.all([
     banco().query(
       `SELECT
@@ -64,6 +71,47 @@ export async function resumoDoCatalogo(): Promise<ResumoDoCatalogo> {
     midia: { fotos: r.fotos, plantas: r.plantas, imoveisComPlanta: r.com_planta },
     precos: { medioVenda: r.preco_medio, medianoVenda: r.preco_mediano, medioAluguel: r.aluguel_medio },
     ultimaAtualizacao: r.ultima,
+  }
+}
+
+/** O mesmo resumo a partir do catálogo da Viniun (o que está no site agora). O que não existe lá fica zerado. */
+async function resumoDaViniun(): Promise<ResumoDoCatalogo> {
+  const [lista, naVitrine] = await Promise.all([catalogoDaViniun(), contarNaVitrineViniun()])
+  const venda = lista.filter((im) => im.finalidade === 'venda')
+  const aluguel = lista.filter((im) => im.finalidade === 'aluguel')
+  const construtoras = new Set(lista.map((im) => im.construtora.slug).filter((slug) => slug !== SLUG_CONSTRUTORA_PADRAO))
+  const precosVenda = venda.map((im) => im.preco).filter((p) => p > 0).sort((a, b) => a - b)
+  const media = (l: number[]) => (l.length ? l.reduce((a, b) => a + b, 0) / l.length : 0)
+  const meio = precosVenda.length >> 1
+  const mediana = !precosVenda.length ? 0 : precosVenda.length % 2 ? precosVenda[meio]! : (precosVenda[meio - 1]! + precosVenda[meio]!) / 2
+  return {
+    imoveis: {
+      total: lista.length,
+      ativos: lista.length,
+      inativos: 0,
+      venda: venda.length,
+      aluguel: aluguel.length,
+      lancamentos: venda.filter((im) => im.situacao === 'lancamento' || im.situacao === 'breve-lancamento').length,
+      mcmv: lista.filter((im) => im.mcmv).length,
+      naVitrine,
+    },
+    construtoras: {
+      total: construtoras.size,
+      comImoveis: construtoras.size,
+      semImoveis: 0,
+      imoveisNaoInformados: lista.filter((im) => im.construtora.slug === SLUG_CONSTRUTORA_PADRAO).length,
+    },
+    local: {
+      cidades: new Set(lista.map((im) => im.local.cidadeSlug)).size,
+      bairros: new Set(lista.map((im) => `${im.local.cidadeSlug}/${im.local.bairroSlug}`)).size,
+    },
+    midia: {
+      fotos: lista.reduce((n, im) => n + im.fotos.length, 0),
+      plantas: lista.reduce((n, im) => n + im.plantas.length, 0),
+      imoveisComPlanta: lista.filter((im) => im.plantas.length > 0).length,
+    },
+    precos: { medioVenda: media(precosVenda), medianoVenda: mediana, medioAluguel: media(aluguel.map((im) => im.preco).filter((p) => p > 0)) },
+    ultimaAtualizacao: lista.reduce<string | null>((max, im) => (!max || im.atualizadoEm > max ? im.atualizadoEm : max), null),
   }
 }
 

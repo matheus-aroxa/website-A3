@@ -47,6 +47,9 @@ async function cidades() {
   return cache.cidades
 }
 
+/** Telas do painel que só existem com o catálogo no banco (FONTE_IMOVEIS=banco). */
+const SO_COM_CATALOGO = /^\/admin(\/(imoveis|construtoras|relatorios\/(catalogo|imoveis|construtoras))(\/.*)?)?$/
+
 // Painel: quem não tem sessão válida vai para o login antes de qualquer renderização.
 // É só a primeira barreira; páginas e Server Actions conferem a sessão de novo (src/lib/admin/acesso.ts).
 async function proxyAdmin(request: NextRequest) {
@@ -60,9 +63,10 @@ async function proxyAdmin(request: NextRequest) {
   }
   // A tela de administradores é só do principal (a página e as ações conferem de novo).
   if (admin && !admin.principal && pathname.startsWith('/admin/administradores')) return NextResponse.redirect(new URL('/admin', request.url))
-  // Catálogo na Viniun: cadastro, vitrine e construtoras são feitos lá (o início do painel explica). As ações conferem de novo.
-  if (admin && !catalogoNoPainel() && /^\/admin\/(imoveis|vitrine|construtoras)(\/|$)/.test(pathname)) {
-    return NextResponse.redirect(new URL('/admin', request.url))
+  // Catálogo na Viniun: imóveis e construtoras são cadastrados lá, e os relatórios que leem o cadastro do banco somem.
+  // O painel abre nos relatórios. As páginas e as ações conferem de novo.
+  if (admin && !catalogoNoPainel() && SO_COM_CATALOGO.test(pathname)) {
+    return NextResponse.redirect(new URL('/admin/relatorios', request.url))
   }
   if (admin) return NextResponse.next()
   const login = new URL('/admin/entrar', request.url)

@@ -18,6 +18,9 @@ vem de uma **medição de uso própria**, anônima e sem cookies, que só passa 
 | Catálogo | Imóveis, construtoras, cidades, bairros, preços, faixas, quartos, entrega, fotos e cadastros por mês | tabelas do site |
 | Construtoras | Imóveis, visitas e contatos por construtora; construtoras sem imóveis | catálogo + medição |
 
+Com o catálogo na Viniun (`FONTE_IMOVEIS=viniun`), as abas Imóveis, Catálogo e Construtoras somem (leem o cadastro do banco,
+que não acompanha a Viniun) e os números de catálogo da visão geral vêm da Viniun. Voltam com `FONTE_IMOVEIS=banco`.
+
 Todas têm tabela equivalente a cada gráfico ("Ver tabela"). As abas de audiência aceitam período (hoje, 7, 30, 90 dias, mês, 12 meses, desde o início ou datas escolhidas), que
 vai na URL (`?p=7d` ou `?de=2026-10-01&ate=2026-10-27`) e é mantido ao trocar de aba.
 

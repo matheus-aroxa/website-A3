@@ -3,7 +3,7 @@
 // A fonte é o banco (consultas.ts: filtros e paginação no SQL, sem carregar o catálogo inteiro) ou o CRM Viniun
 // (viniun/consultas.ts), conforme FONTE_IMOVEIS: ver consultas-site.ts e docs/integracao-viniun.md.
 // Para atualizar na hora após uma mudança no catálogo: POST /api/revalidar (tag "imoveis").
-// O painel administrativo invalida a mesma tag ao salvar.
+// O painel administrativo invalida a mesma tag ao salvar; a vitrine da home tem também a tag "vitrine".
 import 'server-only'
 import { cacheLife, cacheTag } from 'next/cache'
 import {
@@ -19,13 +19,13 @@ import {
   contarImoveis,
   type PaginaResumos,
 } from './consultas-site'
-import { TAG_IMOVEIS } from './fonte'
+import { TAG_IMOVEIS, TAG_VITRINE } from './fonte'
 import { lerFiltros, type Filtros, type FiltrosRota } from './filtros'
 import { paginasDeBusca, type PaginaBusca } from './paginas'
 import type { IndiceImovel } from './rotas'
 import type { Cidade, Construtora, Imovel, ImovelResumo } from './tipos'
 
-export { TAG_IMOVEIS }
+export { TAG_IMOVEIS, TAG_VITRINE }
 
 /** Quantos imóveis o painel pode pôr em destaque na home. */
 export const LIMITE_DESTAQUES = 12
@@ -70,7 +70,7 @@ export async function listarPaginasDeBusca(): Promise<PaginaBusca[]> {
 export async function listarDestaques(): Promise<ImovelResumo[]> {
   'use cache'
   cacheLife('hours')
-  cacheTag(TAG_IMOVEIS)
+  cacheTag(TAG_IMOVEIS, TAG_VITRINE)
   return buscarDestaques(LIMITE_DESTAQUES)
 }
 
@@ -117,6 +117,6 @@ export async function listarSemelhantes(imovel: Imovel): Promise<ImovelResumo[]>
 export async function obterImovelHeroi(): Promise<Imovel | null> {
   'use cache'
   cacheLife('hours')
-  cacheTag(TAG_IMOVEIS)
+  cacheTag(TAG_IMOVEIS, TAG_VITRINE)
   return buscarHeroi()
 }

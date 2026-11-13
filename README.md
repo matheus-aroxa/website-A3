@@ -88,6 +88,9 @@ A política de privacidade descreve isso; se um dia os contatos passarem a ser g
 Permite à equipe cadastrar e editar imóveis, desativá-los (somem do site, continuam no painel), excluí-los (apaga de vez, com
 as fotos do S3) e escolher o imóvel do topo da home e os destaques.
 
+Com `FONTE_IMOVEIS=viniun`, o cadastro de imóveis, as construtoras e as abas de relatório que leem o cadastro do banco
+somem do painel (ficam relatórios, vitrine e administradores); voltam com `FONTE_IMOVEIS=banco` (docs/integracao-viniun.md).
+
 **Primeiro acesso:** não existe administrador padrão. Cadastre cada administrador com o `INSERT` do
 `docs/login-admin.md`.
 
@@ -135,7 +138,7 @@ as fotos do S3) e escolher o imóvel do topo da home e os destaques.
 - Rodar `db/relatorios.sql` no Supabase **antes** de publicar o código dos relatórios (a medição de visitas só começa a contar
   depois da publicação) e revisar com o jurídico a seção "Medição de uso do site" da política de privacidade (docs/relatorios.md).
 
-- Antes de ligar `FONTE_IMOVEIS=viniun`: rodar `db/viniun.sql` no Supabase e ler docs/integracao-viniun.md.
+- Antes de ligar `FONTE_IMOVEIS=viniun`: rodar `db/viniun.sql` e `db/vitrine-viniun.sql` no Supabase e ler docs/integracao-viniun.md.
 
 ## Estrutura
 
