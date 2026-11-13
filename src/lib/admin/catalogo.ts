@@ -3,6 +3,7 @@
 import 'server-only'
 import { obterRegistro, obterVitrine } from '@/lib/imoveis/banco'
 import {
+  idMaisRecente,
   idsAtivos,
   listarOpcoesVitrine,
   listarPaginaAdmin,
@@ -13,7 +14,7 @@ import {
 } from '@/lib/imoveis/consultas-admin'
 import { etiquetaImovel, formatarPreco, rotuloPreco } from '@/lib/imoveis/formato'
 import { listarConstrutorasAdmin } from '@/lib/imoveis/construtoras'
-import { temFoto } from '@/lib/imoveis/filtragem'
+import { porMaisRecente, temFoto } from '@/lib/imoveis/filtragem'
 import { fonteDosImoveis } from '@/lib/imoveis/fonte'
 import type { StatusImovel, Vitrine } from '@/lib/imoveis/painel'
 import { LIMITE_DESTAQUES } from '@/lib/imoveis/repositorio'
@@ -77,9 +78,10 @@ export async function obterImovelAdmin(id: string) {
 export async function obterVitrineAdmin() {
   await exigirAdmin()
   if (fonteDosImoveis() === 'viniun') return vitrineDaViniun()
-  const [vitrine, linhas] = await Promise.all([obterVitrineEfetiva(), listarOpcoesVitrine()])
+  const [vitrine, linhas, semDestaques] = await Promise.all([obterVitrineEfetiva(), listarOpcoesVitrine(), idMaisRecente()])
   return {
     vitrine,
+    semDestaques,
     opcoes: linhas.map(
       (l): OpcaoVitrine => ({
         id: l.id,
@@ -125,6 +127,7 @@ async function vitrineDaViniun() {
   const ordenados = [...imoveis].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR') || a.id.localeCompare(b.id))
   return {
     vitrine: vitrineEfetivaViniun(estado, imoveis),
+    semDestaques: porMaisRecente(imoveis)[0]?.id ?? null,
     opcoes: ordenados.map((im): OpcaoVitrine => {
       const capa = (im.capa ?? im.fotos[0])?.src
       return {

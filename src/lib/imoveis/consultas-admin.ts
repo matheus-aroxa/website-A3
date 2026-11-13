@@ -156,6 +156,12 @@ export async function listarOpcoesVitrine(): Promise<LinhaOpcaoVitrine[]> {
   return rows
 }
 
+/** O imóvel publicado mais recente: o topo da home quando não há destaques (mesma ordem de buscarHeroi). */
+export async function idMaisRecente(): Promise<string | null> {
+  const { rows } = await banco().query<{ id: string }>("SELECT id FROM imoveis WHERE status = 'ativo' ORDER BY publicado_em DESC, id LIMIT 1")
+  return rows[0]?.id ?? null
+}
+
 /** Quais destes ids são imóveis publicados. */
 export async function idsAtivos(ids: string[]): Promise<Set<string>> {
   if (!ids.length) return new Set()

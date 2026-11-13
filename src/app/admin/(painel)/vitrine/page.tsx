@@ -9,8 +9,8 @@ import s from '@/components/admin/Admin.module.css'
 export const metadata: Metadata = { title: 'Vitrine da home' }
 
 async function Vitrine() {
-  const { vitrine, opcoes } = await obterVitrineAdmin()
-  return <EditorVitrine inicial={vitrine} opcoes={opcoes} limite={LIMITE_DESTAQUES} porVez={DESTAQUES_POR_VEZ} />
+  const { vitrine, opcoes, semDestaques } = await obterVitrineAdmin()
+  return <EditorVitrine inicial={vitrine} opcoes={opcoes} semDestaques={semDestaques} limite={LIMITE_DESTAQUES} porVez={DESTAQUES_POR_VEZ} />
 }
 
 export default function PaginaVitrine() {

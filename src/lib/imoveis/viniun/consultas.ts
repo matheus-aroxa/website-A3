@@ -37,7 +37,11 @@ export async function buscarDestaques(limite: number): Promise<ImovelResumo[]> {
   return (await destaquesEfetivos()).slice(0, limite).map(paraResumo)
 }
 
-/** Topo da home: o escolhido no painel; sem escolha, o primeiro destaque (ou, sem destaque, o imóvel mais recente). */
+/**
+ * Topo da home: o escolhido no painel; sem escolha, o primeiro destaque (ou, sem destaque, o imóvel mais recente).
+ * Atenção: a data de publicação da Viniun é a do lote "Publicar no site" de 11/11/2026, então "mais recente" ali é só a
+ * ordem em que o lote foi processado.
+ */
 export async function buscarHeroi(): Promise<Imovel | null> {
   const [lista, { personalizada, vitrine }] = await Promise.all([catalogo(), obterVitrine()])
   const escolhido = personalizada && vitrine.heroi ? lista.find((im) => im.id === vitrine.heroi && temFoto(im)) : undefined

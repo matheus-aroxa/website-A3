@@ -40,7 +40,10 @@ antigos dos imóveis e a cópia das fichas da Viniun (abaixo).
   de visitas do site continua rodando nos dois modos, então os relatórios voltam com o histórico completo.
 - **Vitrine da home:** o imóvel do topo e os destaques são escolhidos no painel (`/admin/vitrine`), nos dois modos. No
   modo Viniun, a lista traz os imóveis publicados lá com foto; enquanto a vitrine nunca foi salva, valem os marcados como
-  "Destaque" na Viniun. As escolhas ficam nas mesmas tabelas: um imóvel escolhido no modo Viniun que não existe no banco
+  "Destaque" na Viniun. Com o topo em "Automático", a home mostra o primeiro destaque da lista (nos dois modos); sem
+  destaques, o imóvel publicado mais recente. A prévia do painel mostra esse imóvel. Atenção: no modo Viniun, "mais
+  recente" usa a data de publicação da Viniun, que é a do lote "Publicar no site" de 11/11/2026 para 325 dos 326 imóveis;
+  a ordem "Mais recentes" da busca do site tem o mesmo problema. As escolhas ficam nas mesmas tabelas: um imóvel escolhido no modo Viniun que não existe no banco
   é ignorado no modo banco, e vice-versa. Salvar a vitrine atualiza só a home, sem reler o catálogo.
 
 ### Como os campos da Viniun viram os do site

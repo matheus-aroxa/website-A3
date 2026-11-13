@@ -41,7 +41,7 @@ function PreviaTopo({ imovel }: { imovel?: OpcaoVitrine }) {
           </span>
         </div>
       ) : (
-        <p className={s.previaTopoVazio}>O topo mostra o destaque mais recente.</p>
+        <p className={s.previaTopoVazio}>{imovel ? 'Este imóvel está sem foto.' : 'Nenhum imóvel publicado.'}</p>
       )}
     </div>
   )
@@ -52,9 +52,12 @@ export function EditorVitrine({
   opcoes,
   limite,
   porVez,
+  semDestaques,
 }: {
   inicial: Vitrine
   opcoes: OpcaoVitrine[]
+  /** Imóvel do topo no automático quando não há destaques (o publicado mais recente). */
+  semDestaques: string | null
   limite: number
   /** Quantos destaques a home mostra de uma vez; acima disso eles viram um carrossel. */
   porVez: number
@@ -75,6 +78,10 @@ export function EditorVitrine({
   const porId = new Map(opcoes.map((o) => [o.id, o]))
   const sujo = heroi !== (inicial.heroi ?? '') || JSON.stringify(destaques) !== JSON.stringify(inicial.destaques)
   const cheio = destaques.length >= limite
+  // O que a home mostra no topo: o escolhido ou, no automático, o primeiro destaque (sem destaques, o mais recente).
+  // Mesma regra do site (buscarHeroi em consultas.ts e viniun/consultas.ts).
+  const idDoTopo = heroi || destaques[0] || semDestaques || ''
+  const automatico = heroi ? null : destaques[0] ? 'Automático: o primeiro destaque da lista.' : 'Automático: sem destaques, vale o imóvel publicado mais recente.'
 
   const mover = (de: number, para: number) =>
     setDestaques((lista) => {
@@ -105,12 +112,13 @@ export function EditorVitrine({
               aria-label="Imóvel do topo da home"
               valor={heroi}
               aoMudar={setHeroi}
-              opcoes={[{ valor: '', rotulo: 'Automático (o destaque mais recente)' }, ...opcoes.map((o) => ({ valor: o.id, rotulo: rotulo(o) }))]}
+              opcoes={[{ valor: '', rotulo: 'Automático (o primeiro destaque da lista)' }, ...opcoes.map((o) => ({ valor: o.id, rotulo: rotulo(o) }))]}
             />
           </div>
           <div className={s.previa}>
             <span className={s.legenda}>Como será exibido</span>
-            <PreviaTopo imovel={porId.get(heroi)} />
+            <PreviaTopo imovel={porId.get(idDoTopo)} />
+            {automatico && <p className={s.previaTopoAuto}>{automatico}</p>}
           </div>
         </div>
       </Secao>
