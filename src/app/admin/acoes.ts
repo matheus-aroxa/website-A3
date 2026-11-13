@@ -333,10 +333,12 @@ export async function salvarVitrine(_: EstadoFormulario, fd: FormData): Promise<
   const ativo = (id: unknown): id is string => typeof id === 'string' && publicados.has(id)
   const destaques = pedidos.filter(ativo)
 
+  // O topo da home é sempre escolhido no painel (não há "automático").
+  if (!ativo(heroi)) return { status: 'erro', mensagem: 'Escolha o imóvel do topo da home (ele precisa estar publicado).' }
   if (destaques.length > LIMITE_DESTAQUES) {
     return { status: 'erro', mensagem: `A home mostra no máximo ${LIMITE_DESTAQUES} destaques.` }
   }
-  await gravarVitrine({ heroi: ativo(heroi) ? heroi : null, destaques }, admin.email)
+  await gravarVitrine({ heroi, destaques }, admin.email)
   // Só o topo e os destaques da home: no modo Viniun, não precisa reler o catálogo de lá.
   updateTag(TAG_VITRINE)
   refresh()
