@@ -29,8 +29,8 @@ antigos dos imóveis e a cópia das fichas da Viniun (abaixo).
   todos os filtros e ordenações do site.
 - **Cópia das fichas no banco** (`viniun_fichas`): a cada atualização, o site pede a lista de imóveis com a data de
   atualização (1 chamada) e só baixa as fichas novas ou alteradas. Se a Viniun sair do ar, vale a última cópia.
-- O catálogo fica num cache compartilhado por 1 hora. **Atualização na hora:** depois do deploy, cadastre na Viniun um
-  webhook para `https://<domínio>/api/viniun` com os eventos `imovel.publicado`, `imovel.atualizado` e
+- O catálogo fica num cache compartilhado por 1 hora. **Atualização na hora (cadastrado em 13/11/2026):** na Viniun, um
+  webhook para `https://www.a3imobiliaria.com.br/api/viniun` com os eventos `imovel.publicado`, `imovel.atualizado` e
   `imovel.despublicado`, e coloque o segredo em `VINIUN_WEBHOOK_SECRET`.
 - **Endereços preservados (SEO):** o imóvel que já existia no banco (mesmo código, ex.: `AP0277`) mantém a URL e o id
   de antes; cidades e bairros também mantêm os slugs. Só imóveis novos, cadastrados direto na Viniun, usam a URL da Viniun.
