@@ -77,7 +77,8 @@ export function BuscaInicial({ cidades }: { cidades: Cidade[] }) {
     e.preventDefault()
     const filtros = aplicarAlteracao(FILTROS_PADRAO, {
       categoria: aluguel ? 'aluguel' : 'venda',
-      situacoes: modo === 'lancamentos' ? SITUACOES_LANCAMENTO : [],
+      // "Imóveis prontos" é só o que está pronto para morar (sem isso, a busca trazia também lançamentos e obras).
+      situacoes: modo === 'lancamentos' ? SITUACOES_LANCAMENTO : modo === 'venda' ? ['pronto'] : [],
       tipos: tipo ? [tipo] : [],
       cidade: cidadeSlug || null,
       bairro: bairroSlug || null,
