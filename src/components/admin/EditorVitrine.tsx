@@ -41,7 +41,7 @@ function PreviaTopo({ imovel }: { imovel?: OpcaoVitrine }) {
           </span>
         </div>
       ) : (
-        <p className={s.previaTopoVazio}>O topo mostra o destaque mais recente.</p>
+        <p className={s.previaTopoVazio}>{imovel ? 'Este imóvel está sem foto.' : 'Escolha o imóvel do topo.'}</p>
       )}
     </div>
   )
@@ -105,7 +105,8 @@ export function EditorVitrine({
               aria-label="Imóvel do topo da home"
               valor={heroi}
               aoMudar={setHeroi}
-              opcoes={[{ valor: '', rotulo: 'Automático (o destaque mais recente)' }, ...opcoes.map((o) => ({ valor: o.id, rotulo: rotulo(o) }))]}
+              // O topo é sempre escolhido: a opção vazia só aparece enquanto nenhum foi escolhido.
+              opcoes={[...(heroi ? [] : [{ valor: '', rotulo: 'Escolha o imóvel do topo…' }]), ...opcoes.map((o) => ({ valor: o.id, rotulo: rotulo(o) }))]}
             />
           </div>
           <div className={s.previa}>
@@ -230,7 +231,8 @@ export function EditorVitrine({
         <div className={s.barraSalvar} data-barra-salvar>
           <div className={s.barraSalvarConteudo}>
             <span className={s.barraEstado}>
-              <span className={s.ponto} data-sujo aria-hidden="true" />A vitrine mudou. Salve para atualizar a home.
+              <span className={s.ponto} data-sujo aria-hidden="true" />
+              {heroi ? 'A vitrine mudou. Salve para atualizar a home.' : 'Escolha o imóvel do topo para salvar.'}
             </span>
             <div className={s.barraBotoes}>
               <button
@@ -246,7 +248,7 @@ export function EditorVitrine({
               >
                 Descartar
               </button>
-              <button type="button" className={`${s.botao} ${s.botaoSol} ${s.botaoG}`} disabled={salvando} onClick={salvar}>
+              <button type="button" className={`${s.botao} ${s.botaoSol} ${s.botaoG}`} disabled={salvando || !heroi} onClick={salvar}>
                 <Icone nome="check" tamanho={17} espessura={2.4} />
                 {salvando ? 'Salvando…' : 'Salvar vitrine'}
               </button>

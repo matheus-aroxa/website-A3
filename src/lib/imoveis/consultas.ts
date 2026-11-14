@@ -162,12 +162,16 @@ export async function buscarDestaques(limite: number): Promise<ImovelResumo[]> {
   return rows.map(paraResumo)
 }
 
-/** Imóvel do topo da home: o "herói" ou, na falta, o destaque mais recente (ou o mais recente de todos). */
+/**
+ * Imóvel do topo da home: o "herói" ou, na falta, o primeiro destaque da vitrine (antes de a vitrine ser personalizada,
+ * o destaque mais recente, que é o primeiro da lista); sem destaques, o mais recente de todos.
+ */
 export async function buscarHeroi(): Promise<Imovel | null> {
   const { rows } = await banco().query<Linha>(
     `${CONSULTA_SITE} ${VITRINE}
       WHERE i.status = 'ativo'
-      ORDER BY ${HEROI} DESC, COALESCE(${DESTAQUE}, false) DESC, i.publicado_em DESC, i.id LIMIT 1`,
+      ORDER BY ${HEROI} DESC, COALESCE(${DESTAQUE}, false) DESC, (CASE WHEN vc.personalizada THEN vd.posicao END) NULLS LAST,
+               i.publicado_em DESC, i.id LIMIT 1`,
   )
   return rows[0] ? paraImovel(rows[0]) : null
 }

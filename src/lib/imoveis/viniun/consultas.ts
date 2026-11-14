@@ -9,10 +9,12 @@ import { agruparCidades, agruparConstrutoras, paginar, paraIndice, paraResumo, p
 import type { Filtros } from '../filtros'
 import { TAG_IMOVEIS } from '../fonte'
 import type { IndiceImovel } from '../rotas'
+import { obterVitrine } from '../banco'
 import type { Cidade, Construtora, Imovel, ImovelResumo } from '../tipos'
 import { baixarCatalogo } from './carga'
 
-async function catalogo(): Promise<Imovel[]> {
+/** Todos os imóveis publicados no site (inclusive os sem foto, que não aparecem na busca). */
+export async function catalogo(): Promise<Imovel[]> {
   'use cache: remote'
   cacheLife('hours')
   cacheTag(TAG_IMOVEIS)
@@ -27,17 +29,33 @@ export async function buscarPagina(f: Filtros, pagina: number): Promise<PaginaRe
   return paginar(await catalogo(), f, pagina)
 }
 
-/** Os destaques são os imóveis marcados como destaque na Viniun, do mais recente para o mais antigo. */
+/**
+ * Destaques da home: os escolhidos na vitrine do painel, na ordem de lá. Enquanto a vitrine nunca foi salva, os marcados
+ * como "Destaque" na Viniun, do mais recente para o mais antigo. Imóvel que saiu do site ou está sem foto é pulado.
+ */
 export async function buscarDestaques(limite: number): Promise<ImovelResumo[]> {
-  return porMaisRecente((await catalogo()).filter((im) => im.destaque && temFoto(im)))
-    .slice(0, limite)
-    .map(paraResumo)
+  return (await destaquesEfetivos()).slice(0, limite).map(paraResumo)
 }
 
-/** Topo da home: a Viniun não tem "herói"; vale o destaque mais recente (ou, sem destaque, o imóvel mais recente). */
+/**
+ * Topo da home: o escolhido no painel; sem escolha, o primeiro destaque (ou, sem destaque, o imóvel mais recente).
+ * Atenção: a data de publicação da Viniun é a do lote "Publicar no site" de 11/11/2026, então "mais recente" ali é só a
+ * ordem em que o lote foi processado.
+ */
 export async function buscarHeroi(): Promise<Imovel | null> {
-  const lista = porMaisRecente((await catalogo()).filter(temFoto))
-  return lista.find((im) => im.destaque) ?? lista[0] ?? null
+  const [lista, { personalizada, vitrine }] = await Promise.all([catalogo(), obterVitrine()])
+  const escolhido = personalizada && vitrine.heroi ? lista.find((im) => im.id === vitrine.heroi && temFoto(im)) : undefined
+  return escolhido ?? (await destaquesEfetivos())[0] ?? porMaisRecente(lista.filter(temFoto))[0] ?? null
+}
+
+async function destaquesEfetivos(): Promise<Imovel[]> {
+  const [lista, { personalizada, vitrine }] = await Promise.all([catalogo(), obterVitrine()])
+  if (!personalizada) return porMaisRecente(lista.filter((im) => im.destaque && temFoto(im)))
+  const porId = new Map(lista.map((im) => [im.id, im]))
+  return vitrine.destaques.flatMap((id) => {
+    const im = porId.get(id)
+    return im && temFoto(im) ? [im] : []
+  })
 }
 
 /** Mesma finalidade e cidade; mesma situação de obra primeiro, depois os mais recentes. */

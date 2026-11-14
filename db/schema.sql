@@ -1229,21 +1229,5 @@ ALTER TABLE ONLY public.sessoes_admin
     ADD CONSTRAINT sessoes_admin_admin_id_fkey FOREIGN KEY (admin_id) REFERENCES public.administradores(id) ON DELETE CASCADE;
 
 
---
--- Name: vitrine_config vitrine_config_heroi_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.vitrine_config
-    ADD CONSTRAINT vitrine_config_heroi_id_fkey FOREIGN KEY (heroi_id) REFERENCES public.imoveis(id) ON DELETE SET NULL;
-
-
---
--- Name: vitrine_destaques vitrine_destaques_imovel_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.vitrine_destaques
-    ADD CONSTRAINT vitrine_destaques_imovel_id_fkey FOREIGN KEY (imovel_id) REFERENCES public.imoveis(id) ON DELETE CASCADE;
-
-
 -- Linha única de configuração da vitrine da home: as consultas fazem CROSS JOIN com ela, então sem esta linha nada aparece.
 INSERT INTO public.vitrine_config (id, personalizada) VALUES (true, false) ON CONFLICT DO NOTHING;

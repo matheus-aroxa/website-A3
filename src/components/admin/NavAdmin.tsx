@@ -2,7 +2,7 @@
 
 // Cabeçalho do painel: o mesmo do site público (estilos de Cabecalho.module.css e o MenuMobile),
 // com os links do painel e o "Sair" no lugar do "Fale conosco". "Administradores" só aparece para o principal.
-// Com o catálogo na Viniun (`catalogo` falso), "Construtoras" e "Vitrine da home" somem: são mantidas lá.
+// Com o catálogo na Viniun (`catalogo` falso), "Imóveis", "Construtoras" e "Relatórios" somem e o logo leva à vitrine.
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -25,7 +25,7 @@ const LINKS = [
 const LINKS_PRINCIPAL = [...LINKS, { href: '/admin/administradores', rotulo: 'Administradores', chave: 'administradores' }] as const
 
 /** Telas que só existem com o catálogo no banco. */
-const SO_COM_CATALOGO: string[] = ['construtoras', 'vitrine']
+const SO_COM_CATALOGO: string[] = ['imoveis', 'construtoras', 'relatorios']
 
 function chaveAtiva(caminho: string) {
   if (caminho === '/admin' || caminho.startsWith('/admin/imoveis')) return 'imoveis'
@@ -66,7 +66,7 @@ export function CabecalhoAdminEstatico({
   return (
     <header className={c.cabecalho}>
       <div className={`container ${c.barra}`}>
-        <Inicio href="/admin" className={c.logo} aria-label={`${site.nome}, painel administrativo`}>
+        <Inicio href={catalogo ? '/admin' : '/admin/vitrine'} className={c.logo} aria-label={`${site.nome}, painel administrativo`}>
           <Image src={logo} alt={site.nome} width={46} height={40} priority />
         </Inicio>
 

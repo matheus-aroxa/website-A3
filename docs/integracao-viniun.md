@@ -14,7 +14,8 @@ antigos dos imóveis e a cópia das fichas da Viniun (abaixo).
 
 1. Rodar `db/viniun.sql` no Supabase (cria a tabela `viniun_fichas`). Sem ela o site funciona, mas cada atualização do
    cache baixa as ~330 fichas, uma chamada por imóvel: a primeira visita depois de um deploy espera minutos.
-2. Cadastrar na Vercel `FONTE_IMOVEIS=viniun` e `VINIUN_API_KEY`.
+2. Rodar `db/vitrine-viniun.sql` no Supabase, para a vitrine do painel aceitar imóveis cadastrados direto na Viniun.
+3. Cadastrar na Vercel `FONTE_IMOVEIS=viniun` e `VINIUN_API_KEY`.
 
 | Variável | Para quê |
 | --- | --- |
@@ -34,8 +35,16 @@ antigos dos imóveis e a cópia das fichas da Viniun (abaixo).
   `imovel.despublicado`, e coloque o segredo em `VINIUN_WEBHOOK_SECRET`.
 - **Endereços preservados (SEO):** o imóvel que já existia no banco (mesmo código, ex.: `AP0277`) mantém a URL e o id
   de antes; cidades e bairros também mantêm os slugs. Só imóveis novos, cadastrados direto na Viniun, usam a URL da Viniun.
-- No modo Viniun, o painel `/admin` não cadastra nem edita imóveis, vitrine ou construtoras (isso é feito na Viniun).
-  Relatórios e administradores continuam funcionando.
+- **Painel no modo Viniun:** somem o cadastro de imóveis, as construtoras e os relatórios; o painel abre na vitrine da
+  home. Ficam a vitrine e os administradores. Nada é apagado: com `FONTE_IMOVEIS=banco` tudo volta a aparecer. A medição
+  de visitas do site continua rodando nos dois modos, então os relatórios voltam com o histórico completo.
+- **Vitrine da home:** o imóvel do topo e os destaques são escolhidos no painel (`/admin/vitrine`), nos dois modos. No
+  modo Viniun, a lista traz os imóveis publicados lá com foto; enquanto a vitrine nunca foi salva, valem os marcados como
+  "Destaque" na Viniun. O imóvel do topo é sempre escolhido no painel (não há opção automática; sem ele a vitrine não
+  salva). Se o escolhido sair do site, a home mostra o primeiro destaque até alguém escolher outro, e o painel pede a
+  escolha. Atenção: no modo Viniun, a data de publicação é a do lote "Publicar no site" de 11/11/2026 para 325 dos 326
+  imóveis, então a ordem "Mais recentes" da busca do site segue só a ordem desse lote. As escolhas ficam nas mesmas
+  tabelas: um imóvel escolhido no modo Viniun que não existe no banco é ignorado no modo banco, e vice-versa. Salvar a vitrine atualiza só a home, sem reler o catálogo.
 
 ### Como os campos da Viniun viram os do site
 
@@ -82,7 +91,6 @@ Mão e Só Anúncios não mudaram (exigem escolher os imóveis).
 | --- | --- |
 | Breve lançamento | A Viniun não tem essa opção: os 28 aparecem como "Lançamento". |
 | Faixas (ex.: 52 a 54 m², 2 ou 3 quartos), 104 imóveis | A Viniun guarda um valor só; o site mostra esse valor. |
-| Destaques e imóvel do topo da home | Vêm da marcação "Destaque" da Viniun (hoje nenhum: o topo mostra o mais recente). A vitrine do painel não vale no modo Viniun. |
 | Nome do empreendimento | O site usa o título do anúncio na Viniun, sem o trecho "– Apartamento à venda em…" (alguns estão em maiúsculas ou com o nome da construtora). |
 | Frase sob o título | Gerada automaticamente ("Apartamento de 3 quartos em Caxangá, Recife – PE"). |
 | Ponto no mapa | Só quando o endereço completo foi liberado na Viniun (senão a coordenada é aproximada e não vai ao mapa). |
