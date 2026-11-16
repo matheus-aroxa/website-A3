@@ -180,7 +180,7 @@ const es: Dicionario = {
     precoAPartirDe: 'Desde',
     sobConsulta: 'Precio a consultar',
     precoNota: 'El precio puede variar según la disponibilidad en la lista de la constructora.',
-    aproximado: '≈ {valor}',
+    precoOficial: 'Precio oficial: {valor}',
     aproximadoNota: 'Valor aproximado al tipo de cambio del Banco Central de Brasil del {data}. El precio oficial es en reales brasileños.',
     falarWhatsApp: 'WhatsApp',
     simularParcelas: 'Plan de pagos',

@@ -179,7 +179,7 @@ const fr: Dicionario = {
     precoAPartirDe: 'À partir de',
     sobConsulta: 'Prix sur demande',
     precoNota: 'Le prix peut varier selon la disponibilité dans la grille du promoteur.',
-    aproximado: '≈ {valor}',
+    precoOficial: 'Prix officiel : {valor}',
     aproximadoNota: 'Valeur approximative au taux de change de la Banque centrale du Brésil du {data}. Le prix officiel est en réais brésiliens.',
     falarWhatsApp: 'WhatsApp',
     simularParcelas: 'Échéancier',

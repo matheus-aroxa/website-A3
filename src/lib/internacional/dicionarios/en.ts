@@ -179,7 +179,7 @@ const en: Dicionario = {
     precoAPartirDe: 'From',
     sobConsulta: 'Price on request',
     precoNota: 'Prices can change according to availability on the developer’s price list.',
-    aproximado: '≈ {valor}',
+    precoOficial: 'Official price: {valor}',
     aproximadoNota: 'Approximate value at the Central Bank of Brazil exchange rate of {data}. The official price is in Brazilian reais.',
     falarWhatsApp: 'WhatsApp',
     simularParcelas: 'Payment plan',

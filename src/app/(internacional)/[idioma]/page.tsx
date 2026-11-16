@@ -17,7 +17,7 @@ import carregadorImagem from '@/lib/imoveis/carregador-imagem'
 import { DESTAQUES_POR_VEZ } from '@/lib/imoveis/repositorio'
 import { listarDestaquesInternacionais, listarImoveisInternacionais } from '@/lib/internacional/catalogo'
 import { obterCotacoes } from '@/lib/internacional/cotacao'
-import { formatarAproximado, formatarReais } from '@/lib/internacional/formato'
+import { precoNoIdioma } from '@/lib/internacional/formato'
 import { DADOS_IDIOMA, alternativas, ehIdioma, urlImovelInternacional, urlInicio, urlSecao, versoes } from '@/lib/internacional/idiomas'
 import { dicionario } from '@/lib/internacional/textos'
 import { imagemCompartilhamento, imagensSite, linkWhatsApp, site } from '@/lib/site'
@@ -59,6 +59,7 @@ export default async function InicioInternacional({ params }: PageProps<'/[idiom
   const [destaques, todos, cotacoes] = await Promise.all([listarDestaquesInternacionais(12), listarImoveisInternacionais(), obterCotacoes()])
   const cotacao = cotacoes[DADOS_IDIOMA[idioma].moeda]
   const heroi = destaques[0]
+  const precoHeroi = heroi && precoNoIdioma(heroi.preco, idioma, cotacao, d)
   const imoveis = urlSecao(idioma, 'imoveis')
   const contatoWhats = linkWhatsApp(d.contato.mensagemPadrao)
   const cidades = [...new Map(todos.map((im) => [im.cidadeSlug, im.local.cidade])).entries()]
@@ -108,8 +109,8 @@ export default async function InicioInternacional({ params }: PageProps<'/[idiom
                       </span>
                       <strong translate="no">{heroi.nome}</strong>
                       <span>
-                        {d.imovel.precoAPartirDe} <b>{formatarReais(heroi.preco, idioma, d)}</b>
-                        {formatarAproximado(heroi.preco, idioma, cotacao, d) && <> ({formatarAproximado(heroi.preco, idioma, cotacao, d)})</>}
+                        {d.imovel.precoAPartirDe} <b>{precoHeroi!.principal}</b>
+                        {precoHeroi!.reais && <> ({precoHeroi!.reais})</>}
                       </span>
                     </span>
                     <Icone nome="chevron-direita" espessura={2} className={s.heroCardSeta} />

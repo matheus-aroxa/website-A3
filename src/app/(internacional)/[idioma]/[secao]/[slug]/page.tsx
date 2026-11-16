@@ -24,14 +24,13 @@ import { fotosDoImovel, listarImoveisInternacionais, obterImovelInternacional } 
 import { obterCotacoes } from '@/lib/internacional/cotacao'
 import { preencher } from '@/lib/internacional/dicionario'
 import {
-  formatarAproximado,
   formatarArea,
   formatarDataCotacao,
   formatarEntrega,
   formatarEntregaCurta,
   formatarFaixa,
   formatarQuartos,
-  formatarReais,
+  precoNoIdioma,
 } from '@/lib/internacional/formato'
 import {
   DADOS_IDIOMA,
@@ -78,6 +77,7 @@ export async function generateMetadata({ params }: PageProps<'/[idioma]/[secao]/
   if (!r) return { robots: { index: false } }
   const { idioma, im } = r
   const d = dicionario(idioma)
+  const preco = precoNoIdioma(im.preco, idioma, (await obterCotacoes())[DADOS_IDIOMA[idioma].moeda], d)
   const titulo = d.imovel.tituloSeo({ nome: im.nome, tipo: im.tipo, bairro: im.local.bairro, cidade: im.local.cidade })
   const descricao = d.imovel.descricaoSeo({
     nome: im.nome,
@@ -86,7 +86,7 @@ export async function generateMetadata({ params }: PageProps<'/[idioma]/[secao]/
     area: formatarArea(im.area, idioma, d),
     bairro: im.local.bairro,
     cidade: im.local.cidade,
-    preco: im.preco > 0 ? `${d.imovel.precoAPartirDe} ${formatarReais(im.preco, idioma, d)}` : d.imovel.sobConsulta,
+    preco: im.preco > 0 ? `${d.imovel.precoAPartirDe} ${preco.principal}${preco.reais ? ` (${preco.reais})` : ''}` : d.imovel.sobConsulta,
   })
   const url = urlImovelInternacional(idioma, im.slug)
   return {
@@ -114,7 +114,7 @@ export default async function ImovelInternacionalPagina({ params }: PageProps<'/
   const d = dicionario(idioma)
   const [cotacoes, todos] = await Promise.all([obterCotacoes(), listarImoveisInternacionais()])
   const cotacao = cotacoes[DADOS_IDIOMA[idioma].moeda]
-  const aproximado = formatarAproximado(im.preco, idioma, cotacao, d)
+  const preco = precoNoIdioma(im.preco, idioma, cotacao, d)
   const mensagemWhats = preencher(d.imovel.mensagemWhatsApp, { nome: im.nome, codigo: im.codigo })
   const pronto = im.situacao === 'pronto'
   // Parecidos: da mesma cidade e do recorte internacional, os mais recentes (como os "Empreendimentos parecidos").
@@ -190,10 +190,10 @@ export default async function ImovelInternacionalPagina({ params }: PageProps<'/
             <section className={s.preco} aria-label={d.imovel.investimento}>
               <div>
                 <span>{d.imovel.precoAPartirDe}</span>
-                <strong>{formatarReais(im.preco, idioma, d)}</strong>
-                {aproximado && cotacao && (
+                <strong>{preco.principal}</strong>
+                {preco.reais && cotacao && (
                   <>
-                    <span className={si.aproximado}>{aproximado}</span>
+                    <span className={si.precoReais}>{preencher(d.imovel.precoOficial, { valor: preco.reais })}</span>
                     <small>{preencher(d.imovel.aproximadoNota, { data: formatarDataCotacao(cotacao, idioma) })}</small>
                   </>
                 )}
@@ -377,7 +377,8 @@ export default async function ImovelInternacionalPagina({ params }: PageProps<'/
                   <dt>{d.imovel.investimento}</dt>
                   <dd>
                     {im.preco > 0 ? `${d.imovel.precoAPartirDe} ` : ''}
-                    {formatarReais(im.preco, idioma, d)}
+                    {preco.principal}
+                    {preco.reais && ` (${preco.reais})`}
                   </dd>
                 </div>
               </dl>

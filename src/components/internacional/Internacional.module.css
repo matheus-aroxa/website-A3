@@ -1,7 +1,7 @@
 /*
  * Área internacional (/en, /it, /es, /fr, /de). As páginas usam o CSS das páginas em português (home, busca, ficha,
  * página de texto); aqui fica só o que não existe lá: o seletor de idioma, as tabelas e perguntas do guia e da região,
- * a chamada no fim deles e o valor aproximado na moeda do idioma.
+ * a chamada no fim deles e o preço oficial em reais sob o valor na moeda do idioma.
  */
 
 /* ---------- Seletor de idioma (cabeçalho) ---------- */
@@ -163,10 +163,10 @@
 
 /* ---------- Ficha ---------- */
 
-.aproximado {
+.precoReais {
   display: block;
   margin-top: 4px;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
 }
 
