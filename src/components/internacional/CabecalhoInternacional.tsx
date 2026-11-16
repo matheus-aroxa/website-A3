@@ -14,7 +14,7 @@ import { SeletorIdioma, type Versoes } from './SeletorIdioma'
 export type SecaoAtiva = 'imoveis' | 'guia' | 'regiao'
 
 /** O cabeçalho do site em português (components/layout/Cabecalho), com os links da área internacional e o seletor de idioma. */
-export function CabecalhoInternacional({
+export async function CabecalhoInternacional({
   idioma,
   ativo,
   versoes,
@@ -26,7 +26,7 @@ export function CabecalhoInternacional({
   /** "detalhe": no celular troca o logo por "‹ Imóveis" e mostra o botão de compartilhar (como na ficha em português). */
   variante?: 'padrao' | 'detalhe'
 }) {
-  const d = dicionario(idioma)
+  const d = await dicionario(idioma)
   const detalhe = variante === 'detalhe'
   const links = [
     { href: urlSecao(idioma, 'imoveis'), rotulo: d.nav.imoveis, chave: 'imoveis' },
@@ -58,7 +58,7 @@ export function CabecalhoInternacional({
           {detalhe && (
             <BotaoCompartilhar className={s.compartilhar} textos={{ compartilhar: d.imovel.compartilhar, copiado: d.imovel.linkCopiado }} />
           )}
-          <SeletorIdioma idioma={idioma} versoes={versoes} rotulo={d.nav.idioma} portugues={d.nav.portugues} />
+          <SeletorIdioma idioma={idioma} versoes={versoes} rotulo={d.nav.idioma} portugues={d.nav.portugues} rotuloAutomaticos={d.nav.traducaoAutomatica} />
           <MenuMobile
             links={links}
             ativo={ativo}

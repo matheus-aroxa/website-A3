@@ -22,6 +22,7 @@ const en: Dicionario = {
     menuFechar: 'Close menu',
     faleConosco: 'Contact us',
     faleConoscoWhatsApp: 'Contact us on WhatsApp',
+    traducaoAutomatica: 'Automatic translation',
   },
   inicio: {
     tituloSeo: 'Properties for sale in Recife and on the coast of Pernambuco, Brazil | A3',
@@ -30,10 +31,10 @@ const en: Dicionario = {
     titulo: 'Your home in',
     tituloDestaque: 'Brazil.',
     subtitulo:
-      'At {nome} you find apartments and houses near the beach in Recife, Olinda and Paulista — with an agent from the first contact to the keys, even if you buy from another country.',
+      'At {nome} you find apartments and houses near the beach in Recife and Paulista, with an agent from the first contact to the keys — even from abroad.',
     busca: {
       titulo: 'Find your property',
-      modos: ['New launches', 'Ready to move in', 'All'],
+      modos: ['New launches', 'Ready', 'All'],
       modosRotulo: 'Construction status',
       tipo: 'Property type',
       cidade: 'City',
@@ -44,6 +45,7 @@ const en: Dicionario = {
       buscar: 'Search properties',
       maisFiltros: 'More filters',
       menosFiltros: 'Fewer filters',
+      precoMax: 'Maximum price',
     },
     destaquesSobretitulo: 'Featured',
     destaquesTitulo: 'Properties selected for international buyers',
@@ -56,7 +58,7 @@ const en: Dicionario = {
     servicos: [
       {
         titulo: 'Choose from anywhere',
-        texto: 'Photos, videos and video-call tours of each property, with prices in reais and the approximate value in your currency.',
+        texto: 'Photos, videos and video-call tours of each property, with prices in US dollars.',
         link: 'See properties',
       },
       {
@@ -112,7 +114,7 @@ const en: Dicionario = {
   imoveis: {
     tituloSeo: 'Properties for sale in Recife and Pernambuco, Brazil',
     descricaoSeo:
-      'Apartments and houses for sale in Recife, Olinda and Paulista, selected for international buyers. Prices in Brazilian reais with the approximate value in your currency.',
+      'Apartments and houses for sale in Recife, Olinda and Paulista, selected for international buyers. Prices in US dollars.',
     titulo: 'Properties for sale in Recife and Pernambuco',
     intro: 'Ready-to-move-in homes, properties under construction and new launches, with support from an A3 agent.',
     buscaRotulo: 'Search by property name or code',
@@ -128,6 +130,11 @@ const en: Dicionario = {
     ordemMaiorArea: 'Largest area',
     cidade: 'City',
     todasCidades: 'All cities',
+    bairro: 'Neighbourhood',
+    todosBairros: 'All neighbourhoods',
+    precoMax: 'Maximum price',
+    qualquerPreco: 'Any price',
+    ateValor: 'Up to {valor}',
     tipo: 'Property type',
     situacao: 'Status',
     quartos: 'Bedrooms',
@@ -174,13 +181,10 @@ const en: Dicionario = {
     vagaConsultar: 'On request',
     comSuite: 'with en suite',
     entrega: 'Expected completion',
-    entregaCard: 'Completion {data}',
     codigo: 'Code',
     precoAPartirDe: 'From',
     sobConsulta: 'Price on request',
     precoNota: 'Prices can change according to availability on the developer’s price list.',
-    precoOficial: 'Official price: {valor}',
-    aproximadoNota: 'Approximate value at the Central Bank of Brazil exchange rate of {data}. The official price is in Brazilian reais.',
     falarWhatsApp: 'WhatsApp',
     simularParcelas: 'Payment plan',
     andamento: 'Construction progress',
@@ -326,6 +330,7 @@ const en: Dicionario = {
     atendimentoTexto: 'Talk to an agent on WhatsApp or through the contact form.',
     politica: 'Privacy policy',
     pais: 'Brazil',
+    avisoTraducao: 'This page was translated automatically from English. If anything is unclear, talk to an agent.',
   },
   naoEncontrada: {
     titulo: 'We could not find this page',

@@ -1,7 +1,7 @@
 /*
  * Área internacional (/en, /it, /es, /fr, /de). As páginas usam o CSS das páginas em português (home, busca, ficha,
  * página de texto); aqui fica só o que não existe lá: o seletor de idioma, as tabelas e perguntas do guia e da região,
- * a chamada no fim deles e o preço oficial em reais sob o valor na moeda do idioma.
+ * e a chamada no fim deles.
  */
 
 /* ---------- Seletor de idioma (cabeçalho) ---------- */
@@ -39,14 +39,33 @@
   right: 0;
   top: calc(100% + 6px);
   z-index: 30;
-  min-width: 190px;
-  margin: 0;
+  min-width: 210px;
+  /* Com os idiomas automáticos a lista fica longa: rola dentro do quadro. */
+  max-height: min(70vh, 560px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 6px;
-  list-style: none;
   background: #fff;
   border: 1px solid var(--borda);
   border-radius: 14px;
   box-shadow: var(--sombra-card);
+}
+
+.idiomaLista ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.idiomaGrupo {
+  margin: 6px 0 2px;
+  padding: 10px 12px 4px;
+  border-top: 1px solid var(--borda);
+  color: var(--texto-2);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .idiomaLista a {
@@ -162,13 +181,6 @@
 }
 
 /* ---------- Ficha ---------- */
-
-.precoReais {
-  display: block;
-  margin-top: 4px;
-  font-size: 16px;
-  font-weight: 700;
-}
 
 .nota {
   margin: 0 0 12px;

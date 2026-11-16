@@ -3,6 +3,7 @@
 // Privacidade: o código do visitante é um hash de IP + navegador + um "sal" que muda todo dia (e é apagado em 2 dias).
 // O IP, o User-Agent e o sal nunca são gravados em eventos. País, estado e cidade vêm dos cabeçalhos da Vercel.
 import 'server-only'
+import { PADRAO_IDIOMAS } from '@/lib/internacional/idiomas'
 import { createHash, randomBytes, randomUUID } from 'node:crypto'
 import { banco, transacao } from '@/lib/db'
 import { atualizarResumo } from '@/lib/relatorios/resumo'
@@ -42,9 +43,11 @@ async function idDoImovel(slug: string | undefined) {
   return imoveis.mapa.get(slug)
 }
 
+const FICHA_INTERNACIONAL = new RegExp(`^/(?:${PADRAO_IDIOMAS})/[^/]+/([^/]+)$`)
+
 /** Imóvel da página: /imovel/[slug] ou a ficha da área internacional (/en/properties/[slug], /it/immobili/[slug]…). */
 const slugDoCaminho = (caminho: string) =>
-  /^\/imovel\/([^/]+)$/.exec(caminho)?.[1] ?? /^\/(?:en|it|es|fr|de)\/[^/]+\/([^/]+)$/.exec(caminho)?.[1]
+  /^\/imovel\/([^/]+)$/.exec(caminho)?.[1] ?? FICHA_INTERNACIONAL.exec(caminho)?.[1]
 
 // ---------- Limite por visitante ----------
 

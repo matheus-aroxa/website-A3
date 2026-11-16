@@ -63,20 +63,24 @@ export function formatarReais(valor: number, idioma: Idioma, d: Dicionario) {
 }
 
 /**
- * Preço no idioma: o principal é o valor convertido para a moeda do idioma (dólar ou euro, pela PTAX, arredondado ao
- * milhar) e o secundário é o preço oficial, em reais. Sem cotação (API do Banco Central fora do ar) ou sem preço, o
- * principal fica em reais ("R$497,200" ou "Price on request") e não há secundário.
+ * Preço no idioma: o valor convertido para a moeda do idioma (dólar ou euro, pela PTAX do Banco Central, arredondado ao
+ * milhar). As páginas internacionais mostram só esse valor. Sem cotação (API do Banco Central fora do ar), sai o preço em
+ * reais, o único disponível; sem preço, "Price on request".
  */
 export function precoNoIdioma(valor: number, idioma: Idioma, cotacao: Cotacao | undefined, d: Dicionario) {
-  const reais = formatarReais(valor, idioma, d)
   const convertido = valor > 0 && cotacao ? Math.round(valor / cotacao.valor / 1000) * 1000 : 0
-  if (!(convertido > 0)) return { principal: reais, reais: null }
+  if (!(convertido > 0)) return formatarReais(valor, idioma, d)
   const { locale, moeda } = DADOS_IDIOMA[idioma]
-  const principal = new Intl.NumberFormat(locale, { style: 'currency', currency: moeda, maximumFractionDigits: 0 }).format(convertido)
-  return { principal, reais }
+  return new Intl.NumberFormat(locale, { style: 'currency', currency: moeda, maximumFractionDigits: 0 }).format(convertido)
 }
 
-/** Data da cotação ("November 13, 2026"). */
-export function formatarDataCotacao(cotacao: Cotacao, idioma: Idioma) {
-  return new Intl.DateTimeFormat(DADOS_IDIOMA[idioma].locale, { dateStyle: 'long', timeZone: 'America/Recife' }).format(new Date(cotacao.data))
+/** Limites do filtro de preço máximo, na moeda do idioma (dólar ou euro). */
+const LIMITES_PRECO = [100_000, 200_000, 300_000, 500_000, 1_000_000]
+
+/** Opções do filtro de preço máximo ("Up to $200,000"), ou nenhuma sem cotação (aí não dá para converter). */
+export function opcoesPrecoMaximo(idioma: Idioma, cotacao: Cotacao | undefined, d: Dicionario) {
+  if (!cotacao) return []
+  const { locale, moeda } = DADOS_IDIOMA[idioma]
+  const formato = new Intl.NumberFormat(locale, { style: 'currency', currency: moeda, maximumFractionDigits: 0 })
+  return LIMITES_PRECO.map((valor) => ({ valor: String(valor), rotulo: d.imoveis.ateValor.replace('{valor}', formato.format(valor)) }))
 }

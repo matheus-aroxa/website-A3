@@ -8,25 +8,26 @@ import { JsonLd } from '@/components/seo/JsonLd'
 import { coletaAtiva } from '@/lib/coleta/ativa'
 import { fonteDosImoveis } from '@/lib/imoveis/fonte'
 import { HOST_VINIUN_FOTOS } from '@/lib/imoveis/hosts-fotos'
-import { DADOS_IDIOMA, IDIOMAS, ehIdioma } from '@/lib/internacional/idiomas'
+import { DADOS_IDIOMA, IDIOMAS_REVISADOS, ehRevisado, idiomaDisponivel } from '@/lib/internacional/idiomas'
 import { dicionario } from '@/lib/internacional/textos'
 import { schemaImobiliaria } from '@/lib/seo'
 import { URL_IMAGENS, site } from '@/lib/site'
 import { archivo } from '../../fonte'
 import '../../globals.css'
 
-// Layout raiz da área internacional (/en, /it, /es, /fr, /de): próprio, para o <html lang> ser o do idioma.
+// Layout raiz da área internacional (/en, /it, /ja…): próprio, para o <html lang> ser o do idioma.
 // O site em português tem o seu em app/(site)/layout.tsx. Trocar de um para o outro recarrega a página.
 
+// Só os revisados são gerados no build; os automáticos (idiomas.ts) são gerados no primeiro acesso, com a tradução.
 export function generateStaticParams() {
-  return IDIOMAS.map((idioma) => ({ idioma }))
+  return IDIOMAS_REVISADOS.map((idioma) => ({ idioma }))
 }
 
 export async function generateMetadata({ params }: LayoutProps<'/[idioma]'>): Promise<Metadata> {
   const { idioma } = await params
   // A imagem de compartilhamento padrão (app/opengraph-image.jpg) precisa do endereço do site mesmo sem idioma válido.
-  if (!ehIdioma(idioma)) return { metadataBase: new URL(site.url) }
-  const d = dicionario(idioma)
+  if (!idiomaDisponivel(idioma)) return { metadataBase: new URL(site.url) }
+  const d = await dicionario(idioma)
   return {
     metadataBase: new URL(site.url),
     title: { default: d.inicio.tituloSeo, template: `%s | ${site.nomeCurto}` },
@@ -35,11 +36,10 @@ export async function generateMetadata({ params }: LayoutProps<'/[idioma]'>): Pr
     formatDetection: { telephone: false },
     openGraph: { type: 'website', locale: DADOS_IDIOMA[idioma].ogLocale, siteName: site.nome },
     twitter: { card: 'summary_large_image' },
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
-    },
+    // Os idiomas automáticos ficam fora do Google (tradução de máquina, sem revisão).
+    robots: ehRevisado(idioma)
+      ? { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 } }
+      : { index: false, follow: false },
   }
 }
 
@@ -51,12 +51,12 @@ export const viewport: Viewport = {
 
 export default async function LayoutInternacional({ children, params }: LayoutProps<'/[idioma]'>) {
   const { idioma } = await params
-  if (!ehIdioma(idioma)) notFound()
-  const d = dicionario(idioma)
+  if (!idiomaDisponivel(idioma)) notFound()
+  const d = await dicionario(idioma)
   preconnect(URL_IMAGENS)
   if (fonteDosImoveis() === 'viniun') preconnect(`https://${HOST_VINIUN_FOTOS}`)
   return (
-    <html lang={idioma} className={archivo.variable} data-scroll-behavior="smooth">
+    <html lang={DADOS_IDIOMA[idioma].lang} data-traducao={ehRevisado(idioma) ? undefined : 'automatica'} className={archivo.variable} data-scroll-behavior="smooth">
       <body>
         <a href="#conteudo" className="pular-conteudo">
           {d.nav.pularConteudo}

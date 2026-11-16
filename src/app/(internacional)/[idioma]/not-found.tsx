@@ -5,7 +5,7 @@ import { RastrearNaoEncontrada } from '@/components/coleta/RastrearNaoEncontrada
 import { CabecalhoInternacional } from '@/components/internacional/CabecalhoInternacional'
 import { RodapeInternacional } from '@/components/internacional/RodapeInternacional'
 import s from '@/components/layout/PaginaTexto.module.css'
-import { ehIdioma, urlInicio, urlSecao, versoes } from '@/lib/internacional/idiomas'
+import { idiomaDisponivel, urlInicio, urlSecao, versoes } from '@/lib/internacional/idiomas'
 import { dicionario } from '@/lib/internacional/textos'
 import { linkWhatsApp, site } from '@/lib/site'
 
@@ -17,8 +17,8 @@ export const metadata: Metadata = {
 
 export default async function NaoEncontradaInternacional() {
   const valor = await idiomaDaRota()
-  const idioma = valor && ehIdioma(valor) ? valor : 'en'
-  const d = dicionario(idioma)
+  const idioma = valor && idiomaDisponivel(valor) ? valor : 'en'
+  const d = await dicionario(idioma)
   return (
     <>
       <CabecalhoInternacional idioma={idioma} versoes={versoes(urlInicio)} />

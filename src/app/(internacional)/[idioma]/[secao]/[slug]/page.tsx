@@ -5,7 +5,6 @@ import { CabecalhoInternacional } from '@/components/internacional/CabecalhoInte
 import { CardInternacional } from '@/components/internacional/CardInternacional'
 import { ContatoImovelInternacional } from '@/components/internacional/ContatoImovelInternacional'
 import { DescricaoNavegador } from '@/components/internacional/DescricaoNavegador'
-import si from '@/components/internacional/Internacional.module.css'
 import { RodapeInternacional } from '@/components/internacional/RodapeInternacional'
 import { Galeria } from '@/components/imovel/Galeria'
 import s from '@/components/imovel/Imovel.module.css'
@@ -25,7 +24,6 @@ import { obterCotacoes } from '@/lib/internacional/cotacao'
 import { preencher } from '@/lib/internacional/dicionario'
 import {
   formatarArea,
-  formatarDataCotacao,
   formatarEntrega,
   formatarEntregaCurta,
   formatarFaixa,
@@ -34,9 +32,10 @@ import {
 } from '@/lib/internacional/formato'
 import {
   DADOS_IDIOMA,
-  IDIOMAS,
+  IDIOMAS_REVISADOS,
   alternativas,
-  ehIdioma,
+  ehRevisado,
+  idiomaDisponivel,
   secaoDoCaminho,
   urlImovelInternacional,
   urlInicio,
@@ -59,7 +58,7 @@ export const ensureStatic = 'navigation'
  * traduzir nada. As fichas de verdade são geradas no primeiro acesso e ficam em cache.
  */
 export function generateStaticParams({ params }: { params: { idioma: string } }) {
-  const idiomas = ehIdioma(params.idioma) ? [params.idioma] : IDIOMAS
+  const idiomas = ehRevisado(params.idioma) ? [params.idioma] : IDIOMAS_REVISADOS
   return idiomas.map((idioma) => ({ idioma, secao: DADOS_IDIOMA[idioma].caminhos.imoveis, slug: MARCADOR }))
 }
 
@@ -67,7 +66,7 @@ const MARCADOR = '_'
 
 async function carregar(params: PageProps<'/[idioma]/[secao]/[slug]'>['params']) {
   const { idioma, secao, slug } = await params
-  if (!ehIdioma(idioma) || secaoDoCaminho(idioma, secao) !== 'imoveis' || slug === MARCADOR) return null
+  if (!idiomaDisponivel(idioma) || secaoDoCaminho(idioma, secao) !== 'imoveis' || slug === MARCADOR) return null
   const im = await obterImovelInternacional(slug, idioma)
   return im ? { idioma, im } : null
 }
@@ -76,7 +75,7 @@ export async function generateMetadata({ params }: PageProps<'/[idioma]/[secao]/
   const r = await carregar(params)
   if (!r) return { robots: { index: false } }
   const { idioma, im } = r
-  const d = dicionario(idioma)
+  const d = await dicionario(idioma)
   const preco = precoNoIdioma(im.preco, idioma, (await obterCotacoes())[DADOS_IDIOMA[idioma].moeda], d)
   const titulo = d.imovel.tituloSeo({ nome: im.nome, tipo: im.tipo, bairro: im.local.bairro, cidade: im.local.cidade })
   const descricao = d.imovel.descricaoSeo({
@@ -86,13 +85,16 @@ export async function generateMetadata({ params }: PageProps<'/[idioma]/[secao]/
     area: formatarArea(im.area, idioma, d),
     bairro: im.local.bairro,
     cidade: im.local.cidade,
-    preco: im.preco > 0 ? `${d.imovel.precoAPartirDe} ${preco.principal}${preco.reais ? ` (${preco.reais})` : ''}` : d.imovel.sobConsulta,
+    preco: im.preco > 0 ? `${d.imovel.precoAPartirDe} ${preco}` : d.imovel.sobConsulta,
   })
   const url = urlImovelInternacional(idioma, im.slug)
   return {
     title: { absolute: titulo },
     description: descricao,
-    alternates: { canonical: url, languages: alternativas((i) => urlImovelInternacional(i, im.slug), urlImovel(im.slug)) },
+    alternates: {
+      canonical: url,
+      ...(ehRevisado(idioma) && { languages: alternativas((i) => urlImovelInternacional(i, im.slug), urlImovel(im.slug)) }),
+    },
     openGraph: {
       type: 'website',
       locale: DADOS_IDIOMA[idioma].ogLocale,
@@ -111,7 +113,7 @@ export default async function ImovelInternacionalPagina({ params }: PageProps<'/
   const r = await carregar(params)
   if (!r) notFound()
   const { idioma, im } = r
-  const d = dicionario(idioma)
+  const d = await dicionario(idioma)
   const [cotacoes, todos] = await Promise.all([obterCotacoes(), listarImoveisInternacionais()])
   const cotacao = cotacoes[DADOS_IDIOMA[idioma].moeda]
   const preco = precoNoIdioma(im.preco, idioma, cotacao, d)
@@ -190,13 +192,7 @@ export default async function ImovelInternacionalPagina({ params }: PageProps<'/
             <section className={s.preco} aria-label={d.imovel.investimento}>
               <div>
                 <span>{d.imovel.precoAPartirDe}</span>
-                <strong>{preco.principal}</strong>
-                {preco.reais && cotacao && (
-                  <>
-                    <span className={si.precoReais}>{preencher(d.imovel.precoOficial, { valor: preco.reais })}</span>
-                    <small>{preencher(d.imovel.aproximadoNota, { data: formatarDataCotacao(cotacao, idioma) })}</small>
-                  </>
-                )}
+                <strong>{preco}</strong>
                 <small>{d.imovel.precoNota}</small>
               </div>
               <div className={s.precoAcoes}>
@@ -377,8 +373,7 @@ export default async function ImovelInternacionalPagina({ params }: PageProps<'/
                   <dt>{d.imovel.investimento}</dt>
                   <dd>
                     {im.preco > 0 ? `${d.imovel.precoAPartirDe} ` : ''}
-                    {preco.principal}
-                    {preco.reais && ` (${preco.reais})`}
+                    {preco}
                   </dd>
                 </div>
               </dl>

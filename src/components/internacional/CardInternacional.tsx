@@ -8,7 +8,6 @@ import type { Cotacao } from '@/lib/internacional/cotacao'
 import {
   formatarArea,
   formatarBanheirosCurto,
-  formatarEntregaCurta,
   formatarQuartos,
   formatarVagas,
   precoNoIdioma,
@@ -23,9 +22,9 @@ const SIZES = {
 
 /**
  * O card do site em português (components/imoveis/CardImovel) com os textos no idioma: mesma marcação e mesmo CSS.
- * Diferença: o preço principal vem na moeda do idioma (dólar ou euro), com o preço oficial em reais na linha de baixo.
+ * Diferenças: o preço vem na moeda do idioma (dólar ou euro), e o canto do rodapé (código ou entrega) não aparece.
  */
-export function CardInternacional({
+export async function CardInternacional({
   imovel: im,
   idioma,
   cotacao,
@@ -42,7 +41,7 @@ export function CardInternacional({
   prioritario?: boolean
   lista?: string
 }) {
-  const d = dicionario(idioma)
+  const d = await dicionario(idioma)
   const Titulo = `h${nivelTitulo}` as const
   const preco = precoNoIdioma(im.preco, idioma, cotacao, d)
   const alt = d.imovel.altFoto({ nome: im.nome, tipo: im.tipo, bairro: im.local.bairro, cidade: im.local.cidade, posicao: 0 })
@@ -99,13 +98,7 @@ export function CardInternacional({
         <div className={s.rodape}>
           <span className={s.preco}>
             <span>{d.imovel.precoAPartirDe}</span>
-            <strong>{preco.principal}</strong>
-            {preco.reais && <span>{preco.reais}</span>}
-          </span>
-          <span className={s.extra}>
-            {im.entrega && im.situacao !== 'pronto'
-              ? d.imovel.entregaCard.replace('{data}', formatarEntregaCurta(im.entrega, d))
-              : `${d.imovel.codigo} ${im.codigo}`}
+            <strong>{preco}</strong>
           </span>
         </div>
       </div>

@@ -14,11 +14,12 @@ import { Icone, type NomeIcone } from '@/components/ui/Icone'
 import { MapaEstatico } from '@/components/ui/MapaEstatico'
 import { RevelarAoRolar } from '@/components/ui/RevelarAoRolar'
 import carregadorImagem from '@/lib/imoveis/carregador-imagem'
+import { slugificar } from '@/lib/imoveis/formato'
 import { DESTAQUES_POR_VEZ } from '@/lib/imoveis/repositorio'
-import { listarDestaquesInternacionais, listarImoveisInternacionais } from '@/lib/internacional/catalogo'
+import { listarImoveisInternacionais, vitrineInternacional } from '@/lib/internacional/catalogo'
 import { obterCotacoes } from '@/lib/internacional/cotacao'
-import { precoNoIdioma } from '@/lib/internacional/formato'
-import { DADOS_IDIOMA, alternativas, ehIdioma, urlImovelInternacional, urlInicio, urlSecao, versoes } from '@/lib/internacional/idiomas'
+import { opcoesPrecoMaximo, precoNoIdioma } from '@/lib/internacional/formato'
+import { DADOS_IDIOMA, alternativas, ehRevisado, idiomaDisponivel, urlImovelInternacional, urlInicio, urlSecao, versoes } from '@/lib/internacional/idiomas'
 import { dicionario } from '@/lib/internacional/textos'
 import { imagemCompartilhamento, imagensSite, linkWhatsApp, site } from '@/lib/site'
 
@@ -30,12 +31,12 @@ export const ensureStatic = 'navigation'
 
 export async function generateMetadata({ params }: PageProps<'/[idioma]'>): Promise<Metadata> {
   const { idioma } = await params
-  if (!ehIdioma(idioma)) return {}
-  const d = dicionario(idioma)
+  if (!idiomaDisponivel(idioma)) return {}
+  const d = await dicionario(idioma)
   return {
     title: { absolute: d.inicio.tituloSeo },
     description: d.inicio.descricaoSeo,
-    alternates: { canonical: urlInicio(idioma), languages: alternativas(urlInicio) },
+    alternates: { canonical: urlInicio(idioma), ...(ehRevisado(idioma) && { languages: alternativas(urlInicio) }) },
     openGraph: {
       type: 'website',
       locale: DADOS_IDIOMA[idioma].ogLocale,
@@ -54,16 +55,22 @@ const NOMES_DEPOIMENTOS = ['Rayani', 'Gilberto', 'Estela']
 
 export default async function InicioInternacional({ params }: PageProps<'/[idioma]'>) {
   const { idioma } = await params
-  if (!ehIdioma(idioma)) notFound()
-  const d = dicionario(idioma)
-  const [destaques, todos, cotacoes] = await Promise.all([listarDestaquesInternacionais(12), listarImoveisInternacionais(), obterCotacoes()])
+  if (!idiomaDisponivel(idioma)) notFound()
+  const d = await dicionario(idioma)
+  const [{ heroi, destaques }, todos, cotacoes] = await Promise.all([vitrineInternacional(idioma), listarImoveisInternacionais(), obterCotacoes()])
   const cotacao = cotacoes[DADOS_IDIOMA[idioma].moeda]
-  const heroi = destaques[0]
   const precoHeroi = heroi && precoNoIdioma(heroi.preco, idioma, cotacao, d)
   const imoveis = urlSecao(idioma, 'imoveis')
   const contatoWhats = linkWhatsApp(d.contato.mensagemPadrao)
-  const cidades = [...new Map(todos.map((im) => [im.cidadeSlug, im.local.cidade])).entries()]
-    .map(([slug, nome]) => ({ slug, nome }))
+  // Cidades e bairros dos imóveis da área internacional, para o painel de busca do topo (como o da home em português).
+  const porCidade = new Map<string, { slug: string; nome: string; bairros: Map<string, string> }>()
+  for (const im of todos) {
+    const c = porCidade.get(im.cidadeSlug) ?? { slug: im.cidadeSlug, nome: im.local.cidade, bairros: new Map() }
+    c.bairros.set(slugificar(im.local.bairro), im.local.bairro)
+    porCidade.set(im.cidadeSlug, c)
+  }
+  const cidades = [...porCidade.values()]
+    .map((c) => ({ slug: c.slug, nome: c.nome, bairros: [...c.bairros].map(([slug, nome]) => ({ slug, nome })).sort((a, b) => a.nome.localeCompare(b.nome)) }))
     .sort((a, b) => a.nome.localeCompare(b.nome))
   const linksServicos = [imoveis, urlSecao(idioma, 'guia'), '#contato', urlSecao(idioma, 'regiao')]
   const [antesNome, depoisNome] = d.inicio.subtitulo.split('{nome}')
@@ -109,8 +116,7 @@ export default async function InicioInternacional({ params }: PageProps<'/[idiom
                       </span>
                       <strong translate="no">{heroi.nome}</strong>
                       <span>
-                        {d.imovel.precoAPartirDe} <b>{precoHeroi!.principal}</b>
-                        {precoHeroi!.reais && <> ({precoHeroi!.reais})</>}
+                        {d.imovel.precoAPartirDe} <b>{precoHeroi}</b>
                       </span>
                     </span>
                     <Icone nome="chevron-direita" espessura={2} className={s.heroCardSeta} />
@@ -122,11 +128,16 @@ export default async function InicioInternacional({ params }: PageProps<'/[idiom
               <BuscaInicialInternacional
                 destino={imoveis}
                 cidades={cidades}
+                precos={opcoesPrecoMaximo(idioma, cotacao, d)}
                 textos={{
                   ...d.inicio.busca,
+                  bairro: d.imoveis.bairro,
+                  precoMax: d.imoveis.precoMax,
+                  qualquerPreco: d.imoveis.qualquerPreco,
                   quartos: d.imoveis.quartos,
                   banheiros: d.imoveis.banheiros,
-                  vagas: d.imoveis.vagas,
+                  // Forma curta, como o "Vagas" da home em português ("Places de parking" quebrava a linha).
+                  vagas: d.imovel.vagasCurto,
                   tipos: d.imovel.tipoPlural,
                 }}
               />

@@ -25,6 +25,8 @@ export interface Dicionario {
     menuFechar: string
     faleConosco: string
     faleConoscoWhatsApp: string
+    /** Título do grupo dos idiomas de tradução automática no seletor. */
+    traducaoAutomatica: string
   }
   inicio: {
     tituloSeo: string
@@ -49,6 +51,7 @@ export interface Dicionario {
       buscar: string
       maisFiltros: string
       menosFiltros: string
+      precoMax: string
     }
     destaquesSobretitulo: string
     destaquesTitulo: string
@@ -101,6 +104,13 @@ export interface Dicionario {
     ordemMaiorArea: string
     cidade: string
     todasCidades: string
+    bairro: string
+    todosBairros: string
+    /** Filtro de preço máximo, na moeda do idioma. */
+    precoMax: string
+    qualquerPreco: string
+    /** "Up to {valor}". */
+    ateValor: string
     tipo: string
     situacao: string
     quartos: string
@@ -146,16 +156,10 @@ export interface Dicionario {
     vagaConsultar: string
     comSuite: string
     entrega: string
-    /** Canto do card: "Completion Jun/2029" ({data}). */
-    entregaCard: string
     codigo: string
     precoAPartirDe: string
     sobConsulta: string
     precoNota: string
-    /** Preço oficial em reais, sob o valor convertido (ficha): {valor}. */
-    precoOficial: string
-    /** Explica a cotação: {data} = dia da cotação. */
-    aproximadoNota: string
     falarWhatsApp: string
     simularParcelas: string
     andamento: string
@@ -298,6 +302,8 @@ export interface Dicionario {
     politica: string
     /** "Brazil" no endereço. */
     pais: string
+    /** Aviso no rodapé das páginas dos idiomas automáticos. */
+    avisoTraducao: string
   }
   naoEncontrada: {
     titulo: string

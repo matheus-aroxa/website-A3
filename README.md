@@ -31,7 +31,7 @@ ser o endereço real do site: ele alimenta canonical, Open Graph, sitemap e JSON
 | `/api/imoveis` | JSON do "Carregar mais" (celular) | Dinâmica |
 | `/api/revalidar` | Webhook (protegido por `REVALIDATE_SECRET`) para invalidar o cache | Dinâmica |
 | `/api/viniun` | Webhook da Viniun (assinado com `VINIUN_WEBHOOK_SECRET`): imóvel mudou no CRM | Dinâmica |
-| `/admin` | Painel administrativo (login, imóveis, vitrine da home) | Dinâmica, `noindex` |
+| `/admin` | Painel administrativo (login, imóveis, vitrine da home e de cada idioma) | Dinâmica, `noindex` |
 | `/en`, `/it`, `/es`, `/fr`, `/de` | Área internacional: início, imóveis, ficha, guia de compra e região, com endereços no idioma (`/en/properties/[slug]`, `/it/immobili/[slug]`…). Detalhes: docs/area-internacional.md | Estática (fichas geradas no primeiro acesso) |
 
 Filtros que não viram página (quartos, vagas, área, ordem, página…) vão na query string
@@ -139,8 +139,8 @@ administradores); voltam com `FONTE_IMOVEIS=banco` (docs/integracao-viniun.md).
 - Rodar `db/relatorios.sql` no Supabase **antes** de publicar o código dos relatórios (a medição de visitas só começa a contar
   depois da publicação) e revisar com o jurídico a seção "Medição de uso do site" da política de privacidade (docs/relatorios.md).
 
-- Área internacional: dar ao usuário IAM do site a permissão `translate:TranslateText` e definir `TRADUTOR=aws` na Vercel para
-  traduzir as descrições dos imóveis; revisar os textos do guia de compra, da região e da política (docs/area-internacional.md).
+- Área internacional: rodar `db/vitrine-internacional.sql` no Supabase (vitrine por idioma) e definir `TRADUTOR=aws` na Vercel
+  para traduzir as descrições dos imóveis e ligar os 21 idiomas de tradução automática (/ja, /pl…); revisar os textos do guia de compra, da região e da política (docs/area-internacional.md).
 - Antes de ligar `FONTE_IMOVEIS=viniun`: rodar `db/viniun.sql` e `db/vitrine-viniun.sql` no Supabase e ler docs/integracao-viniun.md.
 
 ## Estrutura

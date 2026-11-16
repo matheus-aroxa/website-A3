@@ -20,6 +20,8 @@ export interface ItemLista {
   codigo: string
   cidade: string
   cidadeSlug: string
+  bairro: string
+  bairroSlug: string
   tipo: TipoImovel
   situacao: Situacao
   quartos: number
@@ -46,6 +48,10 @@ export interface TextosLista {
   ordemMaiorArea: string
   cidade: string
   todasCidades: string
+  bairro: string
+  todosBairros: string
+  precoMax: string
+  qualquerPreco: string
   tipo: string
   situacao: string
   quartos: string
@@ -78,15 +84,18 @@ type Ordem = 'recentes' | 'menor-preco' | 'maior-preco' | 'maior-area'
 interface Filtros {
   q: string
   cidade: string
+  bairro: string
   tipos: TipoImovel[]
   situacoes: Situacao[]
   quartos: number
   banheiros: number
   vagas: number
+  /** Preço máximo na moeda do idioma (0: qualquer). */
+  precoMax: number
   ordem: Ordem
 }
 
-const VAZIO: Filtros = { q: '', cidade: '', tipos: [], situacoes: [], quartos: 0, banheiros: 0, vagas: 0, ordem: 'recentes' }
+const VAZIO: Filtros = { q: '', cidade: '', bairro: '', tipos: [], situacoes: [], quartos: 0, banheiros: 0, vagas: 0, precoMax: 0, ordem: 'recentes' }
 const ORDENS: Ordem[] = ['recentes', 'menor-preco', 'maior-preco', 'maior-area']
 
 function lerUrl(busca: string): Filtros {
@@ -99,12 +108,14 @@ function lerUrl(busca: string): Filtros {
   return {
     q: (p.get('q') ?? '').slice(0, 80),
     cidade: p.get('cidade') ?? '',
+    bairro: p.get('cidade') ? (p.get('bairro') ?? '') : '',
     tipos: lista('tipo', TIPOS),
     // Atalhos da home e do rodapé: "lancamentos" (breve lançamento e lançamento) e "prontos".
     situacoes: situacao === 'lancamentos' ? SITUACOES_LANCAMENTO : situacao === 'prontos' ? ['pronto'] : lista('situacao', SITUACOES),
     quartos: numero('quartos'),
     banheiros: numero('banheiros'),
     vagas: numero('vagas'),
+    precoMax: Math.max(0, Number.parseInt(p.get('preco') ?? '', 10) || 0),
     ordem: ORDENS.includes(ordem) ? ordem : 'recentes',
   }
 }
@@ -113,9 +124,11 @@ function montarUrl(f: Filtros) {
   const p = new URLSearchParams()
   if (f.q.trim()) p.set('q', f.q.trim())
   if (f.cidade) p.set('cidade', f.cidade)
+  if (f.cidade && f.bairro) p.set('bairro', f.bairro)
   if (f.tipos.length) p.set('tipo', f.tipos.join(','))
   if (f.situacoes.length) p.set('situacao', f.situacoes.join(','))
   for (const chave of ['quartos', 'banheiros', 'vagas'] as const) if (f[chave]) p.set(chave, String(f[chave]))
+  if (f.precoMax) p.set('preco', String(f.precoMax))
   if (f.ordem !== 'recentes') p.set('ordem', f.ordem)
   const query = p.toString()
   return `${window.location.pathname}${query ? `?${query}` : ''}`
@@ -153,7 +166,20 @@ function Pilulas({ legenda, valor, opcoes, aoEscolher }: { legenda: string; valo
 
 const semAssinatura = () => () => {}
 
-export function ListaImoveis({ itens, textos: t, whatsapp }: { itens: ItemLista[]; textos: TextosLista; whatsapp: string }) {
+export function ListaImoveis({
+  itens,
+  textos: t,
+  whatsapp,
+  cotacao,
+  precos,
+}: {
+  itens: ItemLista[]
+  textos: TextosLista
+  whatsapp: string
+  /** Reais por unidade da moeda do idioma, para o filtro de preço (sem cotação, o filtro não aparece). */
+  cotacao?: number
+  precos: { valor: string; rotulo: string }[]
+}) {
   // Filtros da URL (busca da home, atalhos do rodapé, link compartilhado). No servidor a URL é vazia: o HTML traz a lista
   // completa (para o Google) e, no navegador, a lista já aparece filtrada logo depois de hidratar.
   const daUrl = useSyncExternalStore(semAssinatura, () => window.location.search, () => '')
@@ -212,6 +238,12 @@ export function ListaImoveis({ itens, textos: t, whatsapp }: { itens: ItemLista[
     () => [...new Map(itens.map((i) => [i.cidadeSlug, i.cidade])).entries()].sort((a, b) => a[1].localeCompare(b[1])),
     [itens],
   )
+  // Bairros de cada cidade, para o seletor agrupado por cidade (como na busca em português).
+  const bairros = useMemo(() => {
+    const porCidade = new Map<string, Map<string, string>>()
+    for (const i of itens) porCidade.set(i.cidadeSlug, (porCidade.get(i.cidadeSlug) ?? new Map()).set(i.bairroSlug, i.bairro))
+    return porCidade
+  }, [itens])
 
   const achados = useMemo(() => {
     const q = normalizarBusca(f.q)
@@ -219,11 +251,13 @@ export function ListaImoveis({ itens, textos: t, whatsapp }: { itens: ItemLista[
       (i) =>
         (!q || normalizarBusca(i.nome).includes(q) || i.codigo.toLowerCase().includes(q)) &&
         (!f.cidade || i.cidadeSlug === f.cidade) &&
+        (!f.bairro || i.bairroSlug === f.bairro) &&
         (!f.tipos.length || f.tipos.includes(i.tipo)) &&
         (!f.situacoes.length || f.situacoes.includes(i.situacao)) &&
         i.quartos >= f.quartos &&
         i.banheiros >= f.banheiros &&
-        (f.vagas === 0 || i.vagas >= f.vagas),
+        (f.vagas === 0 || i.vagas >= f.vagas) &&
+        (!f.precoMax || !cotacao || (i.preco > 0 && i.preco / cotacao <= f.precoMax)),
     )
     if (f.ordem === 'recentes') return filtrados
     // Sem preço ("sob consulta") fica no fim nas duas ordens de preço.
@@ -231,7 +265,7 @@ export function ListaImoveis({ itens, textos: t, whatsapp }: { itens: ItemLista[
     return [...filtrados].sort((a, b) =>
       f.ordem === 'menor-preco' ? preco(a) - preco(b) : f.ordem === 'maior-preco' ? preco(b) - preco(a) : b.area - a.area,
     )
-  }, [itens, f])
+  }, [itens, f, cotacao])
 
   const total = achados.length
   const totalPaginas = Math.max(1, Math.ceil(total / POR_PAGINA))
@@ -241,12 +275,14 @@ export function ListaImoveis({ itens, textos: t, whatsapp }: { itens: ItemLista[
 
   const chips: { chave: string; rotulo: string; remover: Partial<Filtros> }[] = [
     ...(f.q.trim() ? [{ chave: 'q', rotulo: `“${f.q.trim()}”`, remover: { q: '' } }] : []),
-    ...(f.cidade ? [{ chave: 'cidade', rotulo: cidades.find(([slug]) => slug === f.cidade)?.[1] ?? f.cidade, remover: { cidade: '' } }] : []),
+    ...(f.cidade ? [{ chave: 'cidade', rotulo: cidades.find(([slug]) => slug === f.cidade)?.[1] ?? f.cidade, remover: { cidade: '', bairro: '' } }] : []),
+    ...(f.cidade && f.bairro ? [{ chave: 'bairro', rotulo: bairros.get(f.cidade)?.get(f.bairro) ?? f.bairro, remover: { bairro: '' } }] : []),
     ...f.tipos.map((tp) => ({ chave: `tipo-${tp}`, rotulo: t.tipos[tp], remover: { tipos: f.tipos.filter((x) => x !== tp) } })),
     ...f.situacoes.map((st) => ({ chave: `sit-${st}`, rotulo: t.situacoes[st], remover: { situacoes: f.situacoes.filter((x) => x !== st) } })),
     ...(f.quartos ? [{ chave: 'quartos', rotulo: `${f.quartos}+ ${t.quartos.toLowerCase()}`, remover: { quartos: 0 } }] : []),
     ...(f.banheiros ? [{ chave: 'banheiros', rotulo: `${f.banheiros}+ ${t.banheiros.toLowerCase()}`, remover: { banheiros: 0 } }] : []),
     ...(f.vagas ? [{ chave: 'vagas', rotulo: `${f.vagas}+ ${t.vagas.toLowerCase()}`, remover: { vagas: 0 } }] : []),
+    ...(f.precoMax && cotacao ? [{ chave: 'preco', rotulo: precos.find((o) => o.valor === String(f.precoMax))?.rotulo ?? String(f.precoMax), remover: { precoMax: 0 } }] : []),
   ]
   const nAtivos = chips.filter((c) => c.chave !== 'q').length
   const contagem = chips.length
@@ -331,8 +367,30 @@ export function ListaImoveis({ itens, textos: t, whatsapp }: { itens: ItemLista[
                 <Seletor
                   aria-label={t.cidade}
                   valor={f.cidade}
-                  aoMudar={(v) => aplicar({ cidade: v })}
+                  aoMudar={(v) => aplicar({ cidade: v, bairro: '' })}
                   opcoes={[{ valor: '', rotulo: t.todasCidades }, ...cidades.map(([slug, nome]) => ({ valor: slug, rotulo: nome }))]}
+                />
+              </label>
+              <label className={`${s.rotuloCampo} ${s.rotuloForte}`}>
+                {t.bairro}
+                <Seletor
+                  aria-label={t.bairro}
+                  valor={f.cidade && f.bairro ? `${f.cidade}/${f.bairro}` : ''}
+                  aoMudar={(v) => {
+                    const [c, b] = v.split('/')
+                    aplicar(b ? { cidade: c!, bairro: b } : { bairro: '' })
+                  }}
+                  opcoes={[
+                    { valor: '', rotulo: t.todosBairros },
+                    ...cidades
+                      .filter(([slug]) => !f.cidade || slug === f.cidade)
+                      .map(([slug, nome]) => ({
+                        rotulo: nome,
+                        opcoes: [...(bairros.get(slug) ?? new Map<string, string>())]
+                          .sort((a, b) => a[1].localeCompare(b[1]))
+                          .map(([bs, bn]) => ({ valor: `${slug}/${bs}`, rotulo: bn })),
+                      })),
+                  ]}
                 />
               </label>
 
@@ -373,6 +431,18 @@ export function ListaImoveis({ itens, textos: t, whatsapp }: { itens: ItemLista[
               <Pilulas legenda={t.quartos} valor={f.quartos} opcoes={[[0, t.todos], [1, '1+'], [2, '2+'], [3, '3+'], [4, '4+']]} aoEscolher={(v) => aplicar({ quartos: v })} />
               <Pilulas legenda={t.banheiros} valor={f.banheiros} opcoes={[[0, t.todos], [1, '1+'], [2, '2+'], [3, '3+']]} aoEscolher={(v) => aplicar({ banheiros: v })} />
               <Pilulas legenda={t.vagas} valor={f.vagas} opcoes={[[0, t.todas], [1, '1+'], [2, '2+'], [3, '3+']]} aoEscolher={(v) => aplicar({ vagas: v })} />
+
+              {cotacao && precos.length > 0 && (
+                <label className={`${s.rotuloCampo} ${s.rotuloForte}`}>
+                  {t.precoMax}
+                  <Seletor
+                    aria-label={t.precoMax}
+                    valor={f.precoMax ? String(f.precoMax) : ''}
+                    aoMudar={(v) => aplicar({ precoMax: Number(v) || 0 })}
+                    opcoes={[{ valor: '', rotulo: t.qualquerPreco }, ...precos]}
+                  />
+                </label>
+              )}
             </div>
 
             <div className={s.painelRodape}>

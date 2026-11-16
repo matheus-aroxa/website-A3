@@ -22,18 +22,19 @@ const fr: Dicionario = {
     menuFechar: 'Fermer le menu',
     faleConosco: 'Contactez-nous',
     faleConoscoWhatsApp: 'Contactez-nous sur WhatsApp',
+    traducaoAutomatica: 'Traduction automatique',
   },
   inicio: {
     tituloSeo: 'Biens à vendre à Recife et sur la côte du Pernambouc, Brésil | A3',
     descricaoSeo:
       'Appartements et maisons près de la plage à Recife, Olinda et Paulista, au Brésil. A3 s’occupe de tout, du choix du bien jusqu’à l’acte de vente, même si vous achetez depuis l’étranger.',
-    titulo: 'Votre logement au',
-    tituloDestaque: 'Brésil.',
+    titulo: 'Chez vous',
+    tituloDestaque: 'au Brésil.',
     subtitulo:
-      'Chez {nome}, vous trouvez des appartements et des maisons près de la plage à Recife, Olinda et Paulista — avec un agent du premier contact à la remise des clés, même si vous achetez depuis un autre pays.',
+      'Chez {nome}, des appartements et maisons près de la plage à Recife et Paulista, avec un agent du premier contact aux clés — même depuis l’étranger.',
     busca: {
       titulo: 'Trouvez votre bien',
-      modos: ['Programmes neufs', 'Prêts à habiter', 'Tous'],
+      modos: ['Neufs', 'Prêts à habiter', 'Tous'],
       modosRotulo: 'État des travaux',
       tipo: 'Type de bien',
       cidade: 'Ville',
@@ -44,6 +45,7 @@ const fr: Dicionario = {
       buscar: 'Rechercher',
       maisFiltros: 'Plus de filtres',
       menosFiltros: 'Moins de filtres',
+      precoMax: 'Prix maximum',
     },
     destaquesSobretitulo: 'À la une',
     destaquesTitulo: 'Biens sélectionnés pour les acheteurs internationaux',
@@ -56,7 +58,7 @@ const fr: Dicionario = {
     servicos: [
       {
         titulo: 'Choisissez où que vous soyez',
-        texto: 'Photos, vidéos et visites en visioconférence de chaque bien, avec les prix en réais et la valeur approximative en euros.',
+        texto: 'Photos, vidéos et visites en visioconférence de chaque bien, avec les prix en euros.',
         link: 'Voir les biens',
       },
       {
@@ -112,7 +114,7 @@ const fr: Dicionario = {
   imoveis: {
     tituloSeo: 'Biens à vendre à Recife et dans le Pernambouc, Brésil',
     descricaoSeo:
-      'Appartements et maisons à vendre à Recife, Olinda et Paulista, sélectionnés pour les acheteurs internationaux. Prix en réais brésiliens avec la valeur approximative en euros.',
+      'Appartements et maisons à vendre à Recife, Olinda et Paulista, sélectionnés pour les acheteurs internationaux. Prix en euros.',
     titulo: 'Biens à vendre à Recife et dans le Pernambouc',
     intro: 'Logements prêts à habiter, en construction et programmes neufs, avec l’accompagnement d’un agent d’A3.',
     buscaRotulo: 'Rechercher par nom ou référence du bien',
@@ -128,6 +130,11 @@ const fr: Dicionario = {
     ordemMaiorArea: 'Plus grande surface',
     cidade: 'Ville',
     todasCidades: 'Toutes les villes',
+    bairro: 'Quartier',
+    todosBairros: 'Tous les quartiers',
+    precoMax: 'Prix maximum',
+    qualquerPreco: 'Tous les prix',
+    ateValor: 'Jusqu’à {valor}',
     tipo: 'Type de bien',
     situacao: 'État',
     quartos: 'Chambres',
@@ -172,15 +179,12 @@ const fr: Dicionario = {
     vagas: 'Places de parking',
     vagasCurto: 'Parking',
     vagaConsultar: 'Sur demande',
-    comSuite: 'avec suite parentale',
+    comSuite: 'avec suite',
     entrega: 'Livraison prévue',
-    entregaCard: 'Livraison {data}',
     codigo: 'Réf.',
     precoAPartirDe: 'À partir de',
     sobConsulta: 'Prix sur demande',
     precoNota: 'Le prix peut varier selon la disponibilité dans la grille du promoteur.',
-    precoOficial: 'Prix officiel : {valor}',
-    aproximadoNota: 'Valeur approximative au taux de change de la Banque centrale du Brésil du {data}. Le prix officiel est en réais brésiliens.',
     falarWhatsApp: 'WhatsApp',
     simularParcelas: 'Échéancier',
     andamento: 'Avancement des travaux',
@@ -326,6 +330,7 @@ const fr: Dicionario = {
     atendimentoTexto: 'Parlez à un agent sur WhatsApp ou via le formulaire de contact.',
     politica: 'Politique de confidentialité',
     pais: 'Brésil',
+    avisoTraducao: 'Cette page a été traduite automatiquement de l’anglais. En cas de doute, parlez à un agent.',
   },
   naoEncontrada: {
     titulo: 'Nous n’avons pas trouvé cette page',

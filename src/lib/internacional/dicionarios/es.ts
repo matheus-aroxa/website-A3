@@ -23,6 +23,7 @@ const es: Dicionario = {
     menuFechar: 'Cerrar el menú',
     faleConosco: 'Contáctanos',
     faleConoscoWhatsApp: 'Contáctanos por WhatsApp',
+    traducaoAutomatica: 'Traducción automática',
   },
   inicio: {
     tituloSeo: 'Inmuebles en venta en Recife y en la costa de Pernambuco, Brasil | A3',
@@ -31,10 +32,10 @@ const es: Dicionario = {
     titulo: 'Tu casa en',
     tituloDestaque: 'Brasil.',
     subtitulo:
-      'En {nome} encuentras departamentos y casas cerca de la playa en Recife, Olinda y Paulista — con un agente desde el primer contacto hasta la entrega de llaves, aunque compres desde otro país.',
+      'En {nome} encuentras departamentos y casas cerca de la playa en Recife y Paulista, con un agente del primer contacto a las llaves — también desde el exterior.',
     busca: {
       titulo: 'Encuentra tu inmueble',
-      modos: ['Lanzamientos', 'Listos para vivir', 'Todos'],
+      modos: ['Lanzamientos', 'Listos', 'Todos'],
       modosRotulo: 'Estado de la obra',
       tipo: 'Tipo de inmueble',
       cidade: 'Ciudad',
@@ -45,6 +46,7 @@ const es: Dicionario = {
       buscar: 'Buscar inmuebles',
       maisFiltros: 'Más filtros',
       menosFiltros: 'Menos filtros',
+      precoMax: 'Precio máximo',
     },
     destaquesSobretitulo: 'Destacados',
     destaquesTitulo: 'Inmuebles seleccionados para compradores internacionales',
@@ -57,7 +59,7 @@ const es: Dicionario = {
     servicos: [
       {
         titulo: 'Elige desde donde estés',
-        texto: 'Fotos, videos y visitas por videollamada de cada inmueble, con precios en reales y el valor aproximado en dólares.',
+        texto: 'Fotos, videos y visitas por videollamada de cada inmueble, con precios en dólares.',
         link: 'Ver inmuebles',
       },
       {
@@ -113,7 +115,7 @@ const es: Dicionario = {
   imoveis: {
     tituloSeo: 'Inmuebles en venta en Recife y Pernambuco, Brasil',
     descricaoSeo:
-      'Departamentos y casas en venta en Recife, Olinda y Paulista, seleccionados para compradores internacionales. Precios en reales brasileños con el valor aproximado en dólares.',
+      'Departamentos y casas en venta en Recife, Olinda y Paulista, seleccionados para compradores internacionales. Precios en dólares.',
     titulo: 'Inmuebles en venta en Recife y Pernambuco',
     intro: 'Inmuebles listos para vivir, en construcción y lanzamientos, con la atención de un agente de A3.',
     buscaRotulo: 'Buscar por nombre o código del inmueble',
@@ -129,6 +131,11 @@ const es: Dicionario = {
     ordemMaiorArea: 'Mayor superficie',
     cidade: 'Ciudad',
     todasCidades: 'Todas las ciudades',
+    bairro: 'Barrio',
+    todosBairros: 'Todos los barrios',
+    precoMax: 'Precio máximo',
+    qualquerPreco: 'Cualquier precio',
+    ateValor: 'Hasta {valor}',
     tipo: 'Tipo de inmueble',
     situacao: 'Estado',
     quartos: 'Dormitorios',
@@ -175,13 +182,10 @@ const es: Dicionario = {
     vagaConsultar: 'A consultar',
     comSuite: 'con suite',
     entrega: 'Entrega prevista',
-    entregaCard: 'Entrega {data}',
     codigo: 'Cód.',
     precoAPartirDe: 'Desde',
     sobConsulta: 'Precio a consultar',
     precoNota: 'El precio puede variar según la disponibilidad en la lista de la constructora.',
-    precoOficial: 'Precio oficial: {valor}',
-    aproximadoNota: 'Valor aproximado al tipo de cambio del Banco Central de Brasil del {data}. El precio oficial es en reales brasileños.',
     falarWhatsApp: 'WhatsApp',
     simularParcelas: 'Plan de pagos',
     andamento: 'Avance de la obra',
@@ -235,7 +239,7 @@ const es: Dicionario = {
   visita: {
     abasRotulo: '¿Cómo prefieres hablar con A3?',
     abaVisita: 'Agendar visita',
-    abaCorretor: 'Hablar con un agente',
+    abaCorretor: 'Contactar agente',
     diasTitulo: '¿Qué días puedes?',
     diasTexto: 'Marca los días de la semana que te quedan mejor — en persona o por videollamada.',
     dias: [
@@ -327,6 +331,7 @@ const es: Dicionario = {
     atendimentoTexto: 'Habla con un agente por WhatsApp o mediante el formulario de contacto.',
     politica: 'Política de privacidad',
     pais: 'Brasil',
+    avisoTraducao: 'Esta página fue traducida automáticamente del inglés. Si algo no queda claro, habla con un agente.',
   },
   naoEncontrada: {
     titulo: 'No encontramos esta página',

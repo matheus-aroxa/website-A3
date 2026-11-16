@@ -13,12 +13,19 @@ import type { TipoImovel } from '@/lib/imoveis/tipos'
 
 type Modo = 'lancamentos' | 'prontos' | ''
 
+export interface CidadeBusca {
+  slug: string
+  nome: string
+  bairros: { slug: string; nome: string }[]
+}
+
 export interface TextosBuscaInicial {
   titulo: string
   modos: [string, string, string]
   modosRotulo: string
   tipo: string
   cidade: string
+  bairro: string
   todos: string
   todas: string
   nome: string
@@ -26,6 +33,8 @@ export interface TextosBuscaInicial {
   buscar: string
   maisFiltros: string
   menosFiltros: string
+  precoMax: string
+  qualquerPreco: string
   quartos: string
   banheiros: string
   vagas: string
@@ -55,21 +64,27 @@ function Passo({ icone, rotulo, valor, max, aoMudar }: { icone: NomeIcone; rotul
 export function BuscaInicialInternacional({
   destino,
   cidades,
+  precos,
   textos: t,
 }: {
   /** Endereço da lista de imóveis no idioma (/en/properties). */
   destino: string
-  cidades: { slug: string; nome: string }[]
+  /** Cidades e bairros dos imóveis da área internacional. */
+  cidades: CidadeBusca[]
+  /** Opções de preço máximo na moeda do idioma (vazio sem cotação). */
+  precos: { valor: string; rotulo: string }[]
   textos: TextosBuscaInicial
 }) {
   const router = useRouter()
   const [modo, setModo] = useState<Modo>('lancamentos')
   const [tipo, setTipo] = useState('')
   const [cidade, setCidade] = useState('')
+  const [bairro, setBairro] = useState('')
   const [quartos, setQuartos] = useState(0)
   const [banheiros, setBanheiros] = useState(0)
   const [vagas, setVagas] = useState(0)
   const [q, setQ] = useState('')
+  const [precoMax, setPrecoMax] = useState('')
   const [maisFiltros, setMaisFiltros] = useState(false)
   const idMais = useId()
   const ativosMais = [quartos, banheiros, vagas].filter((v) => v > 0).length
@@ -80,10 +95,12 @@ export function BuscaInicialInternacional({
     if (modo) params.set('situacao', modo)
     if (tipo) params.set('tipo', tipo)
     if (cidade) params.set('cidade', cidade)
+    if (cidade && bairro) params.set('bairro', bairro)
     if (quartos) params.set('quartos', String(quartos))
     if (banheiros) params.set('banheiros', String(banheiros))
     if (vagas) params.set('vagas', String(vagas))
     if (q.trim()) params.set('q', q.trim())
+    if (precoMax) params.set('preco', precoMax)
     const query = params.toString()
     router.push(query ? `${destino}?${query}` : destino)
   }
@@ -105,7 +122,7 @@ export function BuscaInicialInternacional({
         </button>
       </div>
 
-      <div className={s.abas} role="group" aria-label={t.modosRotulo}>
+      <div className={`${s.abas} abas-modo`} role="group" aria-label={t.modosRotulo}>
         {modos.map((m) => (
           <button key={m.valor || 'todos'} type="button" aria-pressed={modo === m.valor} onClick={() => setModo(m.valor)}>
             {m.rotulo}
@@ -124,15 +141,38 @@ export function BuscaInicialInternacional({
             opcoes={[{ valor: '', rotulo: t.todos }, ...TIPOS.map((tp) => ({ valor: tp, rotulo: t.tipos[tp] }))]}
           />
         </label>
-        {/* Sem o campo de bairro do painel em português, a cidade ocupa a linha toda. */}
-        <label className={s.campo} style={{ gridColumn: '1 / -1' }}>
+        <label className={s.campo}>
           {t.cidade}
           <Seletor
-            className={s.escuro}
+            className={`${s.escuro} ${s.cidade}`}
             aria-label={t.cidade}
             valor={cidade}
-            aoMudar={setCidade}
+            aoMudar={(v) => {
+              setCidade(v)
+              setBairro('')
+            }}
             opcoes={[{ valor: '', rotulo: t.todas }, ...cidades.map((c) => ({ valor: c.slug, rotulo: c.nome }))]}
+          />
+        </label>
+        <label className={s.campo}>
+          {t.bairro}
+          <Seletor
+            className={`${s.escuro} ${s.bairro}`}
+            aria-label={t.bairro}
+            valor={cidade && bairro ? `${cidade}/${bairro}` : ''}
+            aoMudar={(v) => {
+              const [c, b] = v.split('/')
+              if (b) {
+                setCidade(c!)
+                setBairro(b)
+              } else setBairro('')
+            }}
+            opcoes={[
+              { valor: '', rotulo: t.todos },
+              ...cidades
+                .filter((c) => !cidade || c.slug === cidade)
+                .map((c) => ({ rotulo: c.nome, opcoes: c.bairros.map((b) => ({ valor: `${c.slug}/${b.slug}`, rotulo: b.nome })) })),
+            ]}
           />
         </label>
 
@@ -146,6 +186,20 @@ export function BuscaInicialInternacional({
           {t.nome}
           <input className={s.codigo} type="search" name="q" enterKeyHint="search" placeholder={t.nomeDica} value={q} onChange={(e) => setQ(e.target.value)} />
         </label>
+
+        {/* No lugar do quadro do Minha Casa Minha Vida da home em português (não vale para estrangeiros). */}
+        {precos.length > 0 && (
+          <label className={`${s.campo} ${s.extra}`}>
+            {t.precoMax}
+            <Seletor
+              className={s.escuro}
+              aria-label={t.precoMax}
+              valor={precoMax}
+              aoMudar={setPrecoMax}
+              opcoes={[{ valor: '', rotulo: t.qualquerPreco }, ...precos]}
+            />
+          </label>
+        )}
       </div>
 
       <button type="submit" className={`btn btn-sol ${s.buscar}`}>

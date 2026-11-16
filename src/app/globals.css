@@ -590,6 +590,25 @@ textarea.campo {
   box-shadow: 0 2px 6px rgba(14, 31, 29, 0.14);
 }
 
+/* ---------- Idiomas de tradução automática (/ja, /pl…) ----------
+   Os textos saem da tradução de máquina, com tamanho imprevisível: em vez de cortar, as abas quebram em até duas linhas
+   (todas da fila com a mesma altura) e palavras longas quebram com hífen. Os idiomas revisados e o português não mudam. */
+
+html[data-traducao='automatica'] .segmentado button,
+html[data-traducao='automatica'] .abas-modo button {
+  height: auto;
+  min-height: 44px;
+  padding-block: 6px;
+  white-space: normal;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+html[data-traducao='automatica'] :is(h1, h2, h3, .btn) {
+  hyphens: auto;
+  overflow-wrap: break-word;
+}
+
 /* ---------- Diversos ---------- */
 
 .elevar {

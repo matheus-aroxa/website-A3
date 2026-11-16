@@ -7,11 +7,9 @@ import { medirFormulario } from '@/lib/coleta/formulario'
 import { CAMPO_ARMADILHA, apenasDigitos, texto, type EstadoFormulario } from '@/lib/formularios'
 import { obterImovelPorId } from '@/lib/imoveis/repositorio'
 import { preencher } from '@/lib/internacional/dicionario'
-import { ehIdioma, type Idioma } from '@/lib/internacional/idiomas'
+import { DADOS_IDIOMA, idiomaDisponivel, type Idioma } from '@/lib/internacional/idiomas'
 import { dicionario } from '@/lib/internacional/textos'
 import { linkWhatsApp } from '@/lib/site'
-
-const NOME_IDIOMA_PT: Record<Idioma, string> = { en: 'inglês', it: 'italiano', es: 'espanhol', fr: 'francês', de: 'alemão' }
 
 /** Dias da semana da agenda de visita (mesmas chaves do formulário em português) e o nome em português, para a equipe. */
 const DIAS = [
@@ -30,7 +28,7 @@ const ehRobo = (fd: FormData) => texto(fd, CAMPO_ARMADILHA) !== ''
 
 function idiomaDo(fd: FormData): Idioma {
   const valor = texto(fd, 'idioma', 5)
-  return ehIdioma(valor) ? valor : 'en'
+  return idiomaDisponivel(valor) ? valor : 'en'
 }
 
 function valoresDe(fd: FormData) {
@@ -42,8 +40,8 @@ function valoresDe(fd: FormData) {
 }
 
 /** Nome, WhatsApp internacional (8 a 15 dígitos, com o código do país), e-mail opcional e autorização. */
-function validarPessoa(fd: FormData, idioma: Idioma) {
-  const d = dicionario(idioma).contato
+async function validarPessoa(fd: FormData, idioma: Idioma) {
+  const d = (await dicionario(idioma)).contato
   const dados = {
     nome: texto(fd, 'nome', 100),
     pais: texto(fd, 'pais', 60),
@@ -71,7 +69,7 @@ function mensagem(abertura: string, idioma: Idioma, linhas: [string, string | un
     .filter(([, valor]) => valor)
     .map(([rotulo, valor]) => `${rotulo}: ${valor}`)
     .join('\n')
-  return `${abertura}\n\n[Cliente internacional · ${NOME_IDIOMA_PT[idioma]}]\n${corpo}`
+  return `${abertura}\n\n[Cliente internacional · ${DADOS_IDIOMA[idioma].nomePortugues}]\n${corpo}`
 }
 
 async function falhou(formulario: 'contato' | 'visita' | 'corretor', erros: Erros, fd: FormData, imovelId?: string): Promise<EstadoFormulario> {
@@ -83,11 +81,11 @@ async function falhou(formulario: 'contato' | 'visita' | 'corretor', erros: Erro
 export async function enviarContatoInternacional(_: EstadoFormulario, fd: FormData): Promise<EstadoFormulario> {
   if (ehRobo(fd)) return { status: 'sucesso' }
   const idioma = idiomaDo(fd)
-  const { dados, erros } = validarPessoa(fd, idioma)
+  const { dados, erros } = await validarPessoa(fd, idioma)
   const mensagemDigitada = texto(fd, 'mensagem', 2000)
   if (Object.values(erros).some(Boolean)) return falhou('contato', erros, fd)
   await medirFormulario('formulario-enviado', 'contato')
-  const d = dicionario(idioma)
+  const d = await dicionario(idioma)
   return {
     status: 'sucesso',
     whatsapp: linkWhatsApp(
@@ -106,11 +104,11 @@ export async function enviarContatoInternacional(_: EstadoFormulario, fd: FormDa
 export async function solicitarVisitaInternacional(_: EstadoFormulario, fd: FormData): Promise<EstadoFormulario> {
   if (ehRobo(fd)) return { status: 'sucesso' }
   const idioma = idiomaDo(fd)
-  const d = dicionario(idioma)
+  const d = await dicionario(idioma)
   const imovel = await imovelDoFormulario(fd)
   const dias = fd.getAll('dias').filter((v): v is string => typeof v === 'string').slice(0, 7)
   const horarios = fd.getAll('horarios').filter((v): v is string => typeof v === 'string').slice(0, 11)
-  const { dados, erros } = validarPessoa(fd, idioma)
+  const { dados, erros } = await validarPessoa(fd, idioma)
   erros.agenda = dias.length && horarios.length ? undefined : d.visita.erroAgenda
   erros.imovel = imovel ? undefined : d.contato.erroImovel
   if (Object.values(erros).some(Boolean)) return falhou('visita', erros, fd, imovel?.id)
@@ -142,9 +140,9 @@ export async function solicitarVisitaInternacional(_: EstadoFormulario, fd: Form
 export async function falarComCorretorInternacional(_: EstadoFormulario, fd: FormData): Promise<EstadoFormulario> {
   if (ehRobo(fd)) return { status: 'sucesso' }
   const idioma = idiomaDo(fd)
-  const d = dicionario(idioma)
+  const d = await dicionario(idioma)
   const imovel = await imovelDoFormulario(fd)
-  const { dados, erros } = validarPessoa(fd, idioma)
+  const { dados, erros } = await validarPessoa(fd, idioma)
   erros.imovel = imovel ? undefined : d.contato.erroImovel
   if (Object.values(erros).some(Boolean)) return falhou('corretor', erros, fd, imovel?.id)
 
