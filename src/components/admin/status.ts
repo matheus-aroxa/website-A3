@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useTransition } from 'react'
-import { excluirImovel, mudarStatus, type AcaoStatus } from '@/app/admin/acoes'
+import { excluirImovel, mudarStatus, type AcaoStatus } from '@/app/(site)/admin/acoes'
 import type { StatusImovel } from '@/lib/imoveis/painel'
 import { useAvisar } from './Avisos'
 

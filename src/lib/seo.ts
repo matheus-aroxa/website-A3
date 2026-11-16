@@ -6,9 +6,10 @@ import { urlImovel } from './imoveis/rotas'
 import type { Imovel, ImovelResumo } from './imoveis/tipos'
 import { site, urlAbsoluta } from './site'
 
-const ID_ORGANIZACAO = `${site.url}/#imobiliaria`
+export const ID_ORGANIZACAO = `${site.url}/#imobiliaria`
 
-export function schemaImobiliaria() {
+/** A imobiliária e o site. A área internacional passa a descrição e o idioma da página. */
+export function schemaImobiliaria({ descricao = site.descricao, idioma = 'pt-BR' }: { descricao?: string; idioma?: string } = {}) {
   return {
     '@context': 'https://schema.org',
     '@graph': [
@@ -20,7 +21,7 @@ export function schemaImobiliaria() {
         url: site.url,
         logo: urlAbsoluta('/icon.png'),
         image: urlAbsoluta('/opengraph-image.jpg'),
-        description: site.descricao,
+        description: descricao,
         telephone: site.telefone,
         email: site.email,
         contactPoint: {
@@ -50,7 +51,7 @@ export function schemaImobiliaria() {
         url: site.url,
         name: site.nome,
         alternateName: site.nomeCurto,
-        inLanguage: 'pt-BR',
+        inLanguage: idioma,
         publisher: { '@id': ID_ORGANIZACAO },
       },
     ],
@@ -98,7 +99,7 @@ export function schemaListaImoveis(itens: ImovelResumo[], posicaoInicial: number
   }
 }
 
-const TIPO_SCHEMA = { apartamento: 'Apartment', 'casa-condominio': 'SingleFamilyResidence', terreno: 'Place' } as const
+export const TIPO_SCHEMA = { apartamento: 'Apartment', 'casa-condominio': 'SingleFamilyResidence', terreno: 'Place' } as const
 
 export function schemaAnuncio(im: Imovel) {
   const url = urlAbsoluta(urlImovel(im.slug))

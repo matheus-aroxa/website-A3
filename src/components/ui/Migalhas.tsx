@@ -5,9 +5,9 @@ import { schemaMigalhas } from '@/lib/seo'
 import s from './Migalhas.module.css'
 
 /** Trilha de navegação visível + BreadcrumbList (rich result do Google). */
-export function Migalhas({ itens, className }: { itens: Migalha[]; className?: string }) {
+export function Migalhas({ itens, className, rotulo = 'Você está em' }: { itens: Migalha[]; className?: string; rotulo?: string }) {
   return (
-    <nav aria-label="Você está em" className={`${s.migalhas} ${className ?? ''}`}>
+    <nav aria-label={rotulo} className={`${s.migalhas} ${className ?? ''}`}>
       <ol>
         {itens.map((m, i) => {
           const ultima = i === itens.length - 1

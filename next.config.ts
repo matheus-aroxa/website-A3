@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
   // (~40 s, pelo limite de chamadas deles). O padrão (60 s, e 54 s para cada "use cache") fica justo demais.
   staticPageGenerationTimeout: 180,
   partialPrefetching: true,
+  experimental: {
+    // 404 de endereços sem rota (app/global-not-found.tsx): há dois layouts raiz, o do site em português e o da área internacional.
+    globalNotFound: true,
+  },
   poweredByHeader: false,
   images: {
     formats: ['image/avif', 'image/webp'],

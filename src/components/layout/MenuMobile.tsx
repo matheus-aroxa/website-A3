@@ -14,15 +14,22 @@ interface LinkMenu {
   chave: string
 }
 
+export const TEXTOS_MENU = { abrir: 'Abrir menu', fechar: 'Fechar menu', faleConosco: 'Fale conosco' }
+
 export function MenuMobile({
   links,
   ativo,
   rodape,
+  textos = TEXTOS_MENU,
+  whatsapp = linkWhatsApp(),
 }: {
   links: readonly LinkMenu[]
   ativo?: string
   /** Substitui o "Fale conosco" e o CRECI do fim do menu (o painel usa para o "Sair"). */
   rodape?: ReactNode
+  textos?: typeof TEXTOS_MENU
+  /** Link do botão de WhatsApp do fim do menu (a área internacional abre com a mensagem no idioma). */
+  whatsapp?: string
 }) {
   const [aberto, setAberto] = useState(false)
   const botaoRef = useRef<HTMLButtonElement>(null)
@@ -49,7 +56,7 @@ export function MenuMobile({
         ref={botaoRef}
         type="button"
         className={`btn-icone btn ${s.abrir}`}
-        aria-label="Abrir menu"
+        aria-label={textos.abrir}
         aria-expanded={aberto}
         aria-controls="menu-mobile"
         onClick={() => setAberto(true)}
@@ -63,7 +70,7 @@ export function MenuMobile({
           <nav id="menu-mobile" aria-label="Menu" className={s.folha} role="dialog" aria-modal="true">
             <div className={s.topo}>
               <Image src={logo} alt={site.nome} width={41} height={36} />
-              <button ref={fecharRef} type="button" className="btn btn-icone" aria-label="Fechar menu" onClick={() => setAberto(false)}>
+              <button ref={fecharRef} type="button" className="btn btn-icone" aria-label={textos.fechar} onClick={() => setAberto(false)}>
                 <Icone nome="fechar" espessura={2} />
               </button>
             </div>
@@ -84,9 +91,9 @@ export function MenuMobile({
             </ul>
             {rodape ?? (
               <>
-                <a className="btn btn-sol btn-bloco" style={{ height: 54, fontSize: 16 }} href={linkWhatsApp()} target="_blank" rel="noopener" data-rastro="menu-mobile">
+                <a className="btn btn-sol btn-bloco" style={{ height: 54, fontSize: 16 }} href={whatsapp} target="_blank" rel="noopener" data-rastro="menu-mobile">
                   <Icone nome="whatsapp" tamanho={19} />
-                  Fale conosco
+                  {textos.faleConosco}
                 </a>
                 <span className={s.creci}>{site.creci}</span>
               </>

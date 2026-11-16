@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from 'next'
-import { Archivo } from 'next/font/google'
 import { Suspense } from 'react'
 import { preconnect } from 'react-dom'
 import { Rastreador } from '@/components/coleta/Rastreador'
@@ -10,16 +9,8 @@ import { fonteDosImoveis } from '@/lib/imoveis/fonte'
 import { HOST_VINIUN_FOTOS } from '@/lib/imoveis/hosts-fotos'
 import { schemaImobiliaria } from '@/lib/seo'
 import { URL_IMAGENS, openGraphBase, site } from '@/lib/site'
-import './globals.css'
-
-// Auto-hospedada pelo Next (sem requisição ao Google no navegador), com o eixo de
-// largura ("wdth") que o protótipo usa nos títulos via font-stretch.
-const archivo = Archivo({
-  subsets: ['latin'],
-  axes: ['wdth'],
-  display: 'swap',
-  variable: '--fonte-archivo',
-})
+import { archivo } from '../fonte'
+import '../globals.css'
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),

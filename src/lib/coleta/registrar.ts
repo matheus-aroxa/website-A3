@@ -42,8 +42,9 @@ async function idDoImovel(slug: string | undefined) {
   return imoveis.mapa.get(slug)
 }
 
-/** Imóvel da página: /imovel/[slug]. */
-const slugDoCaminho = (caminho: string) => /^\/imovel\/([^/]+)$/.exec(caminho)?.[1]
+/** Imóvel da página: /imovel/[slug] ou a ficha da área internacional (/en/properties/[slug], /it/immobili/[slug]…). */
+const slugDoCaminho = (caminho: string) =>
+  /^\/imovel\/([^/]+)$/.exec(caminho)?.[1] ?? /^\/(?:en|it|es|fr|de)\/[^/]+\/([^/]+)$/.exec(caminho)?.[1]
 
 // ---------- Limite por visitante ----------
 

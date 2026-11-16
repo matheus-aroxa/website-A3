@@ -41,6 +41,8 @@ import {
   urlImovel,
 } from '@/lib/imoveis/rotas'
 import { SLUG_CONSTRUTORA_PADRAO, type Imovel } from '@/lib/imoveis/tipos'
+import { alternativas, urlImovelInternacional, versoes } from '@/lib/internacional/idiomas'
+import { noRecorteInternacional } from '@/lib/internacional/recorte'
 import { schemaAnuncio } from '@/lib/seo'
 import { linkWhatsApp, openGraphBase } from '@/lib/site'
 import s from '@/components/imovel/Imovel.module.css'
@@ -65,7 +67,10 @@ export async function generateMetadata({ params }: PageProps<'/imovel/[slug]'>):
   return {
     title: { absolute: titulo },
     description: descricao,
-    alternates: { canonical: url },
+    // No recorte da área internacional, a ficha existe também em /en, /it…: o hreflang liga as versões.
+    alternates: noRecorteInternacional(im)
+      ? { canonical: url, languages: { 'pt-BR': url, ...alternativas((i) => urlImovelInternacional(i, im.slug)) } }
+      : { canonical: url },
     openGraph: {
       ...openGraphBase,
       title: titulo,
@@ -119,7 +124,11 @@ export default async function PaginaImovel({ params }: PageProps<'/imovel/[slug]
   const categoria = categoriaDoImovel(im)
   return (
     <>
-      <Cabecalho ativo="imoveis" variante="detalhe" />
+      <Cabecalho
+        ativo="imoveis"
+        variante="detalhe"
+        versoes={noRecorteInternacional(im) ? versoes((i) => urlImovelInternacional(i, im.slug), urlImovel(im.slug)) : undefined}
+      />
       <main id="conteudo">
         <div className={`container ${s.topo}`}>
           <Migalhas itens={migalhasDoImovel(im)} className={s.migalhas} />

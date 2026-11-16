@@ -11,11 +11,14 @@ export function MapaEstatico({
   legenda,
   altura,
   className,
+  rotulo,
 }: {
   consulta: string
   legenda: string
   altura?: number
   className?: string
+  /** Texto do link para leitores de tela (padrão: "Abrir … no Google Maps"). */
+  rotulo?: string
 }) {
   return (
     <a
@@ -24,7 +27,7 @@ export function MapaEstatico({
       rel="noopener"
       className={`${s.mapa} ${className ?? ''}`}
       style={altura ? { height: altura } : undefined}
-      aria-label={`Abrir ${consulta} no Google Maps`}
+      aria-label={rotulo ?? `Abrir ${consulta} no Google Maps`}
       data-evento="mapa"
     >
       <Image src={mapa} alt="" fill sizes="(max-width: 767px) 100vw, 800px" />

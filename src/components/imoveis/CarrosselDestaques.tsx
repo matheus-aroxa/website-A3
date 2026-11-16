@@ -1,14 +1,13 @@
 'use client'
 
 // Destaques da home. Até `porVez` imóveis ficam em grade, sem controles. Com mais, viram um carrossel de rolagem
-// (scroll-snap) que passa sozinho de tempos em tempos, tem botões de anterior/próximo e dá a volta ao chegar no fim.
+// (scroll-snap) com botões de anterior/próximo, que dá a volta ao chegar no fim. Não passa sozinho: só anda quando a
+// pessoa usa as setas ou rola.
 // Os cards chegam prontos do servidor (`children`); aqui só entra a navegação.
 
 import { Children, useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { Icone } from '@/components/ui/Icone'
 import s from './CarrosselDestaques.module.css'
-
-const INTERVALO_MS = 6000
 
 /** Tamanho de um passo (os cards que cabem de uma vez) e até onde dá para rolar. */
 function medidas(el: HTMLElement) {
@@ -18,15 +17,11 @@ function medidas(el: HTMLElement) {
   const porPagina = Math.max(1, Math.round((el.clientWidth + gap) / largura))
   return { passo: porPagina * largura, fim: el.scrollWidth - el.clientWidth }
 }
-/** Depois de tocar na tela, o carrossel espera um pouco antes de voltar a passar sozinho. */
-const RETOMAR_APOS_TOQUE_MS = 5000
 
 export function CarrosselDestaques({ children, porVez, classeGrade }: { children: ReactNode; porVez: number; classeGrade?: string }) {
   const itens = Children.toArray(children)
   const carrossel = itens.length > porVez
   const pista = useRef<HTMLDivElement>(null)
-  const pausado = useRef(false)
-  const retomar = useRef<ReturnType<typeof setTimeout>>(undefined)
   const [rolavel, setRolavel] = useState(false)
   const [paginas, setPaginas] = useState({ total: 1, atual: 0 })
 
@@ -62,16 +57,6 @@ export function CarrosselDestaques({ children, porVez, classeGrade }: { children
     el.scrollTo({ left: alvo, behavior: reduzido ? 'auto' : 'smooth' })
   }, [])
 
-  // Passa sozinho, a não ser que a pessoa esteja interagindo, a aba esteja em segundo plano ou ela prefira menos movimento.
-  useEffect(() => {
-    if (!carrossel || !rolavel || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    const tempo = setInterval(() => {
-      if (!pausado.current && !document.hidden) passar(1)
-    }, INTERVALO_MS)
-    return () => clearInterval(tempo)
-  }, [carrossel, rolavel, passar])
-  useEffect(() => () => clearTimeout(retomar.current), [])
-
   if (!carrossel) {
     return (
       <div className={`${classeGrade ?? ''} carrossel-mobile`} data-revelar-filhos>
@@ -80,28 +65,8 @@ export function CarrosselDestaques({ children, porVez, classeGrade }: { children
     )
   }
 
-  const pausar = () => {
-    clearTimeout(retomar.current)
-    pausado.current = true
-  }
-  const continuar = (apos = 0) => {
-    clearTimeout(retomar.current)
-    retomar.current = setTimeout(() => (pausado.current = false), apos)
-  }
-
   return (
-    <div
-      className={s.carrossel}
-      role="region"
-      aria-roledescription="carrossel"
-      aria-label="Imóveis em destaque"
-      onMouseEnter={pausar}
-      onMouseLeave={() => continuar()}
-      onFocus={pausar}
-      onBlur={() => continuar()}
-      onTouchStart={pausar}
-      onTouchEnd={() => continuar(RETOMAR_APOS_TOQUE_MS)}
-    >
+    <div className={s.carrossel} role="region" aria-roledescription="carrossel" aria-label="Imóveis em destaque">
       {/* Setas nas laterais, fora dos cards (no celular, sem espaço ao lado, vão para a linha de baixo, com os pontos). */}
       <div className={s.palco} data-controles={rolavel || undefined}>
         <div ref={pista} className={s.pista} data-revelar-filhos>

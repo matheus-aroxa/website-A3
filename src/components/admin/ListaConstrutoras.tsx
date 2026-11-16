@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useMemo, useState, useTransition } from 'react'
-import { cadastrarConstrutora, excluirConstrutoraAcao, renomearConstrutoraAcao } from '@/app/admin/acoes'
+import { cadastrarConstrutora, excluirConstrutoraAcao, renomearConstrutoraAcao } from '@/app/(site)/admin/acoes'
 import { Icone } from '@/components/ui/Icone'
 import type { ConstrutoraAdmin } from '@/lib/imoveis/construtoras'
 import { normalizarBusca } from '@/lib/imoveis/formato'

@@ -82,7 +82,7 @@ const BLOCOS = [
    ) f WHERE n > 0`,
   porVisita('hora', `extract(hour from em AT TIME ZONE ${FUSO})::int::text`),
   porVisita('pagina', 'caminho'),
-  porVisita('tipo-pagina', "CASE WHEN caminho = '/' THEN 'home' WHEN caminho LIKE '/imoveis%' THEN 'busca' WHEN caminho LIKE '/imovel/%' THEN 'imovel' ELSE 'outras' END"),
+  porVisita('tipo-pagina', "CASE WHEN caminho = '/' THEN 'home' WHEN caminho LIKE '/imoveis%' THEN 'busca' WHEN caminho LIKE '/imovel/%' OR caminho ~ '^/(en|it|es|fr|de)/[^/]+/[^/]+$' THEN 'imovel' ELSE 'outras' END"),
   // Imóveis: visitas e, em sessões, quantas terminaram em contato sobre aquele imóvel.
   `SELECT 'imovel', '', v.imovel_id, v.visitas, v.visitantes, v.sessoes, 0, COALESCE(c.n, 0)::int, v.com_medida, v.tempo, v.rolagem
      FROM (

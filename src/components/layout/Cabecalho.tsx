@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import logo from '@/assets/marca/logo-a3.png'
 import { Icone } from '@/components/ui/Icone'
+import { SeletorIdioma, type Versoes } from '@/components/internacional/SeletorIdioma'
 import { BotaoCompartilhar } from '@/components/ui/BotaoCompartilhar'
 import { site } from '@/lib/site'
 import { LinkInicio } from './LinkInicio'
@@ -12,10 +13,13 @@ import s from './Cabecalho.module.css'
 export function Cabecalho({
   ativo,
   variante = 'padrao',
+  versoes = {},
 }: {
   ativo?: (typeof LINKS_PRINCIPAIS)[number]['chave']
   /** "detalhe": no celular troca o logo por "‹ Imóveis" e mostra o botão de compartilhar. */
   variante?: 'padrao' | 'detalhe'
+  /** Esta página nos outros idiomas (só a ficha de imóvel do recorte internacional tem); sem a versão, vai à página inicial do idioma. */
+  versoes?: Versoes
 }) {
   const detalhe = variante === 'detalhe'
   return (
@@ -46,6 +50,7 @@ export function Cabecalho({
 
         <div className={s.acoes}>
           {detalhe && <BotaoCompartilhar className={s.compartilhar} />}
+          <SeletorIdioma idioma="pt" versoes={versoes} rotulo="Idioma" portugues="Português" />
           <MenuMobile links={LINKS_PRINCIPAIS} ativo={ativo} />
         </div>
       </div>
