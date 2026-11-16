@@ -7,10 +7,11 @@ import { fotosComCapaPrimeiro } from '@/lib/imoveis/busca'
 import { buscarPagina } from '@/lib/imoveis/consultas-site'
 import { FILTROS_PADRAO } from '@/lib/imoveis/filtros'
 import { TAG_IMOVEIS, TAG_VITRINE } from '@/lib/imoveis/fonte'
-import { listarDestaques, listarIndice, obterImovelPorSlug } from '@/lib/imoveis/repositorio'
+import { obterVitrineInternacional } from '@/lib/imoveis/banco'
+import { LIMITE_DESTAQUES, listarDestaques, listarIndice, obterImovelPorSlug } from '@/lib/imoveis/repositorio'
 import type { Foto, Imovel, ImovelResumo } from '@/lib/imoveis/tipos'
 import { formatarQuartos } from './formato'
-import type { Idioma } from './idiomas'
+import { ehRevisado, type Idioma } from './idiomas'
 import { traduzirItemLazer } from './lazer'
 import { noRecorteInternacional } from './recorte'
 import { dicionario } from './textos'
@@ -36,16 +37,47 @@ export async function listarImoveisInternacionais(): Promise<ResumoInternacional
   })
 }
 
-/** Destaques da área internacional: os da vitrine da home que estão no recorte; faltando, completa com os mais recentes. */
-export async function listarDestaquesInternacionais(quantos = 6): Promise<ResumoInternacional[]> {
-  'use cache'
-  cacheLife('hours')
-  cacheTag(TAG_IMOVEIS, TAG_VITRINE)
-  const [destaques, todos] = await Promise.all([listarDestaques(), listarImoveisInternacionais()])
+/** Quantos destaques a página inicial internacional mostra no máximo (o mesmo limite da home em português). */
+const LIMITE_DESTAQUES_INTERNACIONAIS = LIMITE_DESTAQUES
+
+/** Seleção automática, para o idioma que nunca teve a vitrine configurada no painel. */
+async function vitrineAutomatica(todos: ResumoInternacional[]) {
+  const destaques = await listarDestaques()
   const porSlug = new Map(todos.map((im) => [im.slug, im]))
   const escolhidos = destaques.flatMap((d) => porSlug.get(d.slug) ?? [])
   const resto = todos.filter((im) => !escolhidos.includes(im))
-  return [...escolhidos, ...resto].slice(0, quantos)
+  return [...escolhidos, ...resto].slice(0, LIMITE_DESTAQUES_INTERNACIONAIS)
+}
+
+export interface VitrineInternacional {
+  /** Imóvel do topo da página inicial do idioma. */
+  heroi?: ResumoInternacional
+  destaques: ResumoInternacional[]
+  /** Se a vitrine foi escolhida no painel (falso: seleção automática). */
+  personalizada: boolean
+}
+
+/**
+ * Vitrine da página inicial de cada idioma: a escolhida no painel (/admin/vitrine, aba do idioma) ou, se o idioma nunca foi
+ * configurado, a seleção automática (os destaques da home em português que estão no recorte, completados com os mais
+ * recentes). Só entram imóveis do recorte que estão no site; o que saiu some sozinho. Sem imóvel do topo escolhido (ou se
+ * ele saiu do site), o topo é o primeiro destaque.
+ */
+export async function vitrineInternacional(idioma: Idioma): Promise<VitrineInternacional> {
+  'use cache'
+  // Os idiomas automáticos não têm vitrine própria no painel: usam a do inglês.
+  if (!ehRevisado(idioma)) return vitrineInternacional('en')
+  cacheLife('hours')
+  cacheTag(TAG_IMOVEIS, TAG_VITRINE)
+  const [todos, escolhida] = await Promise.all([listarImoveisInternacionais(), obterVitrineInternacional(idioma)])
+  if (!escolhida) {
+    const destaques = await vitrineAutomatica(todos)
+    return { heroi: destaques[0], destaques, personalizada: false }
+  }
+  const porId = new Map(todos.map((im) => [im.id, im]))
+  const destaques = escolhida.destaques.flatMap((id) => porId.get(id) ?? [])
+  const heroi = (escolhida.heroi ? porId.get(escolhida.heroi) : undefined) ?? destaques[0] ?? todos[0]
+  return { heroi, destaques, personalizada: true }
 }
 
 export interface ImovelInternacional extends Imovel {
@@ -64,7 +96,7 @@ export async function obterImovelInternacional(slug: string, idioma: Idioma): Pr
 }
 
 async function traduzirImovel(im: Imovel, idioma: Idioma): Promise<ImovelInternacional> {
-  const d = dicionario(idioma)
+  const d = await dicionario(idioma)
   const lazerPronto = im.lazer.map((item) => traduzirItemLazer(item, idioma))
   const proximidadesProntas = im.proximidades.map((item) => traduzirItemLazer(item, idioma))
   const legendas = [...im.fotos, ...(im.capa ? [im.capa] : [])].flatMap((f) => (f.legenda ? [f.legenda] : []))

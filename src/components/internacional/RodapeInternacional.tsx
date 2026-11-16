@@ -2,13 +2,13 @@ import Image from 'next/image'
 import Link from 'next/link'
 import logoNegativo from '@/assets/marca/logo-a3-negativo.png'
 import s from '@/components/layout/Rodape.module.css'
-import { urlInicio, urlSecao, type Idioma } from '@/lib/internacional/idiomas'
+import { ehRevisado, urlInicio, urlSecao, type Idioma } from '@/lib/internacional/idiomas'
 import { dicionario } from '@/lib/internacional/textos'
 import { anoAtual, linkWhatsApp, site } from '@/lib/site'
 
 /** O rodapé do site em português (components/layout/Rodape), com os textos e os links da área internacional. */
-export function RodapeInternacional({ idioma, comBarraInferior = false }: { idioma: Idioma; comBarraInferior?: boolean }) {
-  const d = dicionario(idioma)
+export async function RodapeInternacional({ idioma, comBarraInferior = false }: { idioma: Idioma; comBarraInferior?: boolean }) {
+  const d = await dicionario(idioma)
   const imoveis = urlSecao(idioma, 'imoveis')
   const navegacao = [
     { href: imoveis, rotulo: d.nav.imoveis },
@@ -64,6 +64,7 @@ export function RodapeInternacional({ idioma, comBarraInferior = false }: { idio
             </address>
           </div>
         </div>
+        {!ehRevisado(idioma) && <p className={s.avisoTraducao}>{d.rodape.avisoTraducao}</p>}
         <div className={s.base}>
           <span>
             © {anoAtual} {site.nome} · {site.creci}

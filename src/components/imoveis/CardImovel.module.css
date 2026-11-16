@@ -155,12 +155,6 @@
   font-size: 25px;
 }
 
-.extra {
-  font-size: 13px;
-  color: var(--texto-2);
-  text-align: right;
-}
-
 @media (max-width: 767px) {
   .foto,
   .card[data-variante='destaque'] .foto {
@@ -182,8 +176,7 @@
   .atributos {
     gap: 6px 14px;
   }
-  .preco span,
-  .extra {
+  .preco span {
     font-size: 12px;
   }
   .preco strong,

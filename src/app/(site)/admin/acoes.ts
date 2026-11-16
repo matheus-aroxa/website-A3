@@ -14,13 +14,15 @@ import {
   excluirImovelNoBanco,
   gravarImovel,
   gravarVitrine,
+  gravarVitrineInternacional,
   inserirImovel,
   mudarStatusNoBanco,
   obterRegistro,
   slugDaCidade,
   slugsEmUso,
 } from '@/lib/imoveis/banco'
-import { idsParaVitrine } from '@/lib/admin/catalogo'
+import { idsParaVitrine, idsParaVitrineInternacional } from '@/lib/admin/catalogo'
+import { DADOS_IDIOMA, ehRevisado } from '@/lib/internacional/idiomas'
 import {
   criarConstrutora,
   excluirConstrutora,
@@ -329,6 +331,9 @@ export async function salvarVitrine(_: EstadoFormulario, fd: FormData): Promise<
   const admin = await exigirAdmin()
   const heroi = fd.get('heroi')
   const pedidos = [...new Set(fd.getAll('destaques'))].filter((id): id is string => typeof id === 'string')
+  // Vitrine de um idioma da área internacional (aba do idioma no painel).
+  const idioma = fd.get('idioma')
+  if (typeof idioma === 'string' && idioma) return salvarVitrineInternacional(idioma, heroi, pedidos, admin.email)
   const publicados = await idsParaVitrine([...pedidos, ...(typeof heroi === 'string' ? [heroi] : [])])
   const ativo = (id: unknown): id is string => typeof id === 'string' && publicados.has(id)
   const destaques = pedidos.filter(ativo)
@@ -343,6 +348,27 @@ export async function salvarVitrine(_: EstadoFormulario, fd: FormData): Promise<
   updateTag(TAG_VITRINE)
   refresh()
   return { status: 'sucesso', mensagem: 'Vitrine atualizada. A home já mostra a nova seleção.' }
+}
+
+/** A vitrine da página inicial de um idioma (/en, /it…): só imóveis publicados e do recorte internacional. */
+async function salvarVitrineInternacional(idioma: string, heroi: FormDataEntryValue | null, pedidos: string[], autor: string): Promise<EstadoFormulario> {
+  if (!ehRevisado(idioma)) return { status: 'erro', mensagem: 'Idioma inválido.' }
+  const permitidos = await idsParaVitrineInternacional([...pedidos, ...(typeof heroi === 'string' ? [heroi] : [])])
+  const ativo = (id: unknown): id is string => typeof id === 'string' && permitidos.has(id)
+  const destaques = pedidos.filter(ativo)
+  if (!ativo(heroi)) return { status: 'erro', mensagem: 'Escolha o imóvel do topo (ele precisa estar publicado e na área internacional).' }
+  if (destaques.length > LIMITE_DESTAQUES) return { status: 'erro', mensagem: `A página mostra no máximo ${LIMITE_DESTAQUES} destaques.` }
+  try {
+    await gravarVitrineInternacional(idioma, { heroi, destaques }, autor)
+  } catch (erro) {
+    if ((erro as { code?: string }).code === '42P01') {
+      return { status: 'erro', mensagem: 'A vitrine dos idiomas ainda não está no banco: rode db/vitrine-internacional.sql no Supabase.' }
+    }
+    throw erro
+  }
+  updateTag(TAG_VITRINE)
+  refresh()
+  return { status: 'sucesso', mensagem: `Vitrine em ${DADOS_IDIOMA[idioma].nome} atualizada.` }
 }
 
 // ---------- Construtoras ----------

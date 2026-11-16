@@ -2,13 +2,14 @@ import type { MetadataRoute } from 'next'
 import { listarIndiceComFotos, listarPaginasDeBusca } from '@/lib/imoveis/repositorio'
 import { urlImovel } from '@/lib/imoveis/rotas'
 import { listarImoveisInternacionais } from '@/lib/internacional/catalogo'
-import { IDIOMAS, alternativas, urlImovelInternacional, urlInicio, urlSecao, type Idioma, type Secao } from '@/lib/internacional/idiomas'
+import { IDIOMAS_REVISADOS, alternativas, urlImovelInternacional, urlInicio, urlSecao, type Idioma, type Secao } from '@/lib/internacional/idiomas'
 import { urlAbsoluta } from '@/lib/site'
 
 /** Cada página da área internacional entra uma vez por idioma, com as outras versões ligadas (hreflang). */
 function emTodosOsIdiomas(caminho: (idioma: Idioma) => string, extra: Omit<MetadataRoute.Sitemap[number], 'url'>, portugues?: string) {
   const languages = Object.fromEntries(Object.entries(alternativas(caminho, portugues)).map(([lang, url]) => [lang, urlAbsoluta(url)]))
-  return IDIOMAS.map((idioma) => ({ ...extra, url: urlAbsoluta(caminho(idioma)), alternates: { languages } }))
+  // Só os idiomas revisados (os automáticos não vão para o Google).
+  return IDIOMAS_REVISADOS.map((idioma) => ({ ...extra, url: urlAbsoluta(caminho(idioma)), alternates: { languages } }))
 }
 
 const maisRecente = (datas: string[]) => datas.sort().at(-1)

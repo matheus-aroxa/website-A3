@@ -111,12 +111,6 @@ export function etiquetaImovel(imovel: Pick<ImovelResumo, 'finalidade' | 'situac
   return imovel.finalidade === 'aluguel' ? 'Para alugar' : rotuloSituacao[imovel.situacao]
 }
 
-/** Texto do canto inferior direito do card: previsão de entrega ou código. */
-export function rodapeCard(imovel: Pick<ImovelResumo, 'entrega' | 'situacao' | 'codigo'>) {
-  if (imovel.entrega && imovel.situacao !== 'pronto') return `Entrega ${formatarEntregaCurta(imovel.entrega)}`
-  return `Cód. ${imovel.codigo}`
-}
-
 /** Nome de bairro como vem do cadastro, com os numerais romanos em maiúsculas ("Merepe Ii" vira "Merepe II"). */
 export function nomeDoLocal(nome: string) {
   return nome.replace(/\b(Ii|Iii|Iv|Vi|Vii|Viii|Ix)\b/g, (numeral) => numeral.toUpperCase())

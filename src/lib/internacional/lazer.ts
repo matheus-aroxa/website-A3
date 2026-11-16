@@ -2,9 +2,10 @@
 // imobiliário de cada idioma e não gastam o limite do serviço de tradução. O que não está aqui vai para a tradução
 // automática (traducao.ts). A chave é o texto em português sem acento, em minúsculas.
 import { normalizarBusca } from '@/lib/imoveis/formato'
-import type { Idioma } from './idiomas'
+import { ehRevisado, type Idioma, type IdiomaRevisado } from './idiomas'
 
-type Traducao = Record<Idioma, string>
+// Só os idiomas revisados; nos automáticos, todo item vai para a tradução automática.
+type Traducao = Record<IdiomaRevisado, string>
 
 const ITENS: Record<string, Traducao> = {
   piscina: { en: 'Swimming pool', it: 'Piscina', es: 'Piscina', fr: 'Piscine', de: 'Swimmingpool' },
@@ -117,5 +118,5 @@ const ITENS: Record<string, Traducao> = {
 /** Tradução pronta do item (lazer ou proximidade), ou `undefined` quando ele precisa ir para a tradução automática. */
 export function traduzirItemLazer(item: string, idioma: Idioma): string | undefined {
   const chave = normalizarBusca(item).replace(/[;:.,]+$/, '').replace(/[-–]/g, ' ').replace(/\s+/g, ' ').trim()
-  return ITENS[chave]?.[idioma]
+  return ehRevisado(idioma) ? ITENS[chave]?.[idioma] : undefined
 }

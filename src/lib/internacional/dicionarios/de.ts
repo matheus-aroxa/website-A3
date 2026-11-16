@@ -21,6 +21,7 @@ const de: Dicionario = {
     menuFechar: 'Menü schließen',
     faleConosco: 'Kontakt',
     faleConoscoWhatsApp: 'Kontakt über WhatsApp',
+    traducaoAutomatica: 'Automatische Übersetzung',
   },
   inicio: {
     tituloSeo: 'Immobilien kaufen in Recife und an der Küste von Pernambuco, Brasilien | A3',
@@ -29,10 +30,10 @@ const de: Dicionario = {
     titulo: 'Ihr Zuhause in',
     tituloDestaque: 'Brasilien.',
     subtitulo:
-      'Bei {nome} finden Sie Wohnungen und Häuser in Strandnähe in Recife, Olinda und Paulista – mit einem Makler vom ersten Kontakt bis zur Schlüsselübergabe, auch wenn Sie aus einem anderen Land kaufen.',
+      'Bei {nome} finden Sie Wohnungen und Häuser in Strandnähe in Recife und Paulista – mit einem Makler vom ersten Kontakt bis zum Schlüssel, auch aus dem Ausland.',
     busca: {
       titulo: 'Immobilie finden',
-      modos: ['Neubauprojekte', 'Bezugsfertig', 'Alle'],
+      modos: ['Neubau', 'Bezugsfertig', 'Alle'],
       modosRotulo: 'Baufortschritt',
       tipo: 'Immobilienart',
       cidade: 'Stadt',
@@ -43,19 +44,20 @@ const de: Dicionario = {
       buscar: 'Immobilien suchen',
       maisFiltros: 'Mehr Filter',
       menosFiltros: 'Weniger Filter',
+      precoMax: 'Höchstpreis',
     },
     destaquesSobretitulo: 'Empfehlungen',
     destaquesTitulo: 'Ausgewählte Immobilien für internationale Käufer',
     verTodos: 'Alle Immobilien ansehen',
     servicosSobretitulo: 'So helfen wir',
-    servicosTitulo: 'Vom ersten Videoanruf bis',
-    servicosTituloDestaque: 'zur Schlüsselübergabe',
+    servicosTitulo: 'Vom ersten Anruf',
+    servicosTituloDestaque: 'bis zum Schlüssel',
     servicosTexto:
       'Ein Makler von A3 begleitet jeden Schritt: die Auswahl der Immobilie, die Besichtigung, die Unterlagen und die Beurkundung – auch aus dem Ausland.',
     servicos: [
       {
         titulo: 'Von überall auswählen',
-        texto: 'Fotos, Videos und Besichtigungen per Videoanruf für jede Immobilie, mit Preisen in Real und dem ungefähren Wert in Euro.',
+        texto: 'Fotos, Videos und Besichtigungen per Videoanruf für jede Immobilie, mit Preisen in Euro.',
         link: 'Immobilien ansehen',
       },
       {
@@ -111,7 +113,7 @@ const de: Dicionario = {
   imoveis: {
     tituloSeo: 'Immobilien kaufen in Recife und Pernambuco, Brasilien',
     descricaoSeo:
-      'Wohnungen und Häuser zum Kauf in Recife, Olinda und Paulista, ausgewählt für internationale Käufer. Preise in brasilianischen Real mit dem ungefähren Wert in Euro.',
+      'Wohnungen und Häuser zum Kauf in Recife, Olinda und Paulista, ausgewählt für internationale Käufer. Preise in Euro.',
     titulo: 'Immobilien zum Kauf in Recife und Pernambuco',
     intro: 'Bezugsfertige Immobilien, Objekte im Bau und Neubauprojekte – mit der Betreuung durch einen Makler von A3.',
     buscaRotulo: 'Nach Name oder Referenz der Immobilie suchen',
@@ -127,6 +129,11 @@ const de: Dicionario = {
     ordemMaiorArea: 'Größte Fläche',
     cidade: 'Stadt',
     todasCidades: 'Alle Städte',
+    bairro: 'Stadtteil',
+    todosBairros: 'Alle Stadtteile',
+    precoMax: 'Höchstpreis',
+    qualquerPreco: 'Beliebiger Preis',
+    ateValor: 'Bis {valor}',
     tipo: 'Immobilienart',
     situacao: 'Status',
     quartos: 'Schlafzimmer',
@@ -173,13 +180,10 @@ const de: Dicionario = {
     vagaConsultar: 'Auf Anfrage',
     comSuite: 'mit eigenem Bad',
     entrega: 'Voraussichtliche Fertigstellung',
-    entregaCard: 'Fertigstellung {data}',
     codigo: 'Ref.',
     precoAPartirDe: 'Ab',
     sobConsulta: 'Preis auf Anfrage',
     precoNota: 'Der Preis kann sich je nach Verfügbarkeit in der Preisliste des Bauträgers ändern.',
-    precoOficial: 'Offizieller Preis: {valor}',
-    aproximadoNota: 'Ungefährer Wert zum Wechselkurs der brasilianischen Zentralbank vom {data}. Der offizielle Preis ist in brasilianischen Real.',
     falarWhatsApp: 'WhatsApp',
     simularParcelas: 'Zahlungsplan',
     andamento: 'Baufortschritt',
@@ -232,7 +236,7 @@ const de: Dicionario = {
   },
   visita: {
     abasRotulo: 'Wie möchten Sie mit A3 sprechen?',
-    abaVisita: 'Besichtigung planen',
+    abaVisita: 'Besichtigung',
     abaCorretor: 'Mit Makler sprechen',
     diasTitulo: 'An welchen Tagen passt es Ihnen?',
     diasTexto: 'Wählen Sie die Wochentage, die Ihnen am besten passen – vor Ort oder per Videoanruf.',
@@ -325,6 +329,7 @@ const de: Dicionario = {
     atendimentoTexto: 'Sprechen Sie mit einem Makler über WhatsApp oder das Kontaktformular.',
     politica: 'Datenschutzerklärung',
     pais: 'Brasilien',
+    avisoTraducao: 'Diese Seite wurde automatisch aus dem Englischen übersetzt. Bei Fragen wenden Sie sich an einen Makler.',
   },
   naoEncontrada: {
     titulo: 'Diese Seite wurde nicht gefunden',

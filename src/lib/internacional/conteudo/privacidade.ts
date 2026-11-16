@@ -2,14 +2,14 @@
 // internacional. O texto em português é o oficial: cada tradução avisa isso no começo. Mudou a política em português?
 // Atualize as traduções aqui.
 import { site } from '@/lib/site'
-import type { Idioma } from '../idiomas'
+import type { IdiomaRevisado } from '../idiomas'
 import type { Artigo } from './tipos'
 
 const empresa = `${site.nome} (${site.creci})`
 const endereco = site.endereco.exibicao
 const contato = `${site.email} · WhatsApp ${site.telefone}`
 
-export const privacidade: Record<Idioma, Artigo> = {
+export const privacidade: Record<IdiomaRevisado, Artigo> = {
   en: {
     tituloSeo: 'Privacy policy',
     descricaoSeo: `How ${site.nome} handles the data you provide in the website forms and on WhatsApp, under Brazil’s data protection law (LGPD).`,

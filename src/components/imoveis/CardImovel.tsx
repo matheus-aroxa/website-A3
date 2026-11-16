@@ -8,7 +8,6 @@ import {
   formatarPreco,
   formatarQuartos,
   formatarVagas,
-  rodapeCard,
   rotuloPreco,
   rotuloTipo,
 } from '@/lib/imoveis/formato'
@@ -95,7 +94,6 @@ export function CardImovel({
             <span>{rotuloPreco(imovel.finalidade)}</span>
             <strong>{formatarPreco(imovel.preco, imovel.finalidade)}</strong>
           </span>
-          <span className={s.extra}>{rodapeCard(imovel)}</span>
         </div>
       </div>
     </article>

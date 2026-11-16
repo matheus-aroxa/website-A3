@@ -6,6 +6,9 @@ import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 import { ativarColeta, encerrarVisita, iniciarVisita, medirRolagem, registrar, retomarVisita } from '@/lib/coleta/cliente'
 import type { TipoEvento } from '@/lib/coleta/tipos'
+import { PADRAO_IDIOMAS } from '@/lib/internacional/idiomas'
+
+const FICHA_INTERNACIONAL = new RegExp(`^/(?:${PADRAO_IDIOMAS})/[^/]+/([^/]+)/?$`)
 
 /** Clique em link de contato, link externo ou imóvel; ou em qualquer elemento marcado com data-evento. */
 function aoClicar(e: MouseEvent) {
@@ -22,7 +25,7 @@ function aoClicar(e: MouseEvent) {
   if (href.startsWith('mailto:')) return registrar('email', { r: rotulo })
   if (link.origin !== location.origin) return registrar('externo', { r: link.hostname.replace(/^www\./, '').slice(0, 80) })
   // Ficha do imóvel: /imovel/[slug] ou, na área internacional, /en/properties/[slug] (/it/immobili/[slug]…).
-  const ficha = /^\/imovel\/([^/]+)\/?$/.exec(link.pathname) ?? /^\/(?:en|it|es|fr|de)\/[^/]+\/([^/]+)\/?$/.exec(link.pathname)
+  const ficha = /^\/imovel\/([^/]+)\/?$/.exec(link.pathname) ?? FICHA_INTERNACIONAL.exec(link.pathname)
   if (ficha && link.pathname !== location.pathname) {
     registrar('card', { i: decodeURIComponent(ficha[1]!), r: link.closest<HTMLElement>('[data-lista]')?.dataset.lista ?? 'link' })
   }

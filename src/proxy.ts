@@ -6,7 +6,7 @@ import { interpretarSegmentos } from '@/lib/imoveis/filtros'
 import { catalogoNoPainel, fonteDosImoveis, inicioDoPainel } from '@/lib/imoveis/fonte'
 import type { Cidade } from '@/lib/imoveis/tipos'
 import { baixarCidades } from '@/lib/imoveis/viniun/carga'
-import { ehIdioma, secaoDoCaminho } from '@/lib/internacional/idiomas'
+import { idiomaDisponivel, secaoDoCaminho } from '@/lib/internacional/idiomas'
 
 // As páginas de busca são transmitidas por streaming (o status 200 sai antes do conteúdo).
 // Para que URLs inexistentes como /imoveis/xyz respondam 404 de verdade — e não um
@@ -87,7 +87,7 @@ const naoEncontrada = (request: NextRequest) => NextResponse.rewrite(new URL(SEM
  */
 function proxyInternacional(request: NextRequest) {
   const [idioma, secao, slug, ...resto] = request.nextUrl.pathname.split('/').filter(Boolean)
-  if (!idioma || !ehIdioma(idioma) || resto.length) return naoEncontrada(request)
+  if (!idioma || !idiomaDisponivel(idioma) || resto.length) return naoEncontrada(request)
   if (!secao) return NextResponse.next()
   const qual = secaoDoCaminho(idioma, secao)
   if (!qual || (slug && qual !== 'imoveis')) return naoEncontrada(request)

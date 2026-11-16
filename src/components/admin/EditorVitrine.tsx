@@ -13,14 +13,20 @@ import { Secao } from './TopoPagina'
 import s from './Admin.module.css'
 import carregadorImagem from '@/lib/imoveis/carregador-imagem'
 
+/** Título do topo da página, como aparece no site: "Seu lar <span>está aqui.</span>". */
+export interface TituloTopo {
+  inicio: string
+  destaque: string
+}
+
 const rotulo = (o: OpcaoVitrine) => `${o.nome} — ${o.bairro}, ${o.cidade} (cód. ${o.codigo})`
 
 /** Miniatura do topo da home no celular: título, foto grande e o cartão do imóvel por cima. */
-function PreviaTopo({ imovel }: { imovel?: OpcaoVitrine }) {
+function PreviaTopo({ imovel, titulo }: { imovel?: OpcaoVitrine; titulo: TituloTopo }) {
   return (
     <div className={s.previaTopo}>
       <strong className={s.previaTopoTitulo}>
-        Seu lar <span>está aqui.</span>
+        {titulo.inicio} <span>{titulo.destaque}</span>
       </strong>
       {imovel?.foto ? (
         <div className={s.previaTopoMidia}>
@@ -52,12 +58,20 @@ export function EditorVitrine({
   opcoes,
   limite,
   porVez,
+  idioma,
+  titulo = { inicio: 'Seu lar', destaque: 'está aqui.' },
+  pagina = 'home',
 }: {
   inicial: Vitrine
   opcoes: OpcaoVitrine[]
   limite: number
   /** Quantos destaques a home mostra de uma vez; acima disso eles viram um carrossel. */
   porVez: number
+  /** Vitrine da página inicial de um idioma da área internacional (vazio: a home em português). */
+  idioma?: string
+  titulo?: TituloTopo
+  /** Como os textos chamam a página ("home", "página em inglês"). */
+  pagina?: string
 }) {
   const avisar = useAvisar()
   const [salvando, iniciar] = useTransition()
@@ -87,22 +101,23 @@ export function EditorVitrine({
   function salvar() {
     const dados = new FormData()
     dados.set('heroi', heroi)
+    if (idioma) dados.set('idioma', idioma)
     destaques.forEach((id) => dados.append('destaques', id))
     iniciar(async () => {
       const r = await salvarVitrine(ESTADO_INICIAL, dados).catch(() => null)
-      if (r?.status === 'sucesso') avisar('Vitrine salva e publicada na home.')
+      if (r?.status === 'sucesso') avisar(`Vitrine salva e publicada na ${pagina}.`)
       else avisar(r?.mensagem ?? 'Não foi possível salvar. Confira a conexão e tente de novo.', { erro: true })
     })
   }
 
   return (
     <>
-      <Secao icone={<Icone nome="casa" />} titulo="Topo da home" descricao="O imóvel com foto grande ao lado de “Seu lar está aqui.”">
+      <Secao icone={<Icone nome="casa" />} titulo={`Topo da ${pagina}`} descricao={`O imóvel com foto grande ao lado de “${titulo.inicio} ${titulo.destaque}”`}>
         <div className={s.vitrineBloco}>
           <div className={s.rotulo}>
             <span id="rotulo-heroi">Imóvel do topo</span>
             <Seletor
-              aria-label="Imóvel do topo da home"
+              aria-label={`Imóvel do topo da ${pagina}`}
               valor={heroi}
               aoMudar={setHeroi}
               // O topo é sempre escolhido: a opção vazia só aparece enquanto nenhum foi escolhido.
@@ -111,7 +126,7 @@ export function EditorVitrine({
           </div>
           <div className={s.previa}>
             <span className={s.legenda}>Como será exibido</span>
-            <PreviaTopo imovel={porId.get(heroi)} />
+            <PreviaTopo imovel={porId.get(heroi)} titulo={titulo} />
           </div>
         </div>
       </Secao>
@@ -119,7 +134,7 @@ export function EditorVitrine({
       <Secao
         icone={<Icone nome="estrela" />}
         titulo="Imóveis em destaque"
-        descricao={`Aparecem na home, nesta ordem. Com mais de ${porVez}, a home mostra ${porVez} por vez em um carrossel que passa sozinho e tem botões para avançar e voltar.`}
+        descricao={`Aparecem na ${pagina}, nesta ordem. Com mais de ${porVez}, a página mostra ${porVez} por vez em um carrossel com botões para avançar e voltar.`}
         extra={
           <span className={s.contador} data-cheio={cheio || undefined}>
             {destaques.length} de {limite}
@@ -196,7 +211,7 @@ export function EditorVitrine({
         )}
 
         <div className={s.previa}>
-          <span className={s.legenda}>Como aparece na home</span>
+          <span className={s.legenda}>Como aparece na {pagina}</span>
           {destaques.length ? (
             <div className={s.previaDestaques} data-carrossel={destaques.length > porVez || undefined}>
               {Array.from({ length: Math.max(porVez, destaques.length) }, (_, i) => {
@@ -222,7 +237,7 @@ export function EditorVitrine({
               })}
             </div>
           ) : (
-            <p className={s.previaVazia}>Sem destaques, a seção “Imóveis em destaque” não aparece na home.</p>
+            <p className={s.previaVazia}>Sem destaques, a seção de imóveis em destaque não aparece na {pagina}.</p>
           )}
         </div>
       </Secao>
@@ -232,7 +247,7 @@ export function EditorVitrine({
           <div className={s.barraSalvarConteudo}>
             <span className={s.barraEstado}>
               <span className={s.ponto} data-sujo aria-hidden="true" />
-              {heroi ? 'A vitrine mudou. Salve para atualizar a home.' : 'Escolha o imóvel do topo para salvar.'}
+              {heroi ? `A vitrine mudou. Salve para atualizar a ${pagina}.` : 'Escolha o imóvel do topo para salvar.'}
             </span>
             <div className={s.barraBotoes}>
               <button

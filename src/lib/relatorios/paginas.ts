@@ -4,7 +4,7 @@ import { banco } from '@/lib/db'
 import { interpretarSegmentos } from '@/lib/imoveis/filtros'
 import { listarCidades } from '@/lib/imoveis/repositorio'
 import { textosDaBusca } from '@/lib/imoveis/rotas'
-import { ehIdioma, secaoDoCaminho } from '@/lib/internacional/idiomas'
+import { PADRAO_IDIOMAS, ehIdioma, secaoDoCaminho } from '@/lib/internacional/idiomas'
 
 export interface NomeDePagina {
   nome: string
@@ -21,7 +21,7 @@ export async function criarNomeadorDePaginas() {
     const imovel = /^\/imovel\/([^/]+)$/.exec(caminho)?.[1]
     if (imovel) return { nome: imoveis.get(imovel) ?? `Imóvel removido (${imovel.slice(0, 40)})`, href: caminho }
     // Área internacional: "[EN] Residencial X", "[IT] Guia de compra"…
-    const internacional = /^\/(en|it|es|fr|de)(?:\/([^/]+))?(?:\/([^/]+))?$/.exec(caminho)
+    const internacional = new RegExp(`^/(${PADRAO_IDIOMAS})(?:/([^/]+))?(?:/([^/]+))?$`).exec(caminho)
     if (internacional) {
       const [, idioma, secao, slug] = internacional
       const prefixo = `[${idioma!.toUpperCase()}]`

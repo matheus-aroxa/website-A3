@@ -20,6 +20,38 @@ O slug do imóvel é o mesmo de `/imovel/<slug>`, e a ficha em português liga a
 seletor de idioma do cabeçalho (o globo). Os endereços ficam em `src/lib/internacional/idiomas.ts`. Mudar um endereço
 depois de publicado faz o Google perder a página antiga: só com um redirecionamento.
 
+## Idiomas de tradução automática (/ja, /pl, /zh…)
+
+Além dos cinco idiomas revisados acima, o site oferece outros 21 com tradução de máquina: holandês (`nl`), sueco (`sv`),
+norueguês (`no`), dinamarquês (`da`), finlandês (`fi`), polonês (`pl`), tcheco (`cs`), húngaro (`hu`), romeno (`ro`), grego
+(`el`), russo (`ru`), ucraniano (`uk`), turco (`tr`), chinês simplificado (`zh`) e tradicional (`zh-tw`), japonês (`ja`),
+coreano (`ko`), hindi (`hi`), indonésio (`id`), vietnamita (`vi`) e tailandês (`th`). A lista fica em
+`src/lib/internacional/idiomas.ts` (`IDIOMAS_AUTOMATICOS`); acrescentar outro idioma do Amazon Translate é uma linha lá.
+
+- **Mesmas páginas** dos idiomas revisados, com os endereços do inglês: `/ja`, `/ja/properties`, `/ja/properties/<slug>`,
+  `/ja/buying-property-in-brazil`, `/ja/recife-and-pernambuco`, `/ja/privacy-policy`.
+- **Textos**: os do inglês (`dicionarios/en.ts`, `conteudo/en.ts`) traduzidos pelo Amazon Translate na primeira vez que
+  alguém abre uma página no idioma (`src/lib/internacional/automatico.ts`). Nada é traduzido de antemão nem guardado no
+  banco: as traduções ficam no cache do Next, com o texto em inglês como chave (mudar um texto em inglês refaz só aquela
+  tradução, no próximo acesso). Vão em blocos de até 9 KB, um texto por linha, para poucas chamadas. Os imóveis seguem como
+  nos outros idiomas (descrição etc. traduzidas do português ao abrir a ficha). Dias da semana, meses e horas vêm do
+  `Intl` do próprio servidor, sem tradução.
+- **Fora do Google**: `noindex`, fora do sitemap e do `hreflang`, links do seletor com `nofollow`. O rodapé avisa que a
+  página foi traduzida automaticamente.
+- **Só com o tradutor ligado** (`TRADUTOR=aws`): sem ele, esses endereços respondem 404 e o seletor não os mostra.
+- **Moeda**: euro para os idiomas europeus (`nl`, `sv`, `no`, `da`, `fi`, `pl`, `cs`, `hu`, `ro`, `el`), dólar para os demais.
+- **Vitrine**: a do inglês (o painel configura só os idiomas revisados).
+- **Design**: as abas (painel de busca do topo, contato da ficha) quebram em duas linhas em vez de cortar, e palavras
+  longas dos títulos quebram com hífen (`html[data-traducao='automatica']` em `globals.css`). Títulos com destaque verde
+  ("Your home in **Brazil.**") são traduzidos como uma frase só e a última palavra vira o destaque; em chinês e japonês,
+  sem espaços entre as palavras, o título sai inteiro, sem destaque.
+- **Qualidade**: tradução de máquina, sem revisão. Palavras soltas que a máquina erraria sem contexto ("Properties", "From")
+  vão com uma fonte em inglês mais clara (`FONTES_DICIONARIO` em `automatico.ts`). Um idioma que ganhar público pode virar
+  revisado: escrever `dicionarios/<idioma>.ts` e `conteudo/<idioma>.ts` e passá-lo para `IDIOMAS_REVISADOS`.
+- **Custo**: a primeira visita a cada idioma traduz cerca de 15 mil caracteres da interface; cada guia, região e política,
+  outros 15 a 35 mil, só quando alguém os abre. Com 21 idiomas, tudo traduzido uma vez fica perto de 1,5 milhão de
+  caracteres (US$ 15 por milhão, depois da cota gratuita).
+
 ## O que é traduzido, e como
 
 | Conteúdo | Onde está | Tradução |
@@ -73,17 +105,25 @@ Google não vê essa tradução (para o Google a descrição continua em portugu
 ser brasileiro e ter renda dentro da faixa). Hoje são 254. Quando a A3 definir o recorte (por preço, cidade, escolha no
 painel…), muda só essa função: listagem, fichas, destaques e sitemap passam todos por ela.
 
-Os destaques da página inicial internacional são os da vitrine da home (painel) que estão no recorte, completados com os
-mais recentes.
+### Vitrine por idioma
+
+Cada idioma tem a própria vitrine: o imóvel do topo e os destaques da página inicial (/en, /it…) são escolhidos no painel,
+em **Vitrine**, na aba do idioma. Assim os italianos podem ver uns imóveis em destaque e os alemães, outros. Só aparecem
+como opção os imóveis do recorte internacional. As escolhas ficam nas tabelas `vitrine_internacional` e
+`vitrine_internacional_destaques` (`db/vitrine-internacional.sql`); salvar atualiza a página na hora.
+
+Idioma que nunca foi configurado (ou enquanto a migração não for aplicada) usa a seleção automática: os destaques da home em
+português que estão no recorte, completados com os mais recentes, e o primeiro deles no topo. Imóvel escolhido que sai do
+site some da vitrine sozinho; excluir um imóvel pelo painel também o tira das vitrines dos idiomas.
 
 ## Preço
 
-O valor principal vem na moeda do idioma: dólar (inglês e espanhol) ou euro (italiano, francês e alemão), convertido pela
-PTAX de venda do Banco Central (API pública, sem chave, `src/lib/internacional/cotacao.ts`) e arredondado ao milhar. O preço
-oficial, em reais, aparece logo abaixo como informação secundária: nos cards, na ficha ("Official price: R$497,200", com a
-data da cotação) e na descrição para o Google. A cotação é relida a cada hora. Se a API do Banco Central falhar, o preço
-volta a aparecer só em reais, como principal (`precoNoIdioma`, em `src/lib/internacional/formato.ts`). Os dados
-estruturados (JSON-LD) continuam com o preço em reais, que é o da oferta.
+As páginas internacionais mostram o preço só na moeda do idioma: dólar (inglês e espanhol) ou euro (italiano, francês e
+alemão), convertido pela PTAX de venda do Banco Central (API pública, sem chave, `src/lib/internacional/cotacao.ts`) e
+arredondado ao milhar. Não aparecem o valor em reais nem menção a conversão ou aproximação (decisão da A3, 16/11/2026); a
+nota "o preço pode mudar conforme a tabela da construtora" continua. A cotação é relida a cada hora. Se a API do Banco
+Central falhar, sai o preço em reais, o único disponível (`precoNoIdioma`, em `src/lib/internacional/formato.ts`). Os dados
+estruturados (JSON-LD), que não aparecem na página, continuam com o preço em reais, que é o valor real da oferta.
 
 ## Contato
 
@@ -123,6 +163,8 @@ Mudou o visual de uma página em português? Leve a mudança para a internaciona
 
 ## Pendências
 
-- Dar a permissão `translate:TranslateText` ao usuário IAM do site e definir `TRADUTOR=aws` na Vercel.
+- Rodar `db/vitrine-internacional.sql` no Supabase (vitrine por idioma no painel).
+- Definir `TRADUTOR=aws` na Vercel (a permissão `translate:TranslateText` já foi dada ao `vercel-a3-user`). Sem ele, os
+  idiomas de tradução automática (/ja, /pl…) não aparecem.
 - Revisar os textos (dicionários e conteúdo), de preferência com um falante nativo, principalmente o italiano.
 - Definir o recorte do catálogo.

@@ -22,6 +22,7 @@ const it: Dicionario = {
     menuFechar: 'Chiudi il menu',
     faleConosco: 'Contattaci',
     faleConoscoWhatsApp: 'Contattaci su WhatsApp',
+    traducaoAutomatica: 'Traduzione automatica',
   },
   inicio: {
     tituloSeo: 'Immobili in vendita a Recife e sulla costa del Pernambuco, Brasile | A3',
@@ -30,10 +31,10 @@ const it: Dicionario = {
     titulo: 'La tua casa in',
     tituloDestaque: 'Brasile.',
     subtitulo:
-      'Da {nome} trovi appartamenti e case vicino al mare a Recife, Olinda e Paulista — con un agente dal primo contatto alla consegna delle chiavi, anche se compri da un altro Paese.',
+      'Da {nome} trovi appartamenti e case vicino al mare a Recife e Paulista, con un agente dal primo contatto alle chiavi — anche dall’estero.',
     busca: {
       titulo: 'Trova il tuo immobile',
-      modos: ['Nuovi progetti', 'Pronti da abitare', 'Tutti'],
+      modos: ['Nuovi', 'Pronti', 'Tutti'],
       modosRotulo: 'Stato dei lavori',
       tipo: 'Tipologia',
       cidade: 'Città',
@@ -44,6 +45,7 @@ const it: Dicionario = {
       buscar: 'Cerca immobili',
       maisFiltros: 'Più filtri',
       menosFiltros: 'Meno filtri',
+      precoMax: 'Prezzo massimo',
     },
     destaquesSobretitulo: 'In evidenza',
     destaquesTitulo: 'Immobili selezionati per acquirenti internazionali',
@@ -56,7 +58,7 @@ const it: Dicionario = {
     servicos: [
       {
         titulo: 'Scegli da dove vuoi',
-        texto: 'Foto, video e visite in videochiamata di ogni immobile, con prezzi in real e il valore approssimativo in euro.',
+        texto: 'Foto, video e visite in videochiamata di ogni immobile, con i prezzi in euro.',
         link: 'Vedi gli immobili',
       },
       {
@@ -112,7 +114,7 @@ const it: Dicionario = {
   imoveis: {
     tituloSeo: 'Immobili in vendita a Recife e nel Pernambuco, Brasile',
     descricaoSeo:
-      'Appartamenti e case in vendita a Recife, Olinda e Paulista, selezionati per acquirenti internazionali. Prezzi in real brasiliani con il valore approssimativo in euro.',
+      'Appartamenti e case in vendita a Recife, Olinda e Paulista, selezionati per acquirenti internazionali. Prezzi in euro.',
     titulo: 'Immobili in vendita a Recife e nel Pernambuco',
     intro: 'Immobili pronti da abitare, in costruzione e nuovi progetti, con l’assistenza di un agente di A3.',
     buscaRotulo: 'Cerca per nome o codice dell’immobile',
@@ -128,6 +130,11 @@ const it: Dicionario = {
     ordemMaiorArea: 'Superficie maggiore',
     cidade: 'Città',
     todasCidades: 'Tutte le città',
+    bairro: 'Quartiere',
+    todosBairros: 'Tutti i quartieri',
+    precoMax: 'Prezzo massimo',
+    qualquerPreco: 'Qualsiasi prezzo',
+    ateValor: 'Fino a {valor}',
     tipo: 'Tipologia',
     situacao: 'Stato',
     quartos: 'Camere',
@@ -172,15 +179,12 @@ const it: Dicionario = {
     vagas: 'Posti auto',
     vagasCurto: 'Posti auto',
     vagaConsultar: 'Su richiesta',
-    comSuite: 'con bagno in camera',
+    comSuite: 'con suite',
     entrega: 'Consegna prevista',
-    entregaCard: 'Consegna {data}',
     codigo: 'Rif.',
     precoAPartirDe: 'A partire da',
     sobConsulta: 'Prezzo su richiesta',
     precoNota: 'Il prezzo può variare in base alla disponibilità nel listino del costruttore.',
-    precoOficial: 'Prezzo ufficiale: {valor}',
-    aproximadoNota: 'Valore approssimativo al cambio della Banca Centrale del Brasile del {data}. Il prezzo ufficiale è in real brasiliani.',
     falarWhatsApp: 'WhatsApp',
     simularParcelas: 'Piano di pagamento',
     andamento: 'Avanzamento dei lavori',
@@ -326,6 +330,7 @@ const it: Dicionario = {
     atendimentoTexto: 'Parla con un agente su WhatsApp o tramite il modulo di contatto.',
     politica: 'Informativa sulla privacy',
     pais: 'Brasile',
+    avisoTraducao: 'Questa pagina è stata tradotta automaticamente dall’inglese. Per qualsiasi dubbio, parla con un agente.',
   },
   naoEncontrada: {
     titulo: 'Non abbiamo trovato questa pagina',

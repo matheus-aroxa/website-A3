@@ -10,13 +10,16 @@ import { RodapeInternacional } from '@/components/internacional/RodapeInternacio
 import { BotaoWhatsApp } from '@/components/layout/BotaoWhatsApp'
 import { Migalhas } from '@/components/ui/Migalhas'
 import { JsonLd } from '@/components/seo/JsonLd'
+import { slugificar } from '@/lib/imoveis/formato'
 import { listarImoveisInternacionais } from '@/lib/internacional/catalogo'
 import { obterCotacoes } from '@/lib/internacional/cotacao'
+import { opcoesPrecoMaximo } from '@/lib/internacional/formato'
 import {
   DADOS_IDIOMA,
-  IDIOMAS,
+  IDIOMAS_REVISADOS,
   alternativas,
-  ehIdioma,
+  ehRevisado,
+  idiomaDisponivel,
   secaoDoCaminho,
   urlInicio,
   urlSecao,
@@ -24,7 +27,7 @@ import {
   type Idioma,
   type Secao,
 } from '@/lib/internacional/idiomas'
-import { conteudo, dicionario } from '@/lib/internacional/textos'
+import { artigo as textoDaSecao, dicionario } from '@/lib/internacional/textos'
 import { imagemCompartilhamento, linkWhatsApp, site, urlAbsoluta } from '@/lib/site'
 import { ID_ORGANIZACAO } from '@/lib/seo'
 
@@ -34,20 +37,20 @@ import { ID_ORGANIZACAO } from '@/lib/seo'
 export const ensureStatic = 'navigation'
 
 export async function generateStaticParams({ params }: { params: { idioma: string } }) {
-  const idiomas = ehIdioma(params.idioma) ? [params.idioma] : IDIOMAS
+  const idiomas = ehRevisado(params.idioma) ? [params.idioma] : IDIOMAS_REVISADOS
   return idiomas.flatMap((idioma) => Object.values(DADOS_IDIOMA[idioma].caminhos).map((secao) => ({ idioma, secao })))
 }
 
 function resolver(idioma: string, segmento: string): { idioma: Idioma; secao: Secao } | null {
-  if (!ehIdioma(idioma)) return null
+  if (!idiomaDisponivel(idioma)) return null
   const secao = secaoDoCaminho(idioma, segmento)
   return secao ? { idioma, secao } : null
 }
 
-function textosSeo(idioma: Idioma, secao: Secao) {
-  const d = dicionario(idioma)
+async function textosSeo(idioma: Idioma, secao: Secao) {
+  const d = await dicionario(idioma)
   if (secao === 'imoveis') return { titulo: d.imoveis.tituloSeo, descricao: d.imoveis.descricaoSeo }
-  const artigo = conteudo(idioma)[secao]
+  const artigo = await textoDaSecao(idioma, secao)
   return { titulo: artigo.tituloSeo, descricao: artigo.descricaoSeo }
 }
 
@@ -55,12 +58,12 @@ export async function generateMetadata({ params }: PageProps<'/[idioma]/[secao]'
   const p = await params
   const r = resolver(p.idioma, p.secao)
   if (!r) return {}
-  const { titulo, descricao } = textosSeo(r.idioma, r.secao)
+  const { titulo, descricao } = await textosSeo(r.idioma, r.secao)
   const url = urlSecao(r.idioma, r.secao)
   return {
     title: { absolute: titulo },
     description: descricao,
-    alternates: { canonical: url, languages: alternativas((i) => urlSecao(i, r.secao)) },
+    alternates: { canonical: url, ...(ehRevisado(r.idioma) && { languages: alternativas((i) => urlSecao(i, r.secao)) }) },
     openGraph: {
       type: r.secao === 'imoveis' ? 'website' : 'article',
       locale: DADOS_IDIOMA[r.idioma].ogLocale,
@@ -78,10 +81,10 @@ export default async function SecaoInternacional({ params }: PageProps<'/[idioma
   const r = resolver(p.idioma, p.secao)
   if (!r) notFound()
   const { idioma, secao } = r
-  const d = dicionario(idioma)
+  const d = await dicionario(idioma)
   const migalhas = [
     { nome: d.nav.inicio, href: urlInicio(idioma) },
-    { nome: secao === 'imoveis' ? d.nav.imoveis : secao === 'privacidade' ? conteudo(idioma)[secao].titulo : conteudo(idioma)[secao].sobretitulo, href: urlSecao(idioma, secao) },
+    { nome: secao === 'imoveis' ? d.nav.imoveis : secao === 'privacidade' ? (await textoDaSecao(idioma, secao)).titulo : (await textoDaSecao(idioma, secao)).sobretitulo, href: urlSecao(idioma, secao) },
   ]
 
   return (
@@ -104,7 +107,7 @@ export default async function SecaoInternacional({ params }: PageProps<'/[idioma
 
 /** Mesmo desenho da busca em português (app/(site)/imoveis/busca.tsx): topo com título, barra, filtros e resultados. */
 async function ListaDeImoveis({ idioma, migalhas }: { idioma: Idioma; migalhas: { nome: string; href: string }[] }) {
-  const d = dicionario(idioma)
+  const d = await dicionario(idioma)
   const [imoveis, cotacoes] = await Promise.all([listarImoveisInternacionais(), obterCotacoes()])
   const cotacao = cotacoes[DADOS_IDIOMA[idioma].moeda]
   const itens: ItemLista[] = imoveis.map((im, i) => ({
@@ -113,6 +116,8 @@ async function ListaDeImoveis({ idioma, migalhas }: { idioma: Idioma; migalhas: 
     codigo: im.codigo,
     cidade: im.local.cidade,
     cidadeSlug: im.cidadeSlug,
+    bairro: im.local.bairro,
+    bairroSlug: slugificar(im.local.bairro),
     tipo: im.tipo,
     situacao: im.situacao,
     quartos: im.quartos.max,
@@ -136,6 +141,8 @@ async function ListaDeImoveis({ idioma, migalhas }: { idioma: Idioma; migalhas: 
         itens={itens}
         textos={{ ...d.imoveis, tipos: d.imovel.tipo, situacoes: d.imovel.situacao }}
         whatsapp={linkWhatsApp(d.contato.mensagemPadrao)}
+        cotacao={cotacao?.valor}
+        precos={opcoesPrecoMaximo(idioma, cotacao, d)}
       />
       <JsonLd
         dados={{
@@ -153,8 +160,8 @@ async function ListaDeImoveis({ idioma, migalhas }: { idioma: Idioma; migalhas: 
   )
 }
 
-function PaginaArtigo({ idioma, secao, migalhas }: { idioma: Idioma; secao: Exclude<Secao, 'imoveis'>; migalhas: React.ReactNode }) {
-  const artigo = conteudo(idioma)[secao]
+async function PaginaArtigo({ idioma, secao, migalhas }: { idioma: Idioma; secao: Exclude<Secao, 'imoveis'>; migalhas: React.ReactNode }) {
+  const artigo = await textoDaSecao(idioma, secao)
   const url = urlSecao(idioma, secao)
   return (
     <>

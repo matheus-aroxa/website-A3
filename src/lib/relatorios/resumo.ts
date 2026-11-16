@@ -4,6 +4,7 @@
 // Roda sozinho: ao abrir um relatório e, de tempos em tempos, quando chegam eventos novos. Não precisa de agendamento.
 // Cada dia é refeito do zero (apaga e insere), então rodar de novo não duplica nada.
 import 'server-only'
+import { PADRAO_IDIOMAS } from '@/lib/internacional/idiomas'
 import { banco, transacao, type Cliente } from '@/lib/db'
 import { hojeEmRecife } from '@/lib/coleta/dia'
 import { RETENCAO_DIAS, TIPOS_CONVERSAO, TIPOS_INTERACAO } from '@/lib/coleta/tipos'
@@ -82,7 +83,7 @@ const BLOCOS = [
    ) f WHERE n > 0`,
   porVisita('hora', `extract(hour from em AT TIME ZONE ${FUSO})::int::text`),
   porVisita('pagina', 'caminho'),
-  porVisita('tipo-pagina', "CASE WHEN caminho = '/' THEN 'home' WHEN caminho LIKE '/imoveis%' THEN 'busca' WHEN caminho LIKE '/imovel/%' OR caminho ~ '^/(en|it|es|fr|de)/[^/]+/[^/]+$' THEN 'imovel' ELSE 'outras' END"),
+  porVisita('tipo-pagina', `CASE WHEN caminho = '/' THEN 'home' WHEN caminho LIKE '/imoveis%' THEN 'busca' WHEN caminho LIKE '/imovel/%' OR caminho ~ '^/(${PADRAO_IDIOMAS})/[^/]+/[^/]+$' THEN 'imovel' ELSE 'outras' END`),
   // Imóveis: visitas e, em sessões, quantas terminaram em contato sobre aquele imóvel.
   `SELECT 'imovel', '', v.imovel_id, v.visitas, v.visitantes, v.sessoes, 0, COALESCE(c.n, 0)::int, v.com_medida, v.tempo, v.rolagem
      FROM (
