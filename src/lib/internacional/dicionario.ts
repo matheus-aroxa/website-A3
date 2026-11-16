@@ -152,8 +152,8 @@ export interface Dicionario {
     precoAPartirDe: string
     sobConsulta: string
     precoNota: string
-    /** "≈ {valor}" ao lado do preço em reais. */
-    aproximado: string
+    /** Preço oficial em reais, sob o valor convertido (ficha): {valor}. */
+    precoOficial: string
     /** Explica a cotação: {data} = dia da cotação. */
     aproximadoNota: string
     falarWhatsApp: string

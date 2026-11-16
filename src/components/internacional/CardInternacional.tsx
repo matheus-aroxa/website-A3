@@ -6,13 +6,12 @@ import carregadorImagem from '@/lib/imoveis/carregador-imagem'
 import type { ImovelResumo } from '@/lib/imoveis/tipos'
 import type { Cotacao } from '@/lib/internacional/cotacao'
 import {
-  formatarAproximado,
   formatarArea,
   formatarBanheirosCurto,
   formatarEntregaCurta,
   formatarQuartos,
-  formatarReais,
   formatarVagas,
+  precoNoIdioma,
 } from '@/lib/internacional/formato'
 import { urlImovelInternacional, type Idioma } from '@/lib/internacional/idiomas'
 import { dicionario } from '@/lib/internacional/textos'
@@ -24,7 +23,7 @@ const SIZES = {
 
 /**
  * O card do site em português (components/imoveis/CardImovel) com os textos no idioma: mesma marcação e mesmo CSS.
- * A única diferença é a linha do valor aproximado na moeda do idioma, sob o preço em reais.
+ * Diferença: o preço principal vem na moeda do idioma (dólar ou euro), com o preço oficial em reais na linha de baixo.
  */
 export function CardInternacional({
   imovel: im,
@@ -45,7 +44,7 @@ export function CardInternacional({
 }) {
   const d = dicionario(idioma)
   const Titulo = `h${nivelTitulo}` as const
-  const aproximado = formatarAproximado(im.preco, idioma, cotacao, d)
+  const preco = precoNoIdioma(im.preco, idioma, cotacao, d)
   const alt = d.imovel.altFoto({ nome: im.nome, tipo: im.tipo, bairro: im.local.bairro, cidade: im.local.cidade, posicao: 0 })
   return (
     <article className={`elevar ${s.card}`} data-variante={variante} data-lista={lista}>
@@ -100,8 +99,8 @@ export function CardInternacional({
         <div className={s.rodape}>
           <span className={s.preco}>
             <span>{d.imovel.precoAPartirDe}</span>
-            <strong>{formatarReais(im.preco, idioma, d)}</strong>
-            {aproximado && <span>{aproximado}</span>}
+            <strong>{preco.principal}</strong>
+            {preco.reais && <span>{preco.reais}</span>}
           </span>
           <span className={s.extra}>
             {im.entrega && im.situacao !== 'pronto'

@@ -78,9 +78,12 @@ mais recentes.
 
 ## Preço
 
-Sempre em reais, com o valor aproximado em dólar (inglês e espanhol) ou euro (italiano, francês e alemão), arredondado ao
-milhar, pela PTAX de venda do Banco Central (API pública, sem chave, `src/lib/internacional/cotacao.ts`). A cotação é relida
-a cada hora; a página mostra a data dela. Se a API do Banco Central falhar, sai só o preço em reais.
+O valor principal vem na moeda do idioma: dólar (inglês e espanhol) ou euro (italiano, francês e alemão), convertido pela
+PTAX de venda do Banco Central (API pública, sem chave, `src/lib/internacional/cotacao.ts`) e arredondado ao milhar. O preço
+oficial, em reais, aparece logo abaixo como informação secundária: nos cards, na ficha ("Official price: R$497,200", com a
+data da cotação) e na descrição para o Google. A cotação é relida a cada hora. Se a API do Banco Central falhar, o preço
+volta a aparecer só em reais, como principal (`precoNoIdioma`, em `src/lib/internacional/formato.ts`). Os dados
+estruturados (JSON-LD) continuam com o preço em reais, que é o da oferta.
 
 ## Contato
 
