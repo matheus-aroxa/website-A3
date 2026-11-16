@@ -99,6 +99,18 @@ aws iam create-access-key --user-name a3-site-vercel   # a chave secreta só apa
 
 A política foi conferida no simulador da AWS (`aws iam simulate-custom-policy`): permite gravar e apagar em `imoveis/*` e `empreendimentos/*` e listar essas pastas, e nega todo o resto (`site/`, `arquivo/`, `GetObject`, listar o bucket inteiro, mexer na policy ou apagar o bucket). Se um dia as fotos passarem a ser lidas pelo site (não é o caso), acrescente `s3:GetObject`.
 
+**Na conta (conferido em 16/11/2026):** o usuário que a Vercel usa chama-se `vercel-a3-user` (não `a3-site-vercel`) e tem
+a política gerenciada `AmazonS3FullAccess`, mais ampla que a mínima acima. Vale trocar pela política mínima.
+
+**Tradução dos imóveis (área internacional, docs/area-internacional.md):** o mesmo usuário também chama o Amazon Translate,
+com uma segunda política em linha, `traducao-do-site` (`docs/politica-traducao.json`): só `translate:TranslateText`, só em
+`us-east-1` (aplicada em 16/11/2026 e conferida no simulador). O Translate não existe em `sa-east-1`; `us-east-1` é a região mais próxima que tem o serviço. Os textos enviados
+são as descrições públicas dos imóveis, sem dado pessoal.
+
+```bash
+aws iam put-user-policy --user-name vercel-a3-user --policy-name traducao-do-site --policy-document file://docs/politica-traducao.json
+```
+
 ## Apagar fotos e imóveis
 
 Excluir é definitivo; **desativar** é o que tira o imóvel do site mas permite restaurar (Reativar). Não existe mais status "excluído" nem a aba de excluídos.

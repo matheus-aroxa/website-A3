@@ -2,7 +2,7 @@
 
 import { useSearchParams } from 'next/navigation'
 import { useActionState, useState } from 'react'
-import { entrar } from '@/app/admin/acoes'
+import { entrar } from '@/app/(site)/admin/acoes'
 import { Icone } from '@/components/ui/Icone'
 import { ESTADO_INICIAL } from '@/lib/formularios'
 import s from './Admin.module.css'

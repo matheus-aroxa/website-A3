@@ -32,6 +32,7 @@ ser o endereço real do site: ele alimenta canonical, Open Graph, sitemap e JSON
 | `/api/revalidar` | Webhook (protegido por `REVALIDATE_SECRET`) para invalidar o cache | Dinâmica |
 | `/api/viniun` | Webhook da Viniun (assinado com `VINIUN_WEBHOOK_SECRET`): imóvel mudou no CRM | Dinâmica |
 | `/admin` | Painel administrativo (login, imóveis, vitrine da home) | Dinâmica, `noindex` |
+| `/en`, `/it`, `/es`, `/fr`, `/de` | Área internacional: início, imóveis, ficha, guia de compra e região, com endereços no idioma (`/en/properties/[slug]`, `/it/immobili/[slug]`…). Detalhes: docs/area-internacional.md | Estática (fichas geradas no primeiro acesso) |
 
 Filtros que não viram página (quartos, vagas, área, ordem, página…) vão na query string
 (`?quartos=2&ordem=menor-preco`) e apontam o `canonical` para a página limpa.
@@ -138,6 +139,8 @@ administradores); voltam com `FONTE_IMOVEIS=banco` (docs/integracao-viniun.md).
 - Rodar `db/relatorios.sql` no Supabase **antes** de publicar o código dos relatórios (a medição de visitas só começa a contar
   depois da publicação) e revisar com o jurídico a seção "Medição de uso do site" da política de privacidade (docs/relatorios.md).
 
+- Área internacional: dar ao usuário IAM do site a permissão `translate:TranslateText` e definir `TRADUTOR=aws` na Vercel para
+  traduzir as descrições dos imóveis; revisar os textos do guia de compra, da região e da política (docs/area-internacional.md).
 - Antes de ligar `FONTE_IMOVEIS=viniun`: rodar `db/viniun.sql` e `db/vitrine-viniun.sql` no Supabase e ler docs/integracao-viniun.md.
 
 ## Estrutura
@@ -147,7 +150,9 @@ db/                       estrutura do banco, segurança (RLS) e migrações
 docs/                     deploy, banco, fotos, CloudFront, login, SEO
 scripts/                  backup do banco
 src/
-  app/                    rotas, metadados, sitemap, robots, Server Actions
+  app/(site)/             site em português e painel (layout raiz em pt-BR)
+  app/(internacional)/    área internacional /[idioma] (layout raiz próprio, <html lang> do idioma)
+  app/                    sitemap, robots, API, 404 global, Server Actions
   components/
     admin/                painel: lista, formulário do imóvel, vitrine
     busca/                filtros, barra de busca, resultados, paginação
@@ -156,12 +161,14 @@ src/
     imoveis/CardImovel    card usado em home, busca e semelhantes
     layout/               cabeçalho, menu mobile, rodapé, botão do WhatsApp
     formularios/          formulário da home e partes compartilhadas
+    internacional/        cabeçalho, rodapé, seletor de idioma, cards, lista, formulário e artigos da área internacional
     ui/, seo/             ícones, migalhas, mapa, JSON-LD
   lib/
     admin/                login, sessão, fotos (S3)
     db/                   conexão com o Postgres
     imoveis/              tipos, filtros ⇄ URL, consultas SQL, páginas de busca e canonical, textos de SEO, cache
+    internacional/        idiomas e endereços, dicionários, guia, região e política, recorte, cotação, tradução (Amazon Translate)
     seo.ts, site.ts       dados estruturados; dados da imobiliária (telefone, endereço, CRECI…)
-  proxy.ts                404 para URLs de busca inexistentes e porta de entrada do painel
+  proxy.ts                404 para URLs de busca e da área internacional inexistentes; porta de entrada do painel
 vercel.json               região das funções (São Paulo)
 ```

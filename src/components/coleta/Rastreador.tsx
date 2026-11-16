@@ -21,9 +21,10 @@ function aoClicar(e: MouseEvent) {
   if (href.startsWith('tel:')) return registrar('ligacao', { r: rotulo })
   if (href.startsWith('mailto:')) return registrar('email', { r: rotulo })
   if (link.origin !== location.origin) return registrar('externo', { r: link.hostname.replace(/^www\./, '').slice(0, 80) })
-  if (link.pathname.startsWith('/imovel/') && link.pathname !== location.pathname) {
-    const slug = decodeURIComponent(link.pathname.slice('/imovel/'.length)).replace(/\/$/, '')
-    registrar('card', { i: slug, r: link.closest<HTMLElement>('[data-lista]')?.dataset.lista ?? 'link' })
+  // Ficha do imóvel: /imovel/[slug] ou, na área internacional, /en/properties/[slug] (/it/immobili/[slug]…).
+  const ficha = /^\/imovel\/([^/]+)\/?$/.exec(link.pathname) ?? /^\/(?:en|it|es|fr|de)\/[^/]+\/([^/]+)\/?$/.exec(link.pathname)
+  if (ficha && link.pathname !== location.pathname) {
+    registrar('card', { i: decodeURIComponent(ficha[1]!), r: link.closest<HTMLElement>('[data-lista]')?.dataset.lista ?? 'link' })
   }
 }
 

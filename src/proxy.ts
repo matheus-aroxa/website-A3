@@ -6,6 +6,7 @@ import { interpretarSegmentos } from '@/lib/imoveis/filtros'
 import { catalogoNoPainel, fonteDosImoveis, inicioDoPainel } from '@/lib/imoveis/fonte'
 import type { Cidade } from '@/lib/imoveis/tipos'
 import { baixarCidades } from '@/lib/imoveis/viniun/carga'
+import { ehIdioma, secaoDoCaminho } from '@/lib/internacional/idiomas'
 
 // As páginas de busca são transmitidas por streaming (o status 200 sai antes do conteúdo).
 // Para que URLs inexistentes como /imoveis/xyz respondam 404 de verdade — e não um
@@ -74,16 +75,44 @@ async function proxyAdmin(request: NextRequest) {
   return NextResponse.redirect(login)
 }
 
+// Caminho sem nenhuma rota (o mais longo da área internacional tem 3 segmentos): o Next responde com a 404 global
+// (app/global-not-found.tsx) e status 404.
+const SEM_ROTA = '/_/pagina/nao/encontrada'
+const naoEncontrada = (request: NextRequest) => NextResponse.rewrite(new URL(SEM_ROTA, request.url))
+
+/**
+ * Área internacional: tudo o que não é rota do site em português chega aqui (o matcher abaixo). Só passam o idioma e,
+ * depois dele, uma seção válida naquele idioma ("/en/properties", não "/en/immobili"); a ficha de imóvel só sob a seção
+ * de imóveis. O resto vira 404 antes de renderizar. Imóvel inexistente ou fora do recorte: a própria ficha responde 404.
+ */
+function proxyInternacional(request: NextRequest) {
+  const [idioma, secao, slug, ...resto] = request.nextUrl.pathname.split('/').filter(Boolean)
+  if (!idioma || !ehIdioma(idioma) || resto.length) return naoEncontrada(request)
+  if (!secao) return NextResponse.next()
+  const qual = secaoDoCaminho(idioma, secao)
+  if (!qual || (slug && qual !== 'imoveis')) return naoEncontrada(request)
+  return NextResponse.next()
+}
+
 export async function proxy(request: NextRequest) {
-  if (request.nextUrl.pathname === '/admin' || request.nextUrl.pathname.startsWith('/admin/')) return await proxyAdmin(request)
-  const segmentos = request.nextUrl.pathname.replace(/^\/imoveis\/?/, '').split('/').filter(Boolean)
+  const { pathname } = request.nextUrl
+  if (pathname === '/admin' || pathname.startsWith('/admin/')) return await proxyAdmin(request)
+  if (!pathname.startsWith('/imoveis/')) return proxyInternacional(request)
+  const segmentos = pathname.replace(/^\/imoveis\/?/, '').split('/').filter(Boolean)
   const lista = fonteDosImoveis() === 'viniun' ? await cidadesDaViniun() : await cidades()
   // Sem a lista (Viniun fora do ar e nada guardado), deixa a página decidir em vez de responder 404 para tudo.
   if (!lista || interpretarSegmentos(segmentos, lista)) return NextResponse.next()
-  // Caminho sem rota: o Next responde com a página not-found e status 404.
-  return NextResponse.rewrite(new URL('/_pagina-inexistente', request.url))
+  return naoEncontrada(request)
 }
 
+// Rotas do site em português e arquivos ficam de fora (exceto a busca e o painel, conferidos acima): o resto do
+// primeiro nível é o segmento [idioma] da área internacional, que aceitaria qualquer coisa. O matcher precisa ser
+// texto fixo (o Next o lê no build).
 export const config = {
-  matcher: ['/imoveis/:caminho+', '/admin', '/admin/:caminho*'],
+  matcher: [
+    '/imoveis/:caminho+',
+    '/admin',
+    '/admin/:caminho*',
+    '/((?!imoveis(?:/|$)|imovel/|politica-de-privacidade$|admin(?:/|$)|api/|fotos/|_next/|_vercel/|sitemap\\.xml|robots\\.txt|manifest\\.webmanifest|favicon\\.ico|icon|apple-icon|opengraph-image).+)',
+  ],
 }

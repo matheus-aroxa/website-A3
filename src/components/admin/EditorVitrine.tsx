@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { useState, useTransition } from 'react'
-import { salvarVitrine } from '@/app/admin/acoes'
+import { salvarVitrine } from '@/app/(site)/admin/acoes'
 import { Icone } from '@/components/ui/Icone'
 import { Seletor } from '@/components/ui/Seletor'
 import type { OpcaoVitrine } from '@/lib/admin/catalogo'

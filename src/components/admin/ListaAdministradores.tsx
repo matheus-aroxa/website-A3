@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
-import { cadastrarAdministrador, editarDadosAdministrador, excluirAdministradorAcao } from '@/app/admin/acoes'
+import { cadastrarAdministrador, editarDadosAdministrador, excluirAdministradorAcao } from '@/app/(site)/admin/acoes'
 import { Icone } from '@/components/ui/Icone'
 import type { AdministradorPainel } from '@/lib/admin/administradores'
 import { useAvisar } from './Avisos'

@@ -6,7 +6,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { sair } from '@/app/admin/acoes'
+import { sair } from '@/app/(site)/admin/acoes'
 import logo from '@/assets/marca/logo-a3.png'
 import { LinkInicio } from '@/components/layout/LinkInicio'
 import { MenuMobile } from '@/components/layout/MenuMobile'

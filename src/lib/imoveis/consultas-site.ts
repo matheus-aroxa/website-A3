@@ -16,6 +16,6 @@ export const buscarConstrutoras: typeof doBanco.buscarConstrutoras = () => fonte
 export const buscarDestaques: typeof doBanco.buscarDestaques = (limite) => fonte().buscarDestaques(limite)
 export const buscarHeroi: typeof doBanco.buscarHeroi = () => fonte().buscarHeroi()
 export const buscarIndice: typeof doBanco.buscarIndice = (comFotos) => fonte().buscarIndice(comFotos)
-export const buscarPagina: typeof doBanco.buscarPagina = (f, pagina) => fonte().buscarPagina(f, pagina)
+export const buscarPagina: typeof doBanco.buscarPagina = (f, pagina, porPagina) => fonte().buscarPagina(f, pagina, porPagina)
 export const buscarSemelhantes: typeof doBanco.buscarSemelhantes = (imovel, limite) => fonte().buscarSemelhantes(imovel, limite)
 export const contarImoveis: typeof doBanco.contarImoveis = (f) => fonte().contarImoveis(f)

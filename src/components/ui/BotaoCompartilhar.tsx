@@ -3,7 +3,17 @@
 import { useState } from 'react'
 import { Icone } from './Icone'
 
-export function BotaoCompartilhar({ className, titulo }: { className?: string; titulo?: string }) {
+export const TEXTOS_COMPARTILHAR = { compartilhar: 'Compartilhar', copiado: 'Link copiado!' }
+
+export function BotaoCompartilhar({
+  className,
+  titulo,
+  textos = TEXTOS_COMPARTILHAR,
+}: {
+  className?: string
+  titulo?: string
+  textos?: typeof TEXTOS_COMPARTILHAR
+}) {
   const [copiado, setCopiado] = useState(false)
 
   async function compartilhar() {
@@ -26,8 +36,8 @@ export function BotaoCompartilhar({ className, titulo }: { className?: string; t
     <button
       type="button"
       className={`btn btn-icone ${className ?? ''}`}
-      aria-label={copiado ? 'Link copiado' : 'Compartilhar'}
-      title={copiado ? 'Link copiado!' : 'Compartilhar'}
+      aria-label={copiado ? textos.copiado : textos.compartilhar}
+      title={copiado ? textos.copiado : textos.compartilhar}
       onClick={compartilhar}
       data-evento="compartilhar"
     >

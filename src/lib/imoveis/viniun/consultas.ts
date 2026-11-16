@@ -6,7 +6,7 @@ import 'server-only'
 import { cacheLife, cacheTag } from 'next/cache'
 import type { PaginaResumos } from '../consultas'
 import { agruparCidades, agruparConstrutoras, paginar, paraIndice, paraResumo, porMaisRecente, temFoto } from '../filtragem'
-import type { Filtros } from '../filtros'
+import { POR_PAGINA, type Filtros } from '../filtros'
 import { TAG_IMOVEIS } from '../fonte'
 import type { IndiceImovel } from '../rotas'
 import { obterVitrine } from '../banco'
@@ -25,8 +25,8 @@ export async function contarImoveis(f: Filtros): Promise<number> {
   return (await buscarPagina(f, 1)).total
 }
 
-export async function buscarPagina(f: Filtros, pagina: number): Promise<PaginaResumos> {
-  return paginar(await catalogo(), f, pagina)
+export async function buscarPagina(f: Filtros, pagina: number, porPagina = POR_PAGINA): Promise<PaginaResumos> {
+  return paginar(await catalogo(), f, pagina, porPagina)
 }
 
 /**

@@ -38,7 +38,10 @@ export default function PoliticaPrivacidade() {
 
           <h2>Quais dados coletamos</h2>
           <ul>
-            <li>Nome e WhatsApp que você digita nos formulários de contato, de agendamento de visita e de conversa com o corretor;</li>
+            <li>
+              Nome e WhatsApp que você digita nos formulários de contato, de agendamento de visita e de conversa com o corretor (e,
+              nos formulários da área internacional, o país e o e-mail, se você informar);
+            </li>
             <li>A mensagem, os dias e horários de preferência e o imóvel de interesse, quando você preenche;</li>
             <li>
               Dados técnicos de navegação (como endereço IP e tipo de navegador), registrados pelos provedores de hospedagem

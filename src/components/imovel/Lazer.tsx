@@ -7,7 +7,10 @@ import s from './Imovel.module.css'
 const VISIVEIS_NO_CELULAR = 8
 
 /** Todos os itens ficam no HTML (SEO); no celular os excedentes ficam recolhidos. */
-export function Lazer({ itens }: { itens: string[] }) {
+/** `verTodos` leva {n} no lugar da quantidade. */
+export const TEXTOS_LAZER = { menos: 'Mostrar menos', verTodos: 'Ver os {n} itens de lazer' }
+
+export function Lazer({ itens, textos = TEXTOS_LAZER }: { itens: string[]; textos?: typeof TEXTOS_LAZER }) {
   const [aberto, setAberto] = useState(false)
   const excedente = itens.length > VISIVEIS_NO_CELULAR
   return (
@@ -30,7 +33,7 @@ export function Lazer({ itens }: { itens: string[] }) {
           aria-controls="lista-lazer"
           onClick={() => setAberto((a) => !a)}
         >
-          {aberto ? 'Mostrar menos' : `Ver os ${itens.length} itens de lazer`}
+          {aberto ? textos.menos : textos.verTodos.replace('{n}', String(itens.length))}
         </button>
       )}
     </>
