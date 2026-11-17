@@ -14,7 +14,7 @@ import type { Artigo, ConteudoIdioma } from './conteudo/tipos'
 import conteudoEn from './conteudo/en'
 import { preencher, type Dicionario } from './dicionario'
 import en from './dicionarios/en'
-import { DADOS_IDIOMA, type IdiomaAutomatico, type Moeda } from './idiomas'
+import { DADOS_IDIOMA, MOEDAS, type IdiomaAutomatico, type Moeda } from './idiomas'
 import { traduzirDoIngles } from './traducao'
 
 interface Folha {
@@ -64,8 +64,8 @@ function comMaiuscula(traduzido: string, fonte: string, locale: string) {
   return traduzido.charAt(0).toLocaleUpperCase(locale) + traduzido.slice(1)
 }
 
-/** Os textos em inglês que citam o dólar falam do euro nos idiomas em que o preço sai em euro. */
-const naMoeda = (texto: string, moeda: Moeda) => (moeda === 'EUR' ? texto.replace(/US dollars/g, 'euros') : texto)
+/** Os textos em inglês que citam o dólar ("Prices in US dollars") falam da moeda do idioma (iene, coroa sueca…). */
+const naMoeda = (texto: string, moeda: Moeda) => (moeda === 'USD' ? texto : texto.replace(/US dollars/g, MOEDAS[moeda].nome))
 
 /**
  * Tradução de uma lista de textos. Completa, fica no cache até o próximo deploy; com falha (AWS fora do ar), a página

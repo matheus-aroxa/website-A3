@@ -22,7 +22,6 @@ const fr: Dicionario = {
     menuFechar: 'Fermer le menu',
     faleConosco: 'Contactez-nous',
     faleConoscoWhatsApp: 'Contactez-nous sur WhatsApp',
-    traducaoAutomatica: 'Traduction automatique',
   },
   inicio: {
     tituloSeo: 'Biens à vendre à Recife et sur la côte du Pernambouc, Brésil | A3',

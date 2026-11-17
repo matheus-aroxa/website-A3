@@ -22,7 +22,6 @@ const en: Dicionario = {
     menuFechar: 'Close menu',
     faleConosco: 'Contact us',
     faleConoscoWhatsApp: 'Contact us on WhatsApp',
-    traducaoAutomatica: 'Automatic translation',
   },
   inicio: {
     tituloSeo: 'Properties for sale in Recife and on the coast of Pernambuco, Brazil | A3',

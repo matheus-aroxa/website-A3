@@ -39,7 +39,42 @@ export function idiomaDisponivel(valor: string): valor is Idioma {
   return ehRevisado(valor) || (tradutorAtivo() && ehIdioma(valor))
 }
 
-export type Moeda = 'USD' | 'EUR'
+/**
+ * Moedas dos preços: a do país do idioma (coroa sueca em sueco, iene em japonês…), convertida pela cotação de fechamento
+ * do Banco Central (./cotacao.ts). `nome`: como os textos em inglês dos idiomas automáticos a citam ("Prices in Japanese
+ * yen"). `escala`: multiplica os limites do filtro de preço máximo, que são pensados em dólar (até 100 mil, 200 mil…), para
+ * que caiam em valores redondos e parecidos na moeda (¥15 milhões, ¥30 milhões…); vale a ordem de grandeza da moeda contra o
+ * dólar, não precisa acompanhar a cotação. `simbolo`: troca o símbolo do `Intl` quando ele confunde ("$" do dólar taiwanês).
+ */
+export interface DadosMoeda {
+  nome: string
+  escala: number
+  simbolo?: string
+}
+
+export const MOEDAS = {
+  USD: { nome: 'US dollars', escala: 1 },
+  EUR: { nome: 'euros', escala: 1 },
+  SEK: { nome: 'Swedish kronor', escala: 10 },
+  NOK: { nome: 'Norwegian kroner', escala: 10 },
+  DKK: { nome: 'Danish kroner', escala: 5 },
+  PLN: { nome: 'Polish złoty', escala: 5 },
+  CZK: { nome: 'Czech korunas', escala: 20 },
+  HUF: { nome: 'Hungarian forints', escala: 300 },
+  RON: { nome: 'Romanian lei', escala: 5 },
+  RUB: { nome: 'Russian rubles', escala: 100 },
+  UAH: { nome: 'Ukrainian hryvnias', escala: 50 },
+  TRY: { nome: 'Turkish lira', escala: 50 },
+  CNY: { nome: 'Chinese yuan', escala: 5 },
+  TWD: { nome: 'New Taiwan dollars', escala: 30, simbolo: 'NT$' },
+  JPY: { nome: 'Japanese yen', escala: 150 },
+  KRW: { nome: 'South Korean won', escala: 1000 },
+  INR: { nome: 'Indian rupees', escala: 100 },
+  IDR: { nome: 'Indonesian rupiah', escala: 20000 },
+  VND: { nome: 'Vietnamese dong', escala: 25000 },
+  THB: { nome: 'Thai baht', escala: 30 },
+} satisfies Record<string, DadosMoeda>
+export type Moeda = keyof typeof MOEDAS
 
 export interface DadosIdioma {
   /** Nome do idioma nele mesmo, para o seletor ("Italiano", "Deutsch"). */
@@ -54,7 +89,7 @@ export interface DadosIdioma {
   locale: string
   /** `og:locale`. */
   ogLocale: string
-  /** Moeda do preço (dólar ou euro, convertido pela PTAX do dia). */
+  /** Moeda do preço, a do país do idioma (convertida pela cotação do dia, ver MOEDAS). */
   moeda: Moeda
   /** Segmentos dos endereços. Os imóveis usam o mesmo slug do site em português (é o nome do empreendimento). */
   caminhos: { imoveis: string; guia: string; regiao: string; privacidade: string }
@@ -117,30 +152,30 @@ const DADOS_REVISADOS: Record<IdiomaRevisado, DadosIdioma> = {
 /** Endereços dos idiomas automáticos: os do inglês (não vão para o Google, então não precisam estar no idioma). */
 const CAMINHOS_AUTOMATICOS = DADOS_REVISADOS.en.caminhos
 
-// [código, nome no idioma, nome em português, locale, moeda, código na AWS]. Euro para quem está na Europa (a moeda que o
-// comprador europeu usa para comparar, mesmo fora da zona do euro); dólar para os demais.
+// [código, nome no idioma, nome em português, locale, moeda, código na AWS]. A moeda é a do país do locale: euro só para
+// os países da zona do euro (Holanda, Finlândia, Grécia); a Suécia, a Polônia, a Hungria… têm a moeda própria.
 const AUTOMATICOS: [IdiomaAutomatico, string, string, string, Moeda, string][] = [
   ['nl', 'Nederlands', 'holandês', 'nl-NL', 'EUR', 'nl'],
-  ['sv', 'Svenska', 'sueco', 'sv-SE', 'EUR', 'sv'],
-  ['no', 'Norsk', 'norueguês', 'nb-NO', 'EUR', 'no'],
-  ['da', 'Dansk', 'dinamarquês', 'da-DK', 'EUR', 'da'],
+  ['sv', 'Svenska', 'sueco', 'sv-SE', 'SEK', 'sv'],
+  ['no', 'Norsk', 'norueguês', 'nb-NO', 'NOK', 'no'],
+  ['da', 'Dansk', 'dinamarquês', 'da-DK', 'DKK', 'da'],
   ['fi', 'Suomi', 'finlandês', 'fi-FI', 'EUR', 'fi'],
-  ['pl', 'Polski', 'polonês', 'pl-PL', 'EUR', 'pl'],
-  ['cs', 'Čeština', 'tcheco', 'cs-CZ', 'EUR', 'cs'],
-  ['hu', 'Magyar', 'húngaro', 'hu-HU', 'EUR', 'hu'],
-  ['ro', 'Română', 'romeno', 'ro-RO', 'EUR', 'ro'],
+  ['pl', 'Polski', 'polonês', 'pl-PL', 'PLN', 'pl'],
+  ['cs', 'Čeština', 'tcheco', 'cs-CZ', 'CZK', 'cs'],
+  ['hu', 'Magyar', 'húngaro', 'hu-HU', 'HUF', 'hu'],
+  ['ro', 'Română', 'romeno', 'ro-RO', 'RON', 'ro'],
   ['el', 'Ελληνικά', 'grego', 'el-GR', 'EUR', 'el'],
-  ['ru', 'Русский', 'russo', 'ru-RU', 'USD', 'ru'],
-  ['uk', 'Українська', 'ucraniano', 'uk-UA', 'USD', 'uk'],
-  ['tr', 'Türkçe', 'turco', 'tr-TR', 'USD', 'tr'],
-  ['zh', '简体中文', 'chinês simplificado', 'zh-CN', 'USD', 'zh'],
-  ['zh-tw', '繁體中文', 'chinês tradicional', 'zh-TW', 'USD', 'zh-TW'],
-  ['ja', '日本語', 'japonês', 'ja-JP', 'USD', 'ja'],
-  ['ko', '한국어', 'coreano', 'ko-KR', 'USD', 'ko'],
-  ['hi', 'हिन्दी', 'hindi', 'hi-IN', 'USD', 'hi'],
-  ['id', 'Bahasa Indonesia', 'indonésio', 'id-ID', 'USD', 'id'],
-  ['vi', 'Tiếng Việt', 'vietnamita', 'vi-VN', 'USD', 'vi'],
-  ['th', 'ไทย', 'tailandês', 'th-TH', 'USD', 'th'],
+  ['ru', 'Русский', 'russo', 'ru-RU', 'RUB', 'ru'],
+  ['uk', 'Українська', 'ucraniano', 'uk-UA', 'UAH', 'uk'],
+  ['tr', 'Türkçe', 'turco', 'tr-TR', 'TRY', 'tr'],
+  ['zh', '简体中文', 'chinês simplificado', 'zh-CN', 'CNY', 'zh'],
+  ['zh-tw', '繁體中文', 'chinês tradicional', 'zh-TW', 'TWD', 'zh-TW'],
+  ['ja', '日本語', 'japonês', 'ja-JP', 'JPY', 'ja'],
+  ['ko', '한국어', 'coreano', 'ko-KR', 'KRW', 'ko'],
+  ['hi', 'हिन्दी', 'hindi', 'hi-IN', 'INR', 'hi'],
+  ['id', 'Bahasa Indonesia', 'indonésio', 'id-ID', 'IDR', 'id'],
+  ['vi', 'Tiếng Việt', 'vietnamita', 'vi-VN', 'VND', 'vi'],
+  ['th', 'ไทย', 'tailandês', 'th-TH', 'THB', 'th'],
 ]
 
 export const DADOS_IDIOMA: Record<Idioma, DadosIdioma> = {

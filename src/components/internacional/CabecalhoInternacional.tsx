@@ -58,7 +58,7 @@ export async function CabecalhoInternacional({
           {detalhe && (
             <BotaoCompartilhar className={s.compartilhar} textos={{ compartilhar: d.imovel.compartilhar, copiado: d.imovel.linkCopiado }} />
           )}
-          <SeletorIdioma idioma={idioma} versoes={versoes} rotulo={d.nav.idioma} portugues={d.nav.portugues} rotuloAutomaticos={d.nav.traducaoAutomatica} />
+          <SeletorIdioma idioma={idioma} versoes={versoes} rotulo={d.nav.idioma} portugues={d.nav.portugues} />
           <MenuMobile
             links={links}
             ativo={ativo}
