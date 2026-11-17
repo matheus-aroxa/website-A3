@@ -3,7 +3,6 @@
 import 'server-only'
 import { banco, transacao, type Cliente } from '@/lib/db'
 import { altDaFoto, nomeDoLocal, slugificar } from './formato'
-import type { Idioma } from '@/lib/internacional/idiomas'
 import type { StatusImovel, Vitrine } from './painel'
 import type { Finalidade, Foto, Imovel, Planta, Situacao, TipoImovel } from './tipos'
 
@@ -355,14 +354,6 @@ export async function excluirImovelNoBanco(id: string, autor: string): Promise<s
     // A vitrine guarda ids sem chave estrangeira (no modo Viniun, aceita imóveis que não existem aqui): limpa à mão.
     await cliente.query('DELETE FROM vitrine_destaques WHERE imovel_id = $1', [id])
     await cliente.query('UPDATE vitrine_config SET heroi_id = NULL WHERE heroi_id = $1', [id])
-    // Vitrines dos idiomas (db/vitrine-internacional.sql): só se as tabelas já existirem.
-    const { rows: tabela } = await cliente.query<{ existe: boolean }>(
-      "SELECT to_regclass('public.vitrine_internacional_destaques') IS NOT NULL AS existe",
-    )
-    if (tabela[0]?.existe) {
-      await cliente.query('DELETE FROM vitrine_internacional_destaques WHERE imovel_id = $1', [id])
-      await cliente.query('UPDATE vitrine_internacional SET heroi_id = NULL WHERE heroi_id = $1', [id])
-    }
     await cliente.query('DELETE FROM imoveis WHERE id = $1', [id])
     await registrar(cliente, { autor, acao: 'excluir', campos: { id, ...imovel.rows[0] } })
     return rows.map((r) => r.src)
@@ -380,46 +371,5 @@ export async function gravarVitrine(vitrine: Vitrine, autor: string) {
       )
     }
     await registrar(cliente, { autor, acao: 'vitrine', campos: vitrine })
-  })
-}
-
-// ---------- Vitrine da área internacional, por idioma (db/vitrine-internacional.sql) ----------
-
-/**
- * Vitrine escolhida no painel para o idioma, ou `null` se ele nunca foi configurado (a página usa a seleção automática).
- * Sem as tabelas (migração ainda não aplicada), também `null`: o site segue com a seleção automática.
- */
-export async function obterVitrineInternacional(idioma: Idioma): Promise<Vitrine | null> {
-  try {
-    const [config, destaques] = await Promise.all([
-      banco().query<{ heroi_id: string | null }>('SELECT heroi_id FROM vitrine_internacional WHERE idioma = $1', [idioma]),
-      banco().query<{ imovel_id: string }>('SELECT imovel_id FROM vitrine_internacional_destaques WHERE idioma = $1 ORDER BY posicao', [
-        idioma,
-      ]),
-    ])
-    if (!config.rows[0]) return null
-    return { heroi: config.rows[0].heroi_id, destaques: destaques.rows.map((d) => d.imovel_id) }
-  } catch (erro) {
-    if ((erro as { code?: string }).code === '42P01') return null
-    throw erro
-  }
-}
-
-export async function gravarVitrineInternacional(idioma: Idioma, vitrine: Vitrine, autor: string) {
-  await transacao(async (cliente) => {
-    await cliente.query(
-      `INSERT INTO vitrine_internacional (idioma, heroi_id) VALUES ($1, $2)
-       ON CONFLICT (idioma) DO UPDATE SET heroi_id = EXCLUDED.heroi_id, atualizada_em = now()`,
-      [idioma, vitrine.heroi],
-    )
-    await cliente.query('DELETE FROM vitrine_internacional_destaques WHERE idioma = $1', [idioma])
-    if (vitrine.destaques.length) {
-      await cliente.query(
-        `INSERT INTO vitrine_internacional_destaques (idioma, posicao, imovel_id)
-         SELECT $1, * FROM unnest($2::int[], $3::text[])`,
-        [idioma, vitrine.destaques.map((_, i) => i), vitrine.destaques],
-      )
-    }
-    await registrar(cliente, { autor, acao: 'vitrine-internacional', campos: { idioma, ...vitrine } })
   })
 }

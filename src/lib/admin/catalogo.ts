@@ -1,7 +1,7 @@
 // Leituras do catálogo para o painel: inclui os desativados, sem cache
 // (o painel sempre vê o estado atual do banco). A listagem é paginada no SQL (consultas-admin.ts).
 import 'server-only'
-import { obterRegistro, obterVitrine, obterVitrineInternacional } from '@/lib/imoveis/banco'
+import { obterRegistro, obterVitrine } from '@/lib/imoveis/banco'
 import {
   idsAtivos,
   listarOpcoesVitrine,
@@ -19,8 +19,6 @@ import type { StatusImovel, Vitrine } from '@/lib/imoveis/painel'
 import { LIMITE_DESTAQUES } from '@/lib/imoveis/repositorio'
 import type { Imovel } from '@/lib/imoveis/tipos'
 import { catalogo as catalogoDaViniun } from '@/lib/imoveis/viniun/consultas'
-import { listarImoveisInternacionais, vitrineInternacional } from '@/lib/internacional/catalogo'
-import type { Idioma } from '@/lib/internacional/idiomas'
 import { exigirAdmin } from './acesso'
 
 export type { AbaAdmin, FiltroAdmin }
@@ -97,31 +95,6 @@ export async function obterVitrineAdmin() {
       }),
     ),
   }
-}
-
-/**
- * Vitrine da página inicial de um idioma da área internacional, para o editor do painel. As opções são só os imóveis do
- * recorte internacional (os únicos que aparecem nessas páginas). Idioma ainda não configurado: o editor começa da seleção
- * automática que a página mostra hoje.
- */
-export async function obterVitrineInternacionalAdmin(idioma: Idioma) {
-  const [{ opcoes }, recorte, escolhida] = await Promise.all([obterVitrineAdmin(), listarImoveisInternacionais(), obterVitrineInternacional(idioma)])
-  const ids = new Set(recorte.map((im) => im.id))
-  let vitrine: Vitrine
-  if (escolhida) {
-    vitrine = { heroi: escolhida.heroi && ids.has(escolhida.heroi) ? escolhida.heroi : null, destaques: escolhida.destaques.filter((id) => ids.has(id)) }
-  } else {
-    const automatica = await vitrineInternacional(idioma)
-    vitrine = { heroi: automatica.heroi?.id ?? null, destaques: automatica.destaques.map((im) => im.id) }
-  }
-  return { vitrine, opcoes: opcoes.filter((o) => ids.has(o.id)), personalizada: Boolean(escolhida) }
-}
-
-/** Ids que podem entrar na vitrine de um idioma: publicados e no recorte internacional. */
-export async function idsParaVitrineInternacional(ids: string[]): Promise<Set<string>> {
-  const [publicados, recorte] = await Promise.all([idsParaVitrine(ids), listarImoveisInternacionais()])
-  const noRecorte = new Set(recorte.map((im) => im.id))
-  return new Set([...publicados].filter((id) => noRecorte.has(id)))
 }
 
 /** Quais destes ids podem entrar na vitrine: publicados no banco, ou (modo Viniun) publicados na Viniun com foto. */

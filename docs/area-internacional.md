@@ -41,7 +41,6 @@ coreano (`ko`), hindi (`hi`), indonésio (`id`), vietnamita (`vi`) e tailandês 
   ordem alfabética (o `nofollow` não aparece na tela).
 - **Só com o tradutor ligado** (`TRADUTOR=aws`): sem ele, esses endereços respondem 404 e o seletor não os mostra.
 - **Moeda**: a do país do idioma (coroa sueca em sueco, iene em japonês…; ver Preço, abaixo).
-- **Vitrine**: a do inglês (o painel configura só os idiomas revisados).
 - **Design**: as abas (painel de busca do topo, contato da ficha) quebram em duas linhas em vez de cortar, e palavras
   longas dos títulos quebram com hífen (`html[data-traducao='automatica']` em `globals.css`). Títulos com destaque verde
   ("Your home in **Brazil.**") são traduzidos como uma frase só e a última palavra vira o destaque; em chinês e japonês,
@@ -106,16 +105,8 @@ Google não vê essa tradução (para o Google a descrição continua em portugu
 ser brasileiro e ter renda dentro da faixa). Hoje são 254. Quando a A3 definir o recorte (por preço, cidade, escolha no
 painel…), muda só essa função: listagem, fichas, destaques e sitemap passam todos por ela.
 
-### Vitrine por idioma
-
-Cada idioma tem a própria vitrine: o imóvel do topo e os destaques da página inicial (/en, /it…) são escolhidos no painel,
-em **Vitrine**, na aba do idioma. Assim os italianos podem ver uns imóveis em destaque e os alemães, outros. Só aparecem
-como opção os imóveis do recorte internacional. As escolhas ficam nas tabelas `vitrine_internacional` e
-`vitrine_internacional_destaques` (`db/vitrine-internacional.sql`); salvar atualiza a página na hora.
-
-Idioma que nunca foi configurado (ou enquanto a migração não for aplicada) usa a seleção automática: os destaques da home em
-português que estão no recorte, completados com os mais recentes, e o primeiro deles no topo. Imóvel escolhido que sai do
-site some da vitrine sozinho; excluir um imóvel pelo painel também o tira das vitrines dos idiomas.
+Os destaques da página inicial internacional são os da vitrine da home (painel) que estão no recorte, completados com os
+mais recentes; o primeiro deles é o imóvel do topo. É a mesma seleção em todos os idiomas.
 
 ## Preço
 
@@ -176,7 +167,9 @@ Mudou o visual de uma página em português? Leve a mudança para a internaciona
 
 ## Pendências
 
-- Rodar `db/vitrine-internacional.sql` no Supabase (vitrine por idioma no painel).
+- Apagar do banco, se não forem voltar a ser usadas, as tabelas `vitrine_internacional` e `vitrine_internacional_destaques`,
+  da vitrine por idioma (removida em 16/11/2026). Ficaram sem uso, com a seleção do inglês salva naquele dia:
+  `DROP TABLE public.vitrine_internacional_destaques; DROP TABLE public.vitrine_internacional;`
 - Definir `TRADUTOR=aws` na Vercel (a permissão `translate:TranslateText` já foi dada ao `vercel-a3-user`). Sem ele, os
   idiomas de tradução automática (/ja, /pl…) não aparecem.
 - Revisar os textos (dicionários e conteúdo), de preferência com um falante nativo, principalmente o italiano.

@@ -200,21 +200,14 @@
   font-variant-numeric: tabular-nums;
 }
 
-.aba[aria-pressed='true'],
-.aba[aria-current='page'] {
+.aba[aria-pressed='true'] {
   border-color: #fff;
   background: #fff;
   color: var(--tinta);
 }
 
-.aba[aria-pressed='true'] span,
-.aba[aria-current='page'] span {
+.aba[aria-pressed='true'] span {
   color: var(--mar);
-}
-
-/* Abas que são links (vitrine por idioma). */
-a.aba {
-  text-decoration: none;
 }
 
 @media (min-width: 960px) {

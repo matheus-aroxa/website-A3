@@ -18,7 +18,7 @@ import s from './Admin.module.css'
 const LINKS = [
   { href: '/admin', rotulo: 'Imóveis', chave: 'imoveis' },
   { href: '/admin/construtoras', rotulo: 'Construtoras', chave: 'construtoras' },
-  { href: '/admin/vitrine', rotulo: 'Vitrine', chave: 'vitrine' },
+  { href: '/admin/vitrine', rotulo: 'Vitrine da home', chave: 'vitrine' },
   { href: '/admin/relatorios', rotulo: 'Relatórios', chave: 'relatorios' },
 ] as const
 
