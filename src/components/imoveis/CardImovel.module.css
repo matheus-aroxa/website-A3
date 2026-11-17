@@ -64,6 +64,13 @@
   font-weight: 800;
   font-stretch: 112%;
   letter-spacing: -0.01em;
+  /* Os nomes da Viniun são longos ("Paço Decó – Apartamento à venda em Torre, Recife"): no máximo duas linhas, com
+     reticências. O nome inteiro continua no HTML (Google, leitor de tela) e no title do link. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
 }
 
 .card[data-variante='destaque'] .nome {

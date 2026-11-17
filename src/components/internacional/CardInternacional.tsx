@@ -64,7 +64,7 @@ export async function CardInternacional({
       <div className={s.corpo}>
         <span className={s.tipo}>{d.imovel.tipo[im.tipo]}</span>
         <Titulo className={s.nome} translate="no">
-          <Link href={urlImovelInternacional(idioma, im.slug)} className={s.link}>
+          <Link href={urlImovelInternacional(idioma, im.slug)} className={s.link} title={im.nome}>
             {im.nome}
           </Link>
         </Titulo>

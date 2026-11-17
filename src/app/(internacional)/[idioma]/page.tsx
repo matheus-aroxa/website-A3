@@ -109,7 +109,7 @@ export default async function InicioInternacional({ params }: PageProps<'/[idiom
                       fetchPriority="high"
                     />
                   </div>
-                  <Link href={urlImovelInternacional(idioma, heroi.slug)} className={`elevar ${s.heroCard}`}>
+                  <Link href={urlImovelInternacional(idioma, heroi.slug)} className={`elevar ${s.heroCard}`} title={heroi.nome}>
                     <Image loader={carregadorImagem} src={heroi.capa.src} alt="" width={64} height={64} sizes="64px" />
                     <span className={s.heroCardTexto}>
                       <span className={s.heroCardRotulo}>

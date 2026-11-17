@@ -126,7 +126,7 @@ export default async function Home() {
                       fetchPriority="high"
                     />
                   </div>
-                  <Link href={urlImovel(heroi.slug)} className={`elevar ${s.heroCard}`}>
+                  <Link href={urlImovel(heroi.slug)} className={`elevar ${s.heroCard}`} title={heroi.nome}>
                     {capaHeroi && <Image loader={carregadorImagem} src={capaHeroi.src} alt="" width={64} height={64} sizes="64px" />}
                     <span className={s.heroCardTexto}>
                       <span className={s.heroCardRotulo}>

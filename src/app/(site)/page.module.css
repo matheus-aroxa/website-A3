@@ -125,6 +125,12 @@
   font-weight: 800;
   font-stretch: 112%;
   color: var(--tinta);
+  /* Nome longo (os da Viniun): no máximo duas linhas, com reticências, como nos cards. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
 }
 
 .heroCardTexto b {
