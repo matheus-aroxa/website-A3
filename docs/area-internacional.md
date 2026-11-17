@@ -37,10 +37,10 @@ coreano (`ko`), hindi (`hi`), indonésio (`id`), vietnamita (`vi`) e tailandês 
   nos outros idiomas (descrição etc. traduzidas do português ao abrir a ficha). Dias da semana, meses e horas vêm do
   `Intl` do próprio servidor, sem tradução.
 - **Fora do Google**: `noindex`, fora do sitemap e do `hreflang`, links do seletor com `nofollow`. O rodapé avisa que a
-  página foi traduzida automaticamente.
+  página foi traduzida automaticamente. No seletor de idioma eles aparecem junto com os revisados, sem distinção, todos em
+  ordem alfabética (o `nofollow` não aparece na tela).
 - **Só com o tradutor ligado** (`TRADUTOR=aws`): sem ele, esses endereços respondem 404 e o seletor não os mostra.
-- **Moeda**: euro para os idiomas europeus (`nl`, `sv`, `no`, `da`, `fi`, `pl`, `cs`, `hu`, `ro`, `el`), dólar para os demais.
-- **Vitrine**: a do inglês (o painel configura só os idiomas revisados).
+- **Moeda**: a do país do idioma (coroa sueca em sueco, iene em japonês…; ver Preço, abaixo).
 - **Design**: as abas (painel de busca do topo, contato da ficha) quebram em duas linhas em vez de cortar, e palavras
   longas dos títulos quebram com hífen (`html[data-traducao='automatica']` em `globals.css`). Títulos com destaque verde
   ("Your home in **Brazil.**") são traduzidos como uma frase só e a última palavra vira o destaque; em chinês e japonês,
@@ -105,25 +105,29 @@ Google não vê essa tradução (para o Google a descrição continua em portugu
 ser brasileiro e ter renda dentro da faixa). Hoje são 254. Quando a A3 definir o recorte (por preço, cidade, escolha no
 painel…), muda só essa função: listagem, fichas, destaques e sitemap passam todos por ela.
 
-### Vitrine por idioma
-
-Cada idioma tem a própria vitrine: o imóvel do topo e os destaques da página inicial (/en, /it…) são escolhidos no painel,
-em **Vitrine**, na aba do idioma. Assim os italianos podem ver uns imóveis em destaque e os alemães, outros. Só aparecem
-como opção os imóveis do recorte internacional. As escolhas ficam nas tabelas `vitrine_internacional` e
-`vitrine_internacional_destaques` (`db/vitrine-internacional.sql`); salvar atualiza a página na hora.
-
-Idioma que nunca foi configurado (ou enquanto a migração não for aplicada) usa a seleção automática: os destaques da home em
-português que estão no recorte, completados com os mais recentes, e o primeiro deles no topo. Imóvel escolhido que sai do
-site some da vitrine sozinho; excluir um imóvel pelo painel também o tira das vitrines dos idiomas.
+Os destaques da página inicial internacional são os da vitrine da home (painel) que estão no recorte, completados com os
+mais recentes; o primeiro deles é o imóvel do topo. É a mesma seleção em todos os idiomas.
 
 ## Preço
 
-As páginas internacionais mostram o preço só na moeda do idioma: dólar (inglês e espanhol) ou euro (italiano, francês e
-alemão), convertido pela PTAX de venda do Banco Central (API pública, sem chave, `src/lib/internacional/cotacao.ts`) e
-arredondado ao milhar. Não aparecem o valor em reais nem menção a conversão ou aproximação (decisão da A3, 16/11/2026); a
-nota "o preço pode mudar conforme a tabela da construtora" continua. A cotação é relida a cada hora. Se a API do Banco
-Central falhar, sai o preço em reais, o único disponível (`precoNoIdioma`, em `src/lib/internacional/formato.ts`). Os dados
-estruturados (JSON-LD), que não aparecem na página, continuam com o preço em reais, que é o valor real da oferta.
+As páginas internacionais mostram o preço só na moeda do idioma, que é a do país dele: dólar em inglês e espanhol (o
+espanhol foi escrito para o público da Argentina, do Chile e do Uruguai, que pensa imóvel em dólar); euro em italiano,
+francês, alemão, holandês, finlandês e grego; e a moeda própria nos demais (coroa sueca, norueguesa e dinamarquesa, zloty,
+coroa tcheca, florim, leu, rublo, grívnia, lira turca, yuan, dólar taiwanês, iene, won, rúpia indiana, rupia indonésia,
+dong e baht). A tabela fica em `src/lib/internacional/idiomas.ts` (`MOEDAS` e a moeda de cada idioma).
+
+A conversão usa a taxa de venda do fechamento do Banco Central (arquivo público diário, sem chave,
+`https://www4.bcb.gov.br/Download/fechamento/AAAAMMDD.csv`, em `src/lib/internacional/cotacao.ts`): para dólar, euro, iene,
+coroas e as outras moedas com PTAX, é a própria PTAX; para as demais, a taxa que o Banco Central calcula pela paridade com o
+dólar. O preço é arredondado ao milhar (nas moedas de valores muito grandes, como iene, won e rupia, a quatro algarismos).
+Não aparecem o valor em reais nem menção a conversão ou aproximação (decisão da A3, 16/11/2026); a nota "o preço pode mudar
+conforme a tabela da construtora" continua. A cotação é relida a cada hora; antes da publicação do dia (por volta das 13h),
+em fim de semana e feriado, vale o último dia útil. Se o arquivo do Banco Central não vier, sai o preço em reais, o único
+disponível (`precoNoIdioma`, em `src/lib/internacional/formato.ts`). Os dados estruturados (JSON-LD), que não aparecem na
+página, continuam com o preço em reais, que é o valor real da oferta.
+
+O filtro de preço máximo (lista de imóveis e painel do topo) usa os limites de 100 mil, 200 mil, 300 mil, 500 mil e 1 milhão
+de dólares, multiplicados pela `escala` de cada moeda em `MOEDAS` para cair em valores redondos (¥15 milhões, ¥30 milhões…).
 
 ## Contato
 
@@ -163,7 +167,9 @@ Mudou o visual de uma página em português? Leve a mudança para a internaciona
 
 ## Pendências
 
-- Rodar `db/vitrine-internacional.sql` no Supabase (vitrine por idioma no painel).
+- Apagar do banco, se não forem voltar a ser usadas, as tabelas `vitrine_internacional` e `vitrine_internacional_destaques`,
+  da vitrine por idioma (removida em 16/11/2026). Ficaram sem uso, com a seleção do inglês salva naquele dia:
+  `DROP TABLE public.vitrine_internacional_destaques; DROP TABLE public.vitrine_internacional;`
 - Definir `TRADUTOR=aws` na Vercel (a permissão `translate:TranslateText` já foi dada ao `vercel-a3-user`). Sem ele, os
   idiomas de tradução automática (/ja, /pl…) não aparecem.
 - Revisar os textos (dicionários e conteúdo), de preferência com um falante nativo, principalmente o italiano.

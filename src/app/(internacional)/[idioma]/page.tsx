@@ -15,8 +15,8 @@ import { MapaEstatico } from '@/components/ui/MapaEstatico'
 import { RevelarAoRolar } from '@/components/ui/RevelarAoRolar'
 import carregadorImagem from '@/lib/imoveis/carregador-imagem'
 import { slugificar } from '@/lib/imoveis/formato'
-import { DESTAQUES_POR_VEZ } from '@/lib/imoveis/repositorio'
-import { listarImoveisInternacionais, vitrineInternacional } from '@/lib/internacional/catalogo'
+import { DESTAQUES_POR_VEZ, LIMITE_DESTAQUES } from '@/lib/imoveis/repositorio'
+import { listarDestaquesInternacionais, listarImoveisInternacionais } from '@/lib/internacional/catalogo'
 import { obterCotacoes } from '@/lib/internacional/cotacao'
 import { opcoesPrecoMaximo, precoNoIdioma } from '@/lib/internacional/formato'
 import { DADOS_IDIOMA, alternativas, ehRevisado, idiomaDisponivel, urlImovelInternacional, urlInicio, urlSecao, versoes } from '@/lib/internacional/idiomas'
@@ -57,8 +57,9 @@ export default async function InicioInternacional({ params }: PageProps<'/[idiom
   const { idioma } = await params
   if (!idiomaDisponivel(idioma)) notFound()
   const d = await dicionario(idioma)
-  const [{ heroi, destaques }, todos, cotacoes] = await Promise.all([vitrineInternacional(idioma), listarImoveisInternacionais(), obterCotacoes()])
+  const [destaques, todos, cotacoes] = await Promise.all([listarDestaquesInternacionais(LIMITE_DESTAQUES), listarImoveisInternacionais(), obterCotacoes()])
   const cotacao = cotacoes[DADOS_IDIOMA[idioma].moeda]
+  const heroi = destaques[0]
   const precoHeroi = heroi && precoNoIdioma(heroi.preco, idioma, cotacao, d)
   const imoveis = urlSecao(idioma, 'imoveis')
   const contatoWhats = linkWhatsApp(d.contato.mensagemPadrao)
@@ -108,7 +109,7 @@ export default async function InicioInternacional({ params }: PageProps<'/[idiom
                       fetchPriority="high"
                     />
                   </div>
-                  <Link href={urlImovelInternacional(idioma, heroi.slug)} className={`elevar ${s.heroCard}`}>
+                  <Link href={urlImovelInternacional(idioma, heroi.slug)} className={`elevar ${s.heroCard}`} title={heroi.nome}>
                     <Image loader={carregadorImagem} src={heroi.capa.src} alt="" width={64} height={64} sizes="64px" />
                     <span className={s.heroCardTexto}>
                       <span className={s.heroCardRotulo}>

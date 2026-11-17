@@ -17,7 +17,7 @@ export interface Dicionario {
     regiao: string
     contato: string
     idioma: string
-    /** Link para o site em português, com o nome do idioma escrito nele mesmo. */
+    /** "Português" no seletor de idioma (o nome do idioma escrito nele mesmo). */
     portugues: string
     pularConteudo: string
     voceEstaEm: string
@@ -25,8 +25,6 @@ export interface Dicionario {
     menuFechar: string
     faleConosco: string
     faleConoscoWhatsApp: string
-    /** Título do grupo dos idiomas de tradução automática no seletor. */
-    traducaoAutomatica: string
   }
   inicio: {
     tituloSeo: string

@@ -21,7 +21,6 @@ const de: Dicionario = {
     menuFechar: 'Menü schließen',
     faleConosco: 'Kontakt',
     faleConoscoWhatsApp: 'Kontakt über WhatsApp',
-    traducaoAutomatica: 'Automatische Übersetzung',
   },
   inicio: {
     tituloSeo: 'Immobilien kaufen in Recife und an der Küste von Pernambuco, Brasilien | A3',

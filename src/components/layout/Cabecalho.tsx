@@ -50,7 +50,7 @@ export function Cabecalho({
 
         <div className={s.acoes}>
           {detalhe && <BotaoCompartilhar className={s.compartilhar} />}
-          <SeletorIdioma idioma="pt" versoes={versoes} rotulo="Idioma" portugues="Português" rotuloAutomaticos="Tradução automática" />
+          <SeletorIdioma idioma="pt" versoes={versoes} rotulo="Idioma" portugues="Português" />
           <MenuMobile links={LINKS_PRINCIPAIS} ativo={ativo} />
         </div>
       </div>

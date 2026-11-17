@@ -1,4 +1,4 @@
-import { DADOS_IDIOMA, IDIOMAS_AUTOMATICOS, IDIOMAS_REVISADOS, tradutorAtivo, type Idioma } from '@/lib/internacional/idiomas'
+import { DADOS_IDIOMA, ehRevisado, idiomasDisponiveis, type Idioma } from '@/lib/internacional/idiomas'
 import s from './Internacional.module.css'
 
 /** Endereço desta página em cada idioma ("pt" = site em português). Sem a versão, o link leva à página inicial do idioma. */
@@ -9,51 +9,40 @@ interface Opcao {
   nome: string
   href: string
   lang: string
+  /** Idioma de tradução automática: fora do Google, o robô não precisa seguir o link. */
+  nofollow: boolean
 }
 
+/** Ordem alfabética pelo nome no próprio idioma: os de alfabeto latino primeiro, depois grego, cirílico, hindi, tailandês… */
+const ordem = new Intl.Collator('en')
+
 /**
- * Lista de idiomas (sem JavaScript: <details>). Cada link leva à mesma página no outro idioma. Os idiomas de tradução
- * automática vêm num grupo à parte, só com o tradutor ligado.
+ * Lista de idiomas (sem JavaScript: <details>). Cada link leva à mesma página no outro idioma. Os idiomas revisados e os
+ * de tradução automática (só com o tradutor ligado) aparecem juntos, sem distinção, em ordem alfabética.
  */
 export function SeletorIdioma({
   idioma,
   versoes,
   rotulo,
   portugues,
-  rotuloAutomaticos,
 }: {
   /** Idioma da página ("pt" no site em português). */
   idioma: Idioma | 'pt'
   versoes: Versoes
   rotulo: string
   portugues: string
-  /** Título do grupo dos idiomas automáticos ("Tradução automática"). */
-  rotuloAutomaticos: string
 }) {
   const nomeAtual = idioma === 'pt' ? portugues : DADOS_IDIOMA[idioma].nome
-  const opcao = (i: Idioma): Opcao => ({ codigo: i, nome: DADOS_IDIOMA[i].nome, href: versoes[i] ?? `/${i}`, lang: DADOS_IDIOMA[i].lang })
-  const principais = [...IDIOMAS_REVISADOS.map(opcao), { codigo: 'pt', nome: portugues, href: versoes.pt ?? '/', lang: 'pt-BR' }]
-  const automaticos = tradutorAtivo() ? IDIOMAS_AUTOMATICOS.map(opcao) : []
-
-  const lista = (opcoes: Opcao[], nofollow = false) => (
-    <ul>
-      {opcoes.map((o) => (
-        <li key={o.codigo}>
-          {/* <a> e não <Link>: cada idioma tem o próprio layout raiz (<html lang>), a troca recarrega a página. */}
-          <a
-            href={o.href}
-            hrefLang={o.lang}
-            lang={o.lang}
-            rel={nofollow ? 'nofollow' : undefined}
-            aria-current={o.codigo === idioma || undefined}
-          >
-            {o.nome}
-            <small>{o.codigo}</small>
-          </a>
-        </li>
-      ))}
-    </ul>
-  )
+  const opcoes: Opcao[] = [
+    ...idiomasDisponiveis().map((i) => ({
+      codigo: i,
+      nome: DADOS_IDIOMA[i].nome,
+      href: versoes[i] ?? `/${i}`,
+      lang: DADOS_IDIOMA[i].lang,
+      nofollow: !ehRevisado(i),
+    })),
+    { codigo: 'pt', nome: portugues, href: versoes.pt ?? '/', lang: 'pt-BR', nofollow: false },
+  ].sort((a, b) => ordem.compare(a.nome, b.nome))
 
   return (
     <details className={s.idioma}>
@@ -65,14 +54,23 @@ export function SeletorIdioma({
         {idioma}
       </summary>
       <div className={s.idiomaLista}>
-        {lista(principais)}
-        {automaticos.length > 0 && (
-          <>
-            <p className={s.idiomaGrupo}>{rotuloAutomaticos}</p>
-            {/* Fora do Google: o robô não precisa seguir para as páginas de tradução automática. */}
-            {lista(automaticos, true)}
-          </>
-        )}
+        <ul>
+          {opcoes.map((o) => (
+            <li key={o.codigo}>
+              {/* <a> e não <Link>: cada idioma tem o próprio layout raiz (<html lang>), a troca recarrega a página. */}
+              <a
+                href={o.href}
+                hrefLang={o.lang}
+                lang={o.lang}
+                rel={o.nofollow ? 'nofollow' : undefined}
+                aria-current={o.codigo === idioma || undefined}
+              >
+                {o.nome}
+                <small>{o.codigo}</small>
+              </a>
+            </li>
+          ))}
+        </ul>
       </div>
     </details>
   )

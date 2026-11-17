@@ -1,52 +1,65 @@
-// Cotação do dólar e do euro (PTAX de venda do Banco Central), para o valor aproximado ao lado do preço em reais.
-// API pública do Banco Central, sem chave: https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/aplicacao
-// A cotação muda uma vez por dia útil; o cache relê a cada hora. Se a API falhar, a página sai só com o preço em reais.
+// Cotação das moedas dos idiomas (taxa de venda do fechamento do Banco Central), para o preço na moeda do idioma.
+// Arquivo público do Banco Central, sem chave, um por dia útil: https://www4.bcb.gov.br/Download/fechamento/AAAAMMDD.csv.
+// Traz cerca de 150 moedas: para o dólar, o euro, o iene, a coroa sueca… é a própria PTAX; para as que não têm PTAX
+// (zloty, won, baht…), a taxa que o Banco Central calcula pela paridade com o dólar. Sai depois do fechamento da PTAX (por
+// volta das 13h); antes disso, e em fim de semana e feriado, vale o último dia útil. O cache relê a cada hora. Se o arquivo
+// não vier, a página sai com o preço em reais.
 import 'server-only'
 import { cacheLife } from 'next/cache'
-import type { Moeda } from './idiomas'
+import { MOEDAS, type Moeda } from './idiomas'
 
 export interface Cotacao {
   /** Reais por unidade da moeda. */
   valor: number
-  /** Data e hora da cotação (ISO). */
+  /** Dia da cotação (AAAA-MM-DD). */
   data: string
 }
 
-const API = 'https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata'
+const ARQUIVO = 'https://www4.bcb.gov.br/Download/fechamento'
 
-/** "MM-DD-AAAA", o formato que a API espera. */
-function dataApi(d: Date) {
-  return `${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}-${d.getUTCFullYear()}`
+/** Quantos dias para trás procurar o último arquivo publicado (fim de semana, Carnaval, feriado emendado). */
+const DIAS_PARA_TRAS = 8
+
+/** "AAAAMMDD" do dia no horário de Brasília, `atras` dias antes de hoje. */
+function diaEmBrasilia(atras: number) {
+  const brasilia = new Date(Date.now() - 3 * 60 * 60 * 1000 - atras * 24 * 60 * 60 * 1000)
+  return brasilia.toISOString().slice(0, 10).replaceAll('-', '')
 }
 
-async function buscarCotacao(moeda: Moeda): Promise<Cotacao | undefined> {
-  // Dez dias para trás: cobre fim de semana e feriados.
-  const fim = new Date()
-  const inicio = new Date(fim.getTime() - 10 * 24 * 60 * 60 * 1000)
-  const url =
-    `${API}/CotacaoMoedaPeriodo(moeda=@moeda,dataInicial=@dataInicial,dataFinalCotacao=@dataFinalCotacao)` +
-    `?@moeda='${moeda}'&@dataInicial='${dataApi(inicio)}'&@dataFinalCotacao='${dataApi(fim)}'` +
-    `&$format=json&$select=cotacaoVenda,dataHoraCotacao,tipoBoletim`
-  try {
-    const resposta = await fetch(url, { signal: AbortSignal.timeout(8000) })
-    if (!resposta.ok) throw new Error(`HTTP ${resposta.status}`)
-    const { value } = (await resposta.json()) as { value: { cotacaoVenda: number; dataHoraCotacao: string; tipoBoletim: string }[] }
-    // O boletim de fechamento é a PTAX do dia; no meio do dia só há os intermediários.
-    const fechamentos = value.filter((c) => c.tipoBoletim === 'Fechamento')
-    const ultima = (fechamentos.length ? fechamentos : value).at(-1)
-    if (!ultima || !(ultima.cotacaoVenda > 0)) return undefined
-    // "2026-11-13 13:09:27.123" (horário de Brasília) → ISO.
-    const data = new Date(`${ultima.dataHoraCotacao.replace(' ', 'T').slice(0, 19)}-03:00`).toISOString()
-    return { valor: ultima.cotacaoVenda, data }
-  } catch (erro) {
-    console.error(`[cotacao] ${moeda}:`, erro)
-    return undefined
+/**
+ * Linhas "13/11/2026;220;A;USD;5,65120000;5,65180000;1,00000000;1,00000000": data, código, tipo, moeda, taxa de compra
+ * e de venda (reais por unidade), paridade de compra e de venda (com o dólar).
+ */
+function lerArquivo(csv: string) {
+  const cotacoes: Partial<Record<Moeda, Cotacao>> = {}
+  for (const linha of csv.split(/\r?\n/)) {
+    const [data, , , moeda, , venda] = linha.split(';')
+    if (!data || !moeda || !venda || !(moeda in MOEDAS)) continue
+    const valor = Number(venda.replace(',', '.'))
+    const [dia, mes, ano] = data.split('/')
+    if (valor > 0) cotacoes[moeda as Moeda] = { valor, data: `${ano}-${mes}-${dia}` }
   }
+  return cotacoes
 }
 
 export async function obterCotacoes(): Promise<Partial<Record<Moeda, Cotacao>>> {
   'use cache'
   cacheLife('hours')
-  const [USD, EUR] = await Promise.all([buscarCotacao('USD'), buscarCotacao('EUR')])
-  return { ...(USD && { USD }), ...(EUR && { EUR }) }
+  for (let atras = 0; atras <= DIAS_PARA_TRAS; atras++) {
+    const dia = diaEmBrasilia(atras)
+    try {
+      const resposta = await fetch(`${ARQUIVO}/${dia}.csv`, { signal: AbortSignal.timeout(8000) })
+      // Dia sem arquivo (ainda não publicado, fim de semana, feriado): tenta o anterior.
+      if (resposta.status === 404) continue
+      if (!resposta.ok) throw new Error(`HTTP ${resposta.status}`)
+      const cotacoes = lerArquivo(await resposta.text())
+      if (cotacoes.USD) return cotacoes
+    } catch (erro) {
+      // Fora do ar ou lento: os dias anteriores falhariam do mesmo jeito.
+      console.error(`[cotacao] ${dia}:`, erro)
+      return {}
+    }
+  }
+  console.error(`[cotacao] nenhum arquivo de fechamento nos últimos ${DIAS_PARA_TRAS} dias`)
+  return {}
 }

@@ -38,10 +38,6 @@ export async function RodapeInternacional({ idioma, comBarraInferior = false }: 
                 {l.rotulo}
               </Link>
             ))}
-            {/* Outro layout raiz: o Next recarrega a página inteira ao trocar. */}
-            <Link href="/" hrefLang="pt-BR" lang="pt-BR" className={s.link}>
-              {d.nav.portugues}
-            </Link>
           </nav>
           <nav aria-label={d.rodape.buscasFrequentes} className={s.coluna}>
             <strong>{d.rodape.buscasFrequentes}</strong>

@@ -22,7 +22,6 @@ const it: Dicionario = {
     menuFechar: 'Chiudi il menu',
     faleConosco: 'Contattaci',
     faleConoscoWhatsApp: 'Contattaci su WhatsApp',
-    traducaoAutomatica: 'Traduzione automatica',
   },
   inicio: {
     tituloSeo: 'Immobili in vendita a Recife e sulla costa del Pernambuco, Brasile | A3',

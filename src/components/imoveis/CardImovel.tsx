@@ -58,7 +58,7 @@ export function CardImovel({
       <div className={s.corpo}>
         <span className={s.tipo}>{rotuloTipo[imovel.tipo]}</span>
         <Titulo className={s.nome}>
-          <Link href={urlImovel(imovel.slug)} className={s.link}>
+          <Link href={urlImovel(imovel.slug)} className={s.link} title={imovel.nome}>
             {imovel.nome}
           </Link>
         </Titulo>
