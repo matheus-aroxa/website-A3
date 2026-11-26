@@ -28,7 +28,7 @@ export const site = {
 } as const
 
 /** Endereço público do bucket S3 com as imagens do site (imóveis em `imoveis/` e `empreendimentos/`, institucionais em `site/`). */
-export const URL_IMAGENS = 'https://a3-imoveis-fotos.s3.sa-east-1.amazonaws.com'
+export const URL_IMAGENS = 'https://dbn76pzkb0t3o.cloudfront.net'
 
 /** Imagens institucionais no S3. O nome leva o hash do conteúdo, então o cache pode ser eterno: ao trocar a foto, suba outra e mude o nome aqui. */
 export const imagensSite = {
