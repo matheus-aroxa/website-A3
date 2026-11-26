@@ -25,6 +25,30 @@ const ativo = tradutorAtivo
 let cliente: TranslateClient | undefined
 const translate = () => (cliente ??= new TranslateClient({ region: process.env.TRADUTOR_REGIAO?.trim() || 'us-east-1' }))
 
+// ——— Limite mensal de caracteres ———
+// Cada chamada real à AWS (não as que vêm do cache) gasta caracteres. Quando o mês passa do teto, as chamadas
+// seguintes falham de propósito: o texto fica no original e nada é cobrado. O mês é contado no fuso de Recife.
+// Limite: variável TRADUTOR_LIMITE_CARACTERES_MES (padrão 100.000 caracteres ≈ US$ 1,50 por mês, com US$ 2 de teto).
+// Atenção: o contador fica na memória de cada instância da Vercel. Com várias instâncias ao mesmo tempo, o total
+// do mês pode passar do teto. O teto que vale de verdade é o da AWS (Budget Action), ver o plano de custo.
+const LIMITE_CARACTERES_MES = Number(process.env.TRADUTOR_LIMITE_CARACTERES_MES) || 100_000
+let mesDoContador = ''
+let caracteresNoMes = 0
+
+/** Reserva caracteres para uma chamada à AWS. Devolve false quando o limite do mês já foi atingido. */
+function reservarCaracteres(quantidade: number): boolean {
+  const mes = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Recife' }).slice(0, 7)
+  if (mes !== mesDoContador) {
+    mesDoContador = mes
+    caracteresNoMes = 0
+  }
+  if (caracteresNoMes + quantidade > LIMITE_CARACTERES_MES) return false
+  caracteresNoMes += quantidade
+  return true
+}
+
+const LIMITE_ATINGIDO = 'limite mensal de caracteres da tradução atingido'
+
 /**
  * Tradução de um texto, guardada no cache compartilhado do Next pela combinação texto + idioma (os argumentos são a chave).
  * Erro não entra no cache: a próxima geração da página tenta de novo.
@@ -32,6 +56,7 @@ const translate = () => (cliente ??= new TranslateClient({ region: process.env.T
 async function traduzirNaAws(texto: string, idioma: Idioma, origem: 'pt' | 'en' = 'pt'): Promise<string> {
   'use cache: remote'
   cacheLife('max')
+  if (!reservarCaracteres(texto.length)) throw new Error(LIMITE_ATINGIDO)
   const resposta = await translate().send(
     new TranslateTextCommand({ Text: texto, SourceLanguageCode: origem, TargetLanguageCode: DADOS_IDIOMA[idioma].aws }),
   )
@@ -77,38 +102,10 @@ export async function traduzirTextos(textos: string[], idioma: Idioma): Promise<
 }
 
 // ——— Textos da página nos idiomas automáticos (automatico.ts) ———
-// São centenas de textos curtos (botões, rótulos, títulos): um por chamada seria lento e esbarraria no limite de
-// chamadas por segundo da AWS. Vão em blocos, um texto por linha; a AWS mantém as quebras de linha. Se um bloco volta
-// com outra contagem de linhas, os textos dele vão um a um.
-
-/** Folga abaixo dos 10.000 bytes por chamada. */
-const BLOCO_BYTES = 9_000
-
-async function traduzirBlocoNaAws(textos: string[], idioma: Idioma): Promise<string[]> {
-  'use cache: remote'
-  cacheLife('max')
-  const resposta = await translate().send(
-    new TranslateTextCommand({ Text: textos.join('\n'), SourceLanguageCode: 'en', TargetLanguageCode: DADOS_IDIOMA[idioma].aws }),
-  )
-  const linhas = (resposta.TranslatedText ?? '').split('\n')
-  if (linhas.length !== textos.length) throw new Error(`bloco voltou com ${linhas.length} linhas em vez de ${textos.length}`)
-  return linhas.map((l) => l.trim())
-}
-
-function emBlocos(textos: string[]) {
-  const blocos: string[][] = [[]]
-  let bytes = 0
-  for (const texto of textos) {
-    const tamanho = Buffer.byteLength(texto) + 1
-    if (bytes + tamanho > BLOCO_BYTES && blocos.at(-1)!.length) {
-      blocos.push([])
-      bytes = 0
-    }
-    blocos.at(-1)!.push(texto)
-    bytes += tamanho
-  }
-  return blocos
-}
+// Cada texto é traduzido sozinho e guardado no cache com a própria chave (texto + idioma). Antes, os textos iam em
+// blocos, e a chave era o bloco inteiro: mudar um texto refazia o bloco todo e a lista de blocos inteira se deslocava.
+// Agora, mudar um texto custa só a tradução desse texto. As chamadas são feitas poucas de cada vez, por causa do
+// limite de chamadas por segundo da AWS.
 
 /**
  * Traduz do inglês textos de uma linha (quebras viram espaço). Devolve, na mesma ordem, a tradução de cada um ou
@@ -119,26 +116,13 @@ export async function traduzirDoIngles(textos: string[], idioma: Idioma): Promis
   const limpos = textos.map((t) => t.replace(/\s*\n\s*/g, ' ').trim())
   const unicos = [...new Set(limpos.filter((t) => t && Buffer.byteLength(t) <= LIMITE_BYTES))]
   const prontas = new Map<string, string>()
-  const blocos = emBlocos(unicos)
-  for (let i = 0; i < blocos.length; i += SIMULTANEAS) {
-    await Promise.all(
-      blocos.slice(i, i + SIMULTANEAS).map(async (bloco) => {
-        try {
-          const traduzidos = await traduzirBlocoNaAws(bloco, idioma)
-          bloco.forEach((t, j) => prontas.set(t, traduzidos[j]!))
-        } catch (erro) {
-          avisar(erro)
-          // Um a um (cada um no cache).
-          for (let k = 0; k < bloco.length; k += SIMULTANEAS) {
-            const parte = bloco.slice(k, k + SIMULTANEAS)
-            const respostas = await Promise.allSettled(parte.map((t) => traduzirNaAws(t, idioma, 'en')))
-            respostas.forEach((r, j) => {
-              if (r.status === 'fulfilled') prontas.set(parte[j]!, r.value.replace(/\s*\n\s*/g, ' ').trim())
-            })
-          }
-        }
-      }),
-    )
+  for (let i = 0; i < unicos.length; i += SIMULTANEAS) {
+    const lote = unicos.slice(i, i + SIMULTANEAS)
+    const respostas = await Promise.allSettled(lote.map((t) => traduzirNaAws(t, idioma, 'en')))
+    respostas.forEach((r, j) => {
+      if (r.status === 'fulfilled') prontas.set(lote[j]!, r.value.replace(/\s*\n\s*/g, ' ').trim())
+      else avisar(r.reason)
+    })
   }
   return limpos.map((t) => (t ? (prontas.get(t) ?? null) : t))
 }
