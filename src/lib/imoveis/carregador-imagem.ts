@@ -8,7 +8,7 @@
 // Fotos da Viniun (catálogo no CRM) seguem o mesmo princípio: …/thumb/ (~300px), …/media/ (~800px) e …/grande/ (~1600px),
 // e o catálogo guarda a grande. Qualquer outra imagem segue pelo otimizador padrão.
 
-const HOST_S3 = 'a3-imoveis-fotos.s3.sa-east-1.amazonaws.com'
+const HOSTS_S3 = ['a3-imoveis-fotos.s3.sa-east-1.amazonaws.com', 'dbn76pzkb0t3o.cloudfront.net']
 const TAMANHOS = [400, 800, 1600]
 const FOTO_S3 = /^(https:\/\/[^/]+\/.+\/)(\d+)\.webp$/
 
@@ -20,7 +20,7 @@ const TAMANHOS_VINIUN = [
 const FOTO_VINIUN = /^(https:\/\/[^/]+\/.+\/)grande(\/[^/]+)$/
 
 export default function carregadorImagem({ src, width, quality }: { src: string; width: number; quality?: number }) {
-  const m = src.startsWith(`https://${HOST_S3}/`) ? FOTO_S3.exec(src) : null
+  const m = HOSTS_S3.some((h) => src.startsWith(`https://${h}/`)) ? FOTO_S3.exec(src) : null
   if (m) {
     const maximo = Number(m[2])
     const tamanho = TAMANHOS.find((t) => t >= width && t <= maximo) ?? maximo
